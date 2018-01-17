@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="home_page">首页</string>
+    <string name="near">附近</string>
+    <string name="mine">我的</string>
+    <string name="notification">通知</string>
+    <string name="tab_title_attention">关注</string>
+    <string name="tab_title_celebrity">名人</string>
+    <string name="tab_title_memento">悼文</string>
+</resources>
