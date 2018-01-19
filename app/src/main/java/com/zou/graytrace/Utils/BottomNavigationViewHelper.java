@@ -1,5 +1,6 @@
 package com.zou.graytrace.Utils;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.support.design.internal.BottomNavigationItemView;
@@ -14,6 +15,7 @@ import java.lang.reflect.Field;
 
 public class BottomNavigationViewHelper {
 
+    @SuppressLint("RestrictedApi")
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static void disableShiftMode(BottomNavigationView navigationView) {
 

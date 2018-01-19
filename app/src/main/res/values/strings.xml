@@ -6,6 +6,20 @@
     <string name="mine">我的</string>
     <string name="notification">通知</string>
     <string name="tab_title_attention">关注</string>
-    <string name="tab_title_celebrity">名人</string>
-    <string name="tab_title_memento">悼文</string>
+    <string name="tab_title_recommendation">推荐</string>
+    <string name="tab_title_leaderboards">排行榜</string>
+    <string name="nav_upload">上传</string>
+    <string name="name">姓名</string>
+    <string name="nationality">国籍</string>
+    <string name="birth_place">出生地</string>
+    <string name="long_sleep_place">长眠地</string>
+    <string name="residence">居住地</string>
+    <string name="motto">一句话描述</string>
+    <string name="swim_in_world">游历人间</string>
+    <string name="cover">封面</string>
+    <string name="birth_day">生日</string>
+    <string name="death_day">祭日</string>
+    <string name="hint_birth_day">生日（格式:XXXX-XX-XX）</string>
+    <string name="hint_death_day">祭日（格式:XXXX-XX-XX，可以为空）</string>
+    <string name="select_country">选择国家</string>
 </resources>

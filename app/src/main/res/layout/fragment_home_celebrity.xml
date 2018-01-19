@@ -4,5 +4,5 @@
     android:layout_height="match_parent">
     <TextView android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/tab_title_celebrity"/>
+        android:text="@string/tab_title_recommendation"/>
 </android.support.constraint.ConstraintLayout>

@@ -1,0 +1,312 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+    <android.support.constraint.ConstraintLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar_upload_celebrity"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            android:background="?attr/colorPrimary"
+            app:title="@string/nav_upload"
+            app:popupTheme="@style/ThemeOverlay.AppCompat" />
+        <FrameLayout android:layout_width="match_parent"
+            android:layout_height="300dp"
+            android:id="@+id/fl_celebrity_bg"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/toolbar_upload_celebrity">
+            <ImageView
+                android:id="@+id/iv_cover"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@color/colorAccent"
+                android:layout_gravity="bottom|center_horizontal"
+                android:scaleType="center"
+                 />
+            <Button
+                android:id="@+id/btn_select_cover"
+                android:layout_width="68dp"
+                android:layout_height="36dp"
+                android:background="@drawable/shape_btn_cover"
+                android:layout_gravity="bottom|right"
+                android:layout_marginRight="8dp"
+                android:layout_marginBottom="8dp"
+                android:text="@string/cover"
+                android:textSize="10dp"
+                android:textColor="#ffffff"
+                android:drawableStart="@drawable/ic_btn_cover"
+                android:drawableLeft="@drawable/ic_btn_cover" />
+        </FrameLayout>
+        <ImageView
+            android:id="@+id/ic_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_name"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/fl_celebrity_bg" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_celebrity_name"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:focusable="true"
+            android:focusableInTouchMode="true"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ic_name"
+            app:layout_constraintTop_toBottomOf="@+id/fl_celebrity_bg">
+
+            <EditText
+                android:id="@+id/et_celebrity_name"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name"
+                android:inputType="text"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/et_birthday" />
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/ic_birthday"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_birthday"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_name" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_birthday"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_birthday"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_name">
+
+            <EditText
+                android:id="@+id/et_birthday"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_birth_day"
+                android:inputType="date"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/et_death_day" />
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/ic_death_day"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_death_day"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birthday" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_death_day"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_birthday"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birthday">
+
+            <EditText
+                android:id="@+id/et_death_day"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_death_day"
+                android:inputType="date"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/et_celebrity_nationality" />
+        </android.support.design.widget.TextInputLayout>
+
+
+        <ImageView
+            android:id="@+id/ic_nationality"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_nationality"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_death_day" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_celebrity_nationality"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_nationality"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_death_day">
+
+            <EditText
+                android:id="@+id/et_celebrity_nationality"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/nationality"
+                android:inputType="text"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/et_birth_place"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/ic_birth_place"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_birth_place"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_nationality" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_birth_place"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_birth_place"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_nationality">
+
+            <EditText
+                android:id="@+id/et_birth_place"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/birth_place"
+                android:inputType="text"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/et_long_sleep_place"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/ic_long_sleep"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_long_sleep"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birth_place" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_long_sleep_place"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_long_sleep"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birth_place">
+
+            <EditText
+                android:id="@+id/et_long_sleep_place"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/long_sleep_place"
+                android:inputType="text"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/et_residence"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/ic_residence"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_residence"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_long_sleep_place" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_residence"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_residence"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_long_sleep_place">
+
+            <EditText
+                android:id="@+id/et_residence"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/residence"
+                android:inputType="text"
+                android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/et_motto"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/ic_motto"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_motto"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_residence" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_motto"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_motto"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_residence">
+
+            <EditText
+                android:id="@+id/et_motto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/motto"
+                android:lines="1"
+                android:imeOptions="actionDone"/>
+        </android.support.design.widget.TextInputLayout>
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>
