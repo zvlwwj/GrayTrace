@@ -21,4 +21,11 @@
     <string name="hint_birth_day">生日（格式:XXXX-XX-XX）</string>
     <string name="hint_death_day">祭日（格式:XXXX-XX-XX，可以为空）</string>
     <string name="select_country">选择国家</string>
+    <string name="industry">行业</string>
+    <string name="alive">活着</string>
+    <string name="dead">已死</string>
+    <string name="description">描述</string>
+    <string name="events">事件</string>
+    <string name="add_events">添加事件</string>
+    <string name="add_description">添加描述</string>
 </resources>

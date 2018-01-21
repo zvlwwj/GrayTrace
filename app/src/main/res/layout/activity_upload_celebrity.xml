@@ -1,12 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:scrollbars="none">
     <android.support.constraint.ConstraintLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="match_parent"
+        android:animateLayoutChanges="true">
         <android.support.v7.widget.Toolbar
             android:id="@+id/toolbar_upload_celebrity"
             android:layout_width="match_parent"
@@ -78,6 +80,41 @@
         </android.support.design.widget.TextInputLayout>
 
         <ImageView
+            android:id="@+id/ic_alive"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="16dp"
+            android:src="@drawable/ic_alive"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textInputLayout_celebrity_name" />
+
+        <RadioGroup android:id="@+id/rg_alive"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="18dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/ic_alive"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_name"
+            android:orientation="horizontal"
+            >
+            <RadioButton android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_alive"
+                android:text="@string/alive"
+                android:checked="true"/>
+            <RadioButton android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/rb_dead"
+                android:text="@string/dead"
+                android:layout_marginLeft="4dp"/>
+        </RadioGroup>
+
+        <ImageView
             android:id="@+id/ic_birthday"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -86,7 +123,7 @@
             android:layout_marginTop="30dp"
             android:src="@drawable/ic_birthday"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_name" />
+            app:layout_constraintTop_toBottomOf="@+id/rg_alive" />
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/textInputLayout_birthday"
@@ -98,7 +135,7 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_birthday"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_name">
+            app:layout_constraintTop_toBottomOf="@+id/rg_alive">
 
             <EditText
                 android:id="@+id/et_birthday"
@@ -119,7 +156,8 @@
             android:layout_marginTop="30dp"
             android:src="@drawable/ic_death_day"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birthday" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birthday"
+            android:visibility="gone"/>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/textInputLayout_death_day"
@@ -131,7 +169,8 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_birthday"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birthday">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birthday"
+            android:visibility="gone">
 
             <EditText
                 android:id="@+id/et_death_day"
@@ -219,7 +258,8 @@
             android:layout_marginTop="30dp"
             android:src="@drawable/ic_long_sleep"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birth_place" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birth_place"
+            android:visibility="gone"/>
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/textInputLayout_long_sleep_place"
@@ -231,7 +271,8 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_long_sleep"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birth_place">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birth_place"
+            android:visibility="gone">
 
             <EditText
                 android:id="@+id/et_long_sleep_place"
@@ -273,8 +314,42 @@
                 android:hint="@string/residence"
                 android:inputType="text"
                 android:imeOptions="actionNext"
+                android:nextFocusDown="@+id/et_industry"/>
+        </android.support.design.widget.TextInputLayout>
+
+        <ImageView
+            android:id="@+id/ic_industry"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_industry"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_residence" />
+
+        <android.support.design.widget.TextInputLayout
+            android:id="@+id/textInputLayout_industry"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:layout_marginTop="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/ic_industry"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_residence">
+
+            <EditText
+                android:id="@+id/et_industry"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/industry"
+                android:inputType="text"
+                android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_motto"/>
         </android.support.design.widget.TextInputLayout>
+
 
         <ImageView
             android:id="@+id/ic_motto"
@@ -285,7 +360,7 @@
             android:layout_marginTop="30dp"
             android:src="@drawable/ic_motto"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_residence" />
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_industry" />
 
         <android.support.design.widget.TextInputLayout
             android:id="@+id/textInputLayout_motto"
@@ -297,7 +372,7 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_motto"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_residence">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_industry">
 
             <EditText
                 android:id="@+id/et_motto"
@@ -308,5 +383,79 @@
                 android:imeOptions="actionDone"/>
         </android.support.design.widget.TextInputLayout>
 
+        <ImageView android:id="@+id/ic_events"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_events"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_motto"/>
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/events"
+            android:textSize="12dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="12dp"
+            android:id="@+id/tv_events"
+            app:layout_constraintStart_toEndOf="@id/ic_motto"
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_motto"
+            />
+
+        <TextView android:id="@+id/tv_add_events"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_events"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:drawablePadding="2dp"
+            android:textColor="#2196F3"
+            android:drawableStart="@mipmap/ic_add_circle"
+            android:drawableLeft="@mipmap/ic_add_circle"
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toEndOf="@id/ic_motto"
+            app:layout_constraintTop_toBottomOf="@+id/tv_events"
+            />
+
+        <ImageView android:id="@+id/ic_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="30dp"
+            android:src="@drawable/ic_descripition"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tv_add_events"/>
+
+        <TextView android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="8dp"
+            android:layout_marginLeft="8dp"
+            android:layout_marginTop="20dp"
+            android:textSize="12dp"
+            app:layout_constraintStart_toEndOf="@id/ic_description"
+            app:layout_constraintTop_toBottomOf="@+id/tv_add_events"
+            android:text="@string/description"
+            android:id="@+id/tv_description"/>
+
+        <TextView android:id="@+id/tv_add_description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/add_description"
+            android:layout_marginTop="8dp"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:drawablePadding="2dp"
+            android:textColor="#2196F3"
+            android:drawableStart="@mipmap/ic_add_circle"
+            android:drawableLeft="@mipmap/ic_add_circle"
+            android:gravity="center_vertical"
+            app:layout_constraintStart_toEndOf="@id/ic_description"
+            app:layout_constraintTop_toBottomOf="@+id/tv_description"
+            />
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

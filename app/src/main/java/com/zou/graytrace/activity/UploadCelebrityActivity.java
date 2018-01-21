@@ -11,8 +11,11 @@ import android.text.InputType;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -23,6 +26,7 @@ import com.zou.graytrace.Utils.Tools;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 
@@ -40,10 +44,18 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     EditText et_celebrity_name;
     @BindView(R.id.et_birthday)
     EditText et_birthday;
+    @BindView(R.id.ic_death_day)
+    ImageView ic_death_day;
+    @BindView(R.id.textInputLayout_death_day)
+    TextInputLayout textInputLayout_death_day;
     @BindView(R.id.et_celebrity_nationality)
     EditText et_celebrity_nationality;
     @BindView(R.id.et_birth_place)
     EditText et_birth_place;
+    @BindView(R.id.ic_long_sleep)
+    ImageView ic_long_sleep;
+    @BindView(R.id.textInputLayout_long_sleep_place)
+    TextInputLayout textInputLayout_long_sleep_place;
     @BindView(R.id.et_long_sleep_place)
     EditText et_long_sleep_place;
     @BindView(R.id.et_residence)
@@ -52,6 +64,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     EditText et_motto;
     @BindView(R.id.textInputLayout_celebrity_nationality)
     TextInputLayout textInputLayout_celebrity_nationality;
+    @BindView(R.id.rg_alive)
+    RadioGroup rg_alive;
     CountryPicker picker;
 
     private static int TO_LOCAL_PIC = 100;
@@ -61,30 +75,59 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         setContentView(R.layout.activity_upload_celebrity);
         ButterKnife.bind(this);
         initView();
+        setListener();
     }
 
     private void initView() {
         et_celebrity_nationality.setInputType(InputType.TYPE_NULL);
-//        textInputLayout_celebrity_nationality.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//
-//                return true;
-//            }
-//        });
-        et_celebrity_nationality.setOnClickListener(new View.OnClickListener() {
+    }
+
+    private void setListener() {
+        rg_alive.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
             @Override
-            public void onClick(View v) {
-                Toast.makeText(getApplicationContext(),"onTouch",Toast.LENGTH_SHORT).show();
+            public void onCheckedChanged(RadioGroup group, int checkedId) {
+                switch (checkedId){
+                    case R.id.rb_alive:
+                        ic_death_day.setVisibility(View.GONE);
+                        textInputLayout_death_day.setVisibility(View.GONE);
+                        ic_long_sleep.setVisibility(View.GONE);
+                        textInputLayout_long_sleep_place.setVisibility(View.GONE);
+                        break;
+                    case R.id.rb_dead:
+                        ic_death_day.setVisibility(View.VISIBLE);
+                        textInputLayout_death_day.setVisibility(View.VISIBLE);
+                        ic_long_sleep.setVisibility(View.VISIBLE);
+                        textInputLayout_long_sleep_place.setVisibility(View.VISIBLE);
+                        break;
+                }
             }
         });
-//        et_celebrity_nationality.setOnTouchListener(new View.OnTouchListener() {
-//            @Override
-//            public boolean onTouch(View v, MotionEvent event) {
-//                Toast.makeText(getApplicationContext(),"onTouch",Toast.LENGTH_SHORT).show();
-//                return true;
-//            }
-//        });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if(resultCode == RESULT_OK){
+            Uri uri = data.getData();
+            Glide.with(this).load(uri).into(iv_cover);
+        }
+    }
+
+    /**
+     * 添加事件
+     */
+    @OnClick(R.id.tv_add_events)
+    public void addEvents(){
+//        Intent intent = new Intent();
+        Toast.makeText(this,"addEvents",Toast.LENGTH_SHORT).show();
+    }
+
+    /**
+     * 添加描述
+     */
+    @OnClick(R.id.tv_add_description)
+    public void addDescription(){
+//        Intent intent = new Intent();
+        Toast.makeText(this,"addDescription",Toast.LENGTH_SHORT).show();
     }
 
     /**
@@ -98,19 +141,19 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         startActivityForResult(intent, TO_LOCAL_PIC);
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK){
-            Uri uri = data.getData();
-            Glide.with(this).load(uri).into(iv_cover);
-        }
-    }
-
     @OnFocusChange(R.id.et_celebrity_nationality)
-    public void selectCountry(boolean focus){
+    public void nationalityFocusChange(boolean focus){
         if(focus) {
             showCountryPicker();
         }
+    }
+
+    /**
+     * 点击国籍EditText
+     */
+    @OnClick(R.id.et_celebrity_nationality)
+    public void clickNationality(){
+        showCountryPicker();
     }
 
     private void showCountryPicker() {
