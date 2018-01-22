@@ -4,8 +4,10 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.util.DisplayMetrics;
+import android.view.View;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -136,5 +138,17 @@ public class Tools {
             inSampleSize = Math.min(widthRatio, heightRatio);
         }
         return inSampleSize;
+    }
+
+    public static BitmapDrawable convertView2BitmapDrawable(View view){
+
+        view.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        view.layout(0,0,view.getMeasuredWidth(),view.getMeasuredHeight());
+        view.setDrawingCacheEnabled(true);
+        Bitmap bitmap=Bitmap.createBitmap(view.getDrawingCache(true));
+        view.destroyDrawingCache();
+        view.setDrawingCacheEnabled(false);
+        return new BitmapDrawable(bitmap);
     }
 }

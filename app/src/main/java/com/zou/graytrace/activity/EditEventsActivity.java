@@ -148,14 +148,17 @@ public class EditEventsActivity extends AppCompatActivity {
     private void insertVideo(Uri originalUri) {
 
         View spanView = View.inflate(this,R.layout.span_video,null);
+
         ImageView iv_span_video = spanView.findViewById(R.id.iv_span_video);
         ImageView iv_span_play = spanView.findViewById(R.id.iv_span_play);
 //        Glide.with(this).load(originalUri).into(iv_span_video);
         iv_span_video.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
-        spanView.buildDrawingCache();
 
-        BitmapDrawable drawable = new BitmapDrawable(spanView.getDrawingCache());
+
+        BitmapDrawable drawable = Tools.convertView2BitmapDrawable(spanView);
         drawable.setBounds(0,0,Tools.dip2px(this,300),Tools.dip2px(this,150));
+
+
         ImageSpan imageSpan = new ImageSpan(drawable);
         String tempUrl = "<img src=\"" + "img" + "\" />";
         SpannableString spannableString = new SpannableString(tempUrl);
