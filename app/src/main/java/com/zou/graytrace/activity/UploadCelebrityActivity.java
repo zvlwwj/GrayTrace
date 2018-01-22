@@ -6,15 +6,16 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.view.MotionEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
 
@@ -26,7 +27,6 @@ import com.zou.graytrace.Utils.Tools;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
-import butterknife.OnCheckedChanged;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
 
@@ -34,8 +34,13 @@ import butterknife.OnFocusChange;
  * Created by zou on 2018/1/18.
  * 上传界面
  */
-
+//TODO 1.editText获取焦点，但是不弹出键盘
 public class UploadCelebrityActivity extends AppCompatActivity{
+    CountryPicker picker;
+    private static final int ADD_EVENTS = 101;
+    private static final int SELECT_COVER = 100;
+    @BindView(R.id.toolbar_upload_celebrity)
+    Toolbar toolbar_upload_celebrity;
     @BindView(R.id.btn_select_cover)
     Button btn_select_cover;
     @BindView(R.id.iv_cover)
@@ -66,9 +71,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     TextInputLayout textInputLayout_celebrity_nationality;
     @BindView(R.id.rg_alive)
     RadioGroup rg_alive;
-    CountryPicker picker;
 
-    private static int TO_LOCAL_PIC = 100;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -79,6 +83,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     }
 
     private void initView() {
+        setSupportActionBar(toolbar_upload_celebrity);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
         et_celebrity_nationality.setInputType(InputType.TYPE_NULL);
     }
 
@@ -106,9 +115,13 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if(resultCode == RESULT_OK){
-            Uri uri = data.getData();
-            Glide.with(this).load(uri).into(iv_cover);
+        switch (requestCode) {
+            case SELECT_COVER:
+                if (resultCode == RESULT_OK) {
+                    Uri uri = data.getData();
+                    Glide.with(this).load(uri).into(iv_cover);
+                }
+            break;
         }
     }
 
@@ -117,8 +130,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     @OnClick(R.id.tv_add_events)
     public void addEvents(){
-//        Intent intent = new Intent();
-        Toast.makeText(this,"addEvents",Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent(this,EditEventsActivity.class);
+        startActivityForResult(intent,ADD_EVENTS);
     }
 
     /**
@@ -126,8 +139,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     @OnClick(R.id.tv_add_description)
     public void addDescription(){
-//        Intent intent = new Intent();
-        Toast.makeText(this,"addDescription",Toast.LENGTH_SHORT).show();
+        Intent intent = new Intent();
+
     }
 
     /**
@@ -138,7 +151,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         Intent intent = new Intent();
         intent.setType("image/*");
         intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, TO_LOCAL_PIC);
+        startActivityForResult(intent, SELECT_COVER);
     }
 
     @OnFocusChange(R.id.et_celebrity_nationality)
@@ -156,6 +169,31 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         showCountryPicker();
     }
 
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_commit,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()){
+            case android.R.id.home:
+                //TODO 给个dialog提示 返回主界面
+                finish();
+                break;
+            case R.id.action_menu_commit:
+                //TODO 提交
+                Toast.makeText(getApplicationContext(),"提交",Toast.LENGTH_SHORT).show();
+                break;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 选择国籍的dialog
+     */
     private void showCountryPicker() {
         if (picker == null) {
             picker = CountryPicker.newInstance(getResources().getString(R.string.select_country));

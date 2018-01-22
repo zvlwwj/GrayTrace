@@ -28,4 +28,7 @@
     <string name="events">事件</string>
     <string name="add_events">添加事件</string>
     <string name="add_description">添加描述</string>
+    <string name="commit">提交</string>
+    <string name="hint_event_title">请输入标题</string>
+    <string name="hint_event_content">添加事件详情......</string>
 </resources>

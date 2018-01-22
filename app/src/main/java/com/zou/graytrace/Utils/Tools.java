@@ -1,11 +1,16 @@
 package com.zou.graytrace.Utils;
 
+import android.content.ContentResolver;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
 import android.util.DisplayMetrics;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 
 /**
  * Created by zou on 2017/12/11.
@@ -94,5 +99,42 @@ public class Tools {
             result = context.getResources().getDimensionPixelSize(resourceId);
         }
         return result;
+    }
+
+    public static Bitmap getFitSampleBitmap(InputStream inputStream, int width, int height) throws Exception {
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inJustDecodeBounds = true;
+        byte[] bytes = readStream(inputStream);
+        //BitmapFactory.decodeStream(inputStream, null, options);
+        BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+        options.inSampleSize = getFitInSampleSize(width, height, options);
+        options.inJustDecodeBounds = false;
+//        return BitmapFactory.decodeStream(inputStream, null, options);
+        return BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+    }
+
+    /*
+     * 从inputStream中获取字节流 数组大小
+    * */
+    public static byte[] readStream(InputStream inStream) throws Exception {
+        ByteArrayOutputStream outStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[1024];
+        int len = 0;
+        while ((len = inStream.read(buffer)) != -1) {
+            outStream.write(buffer, 0, len);
+        }
+        outStream.close();
+        inStream.close();
+        return outStream.toByteArray();
+    }
+
+    public static int getFitInSampleSize(int reqWidth, int reqHeight, BitmapFactory.Options options) {
+        int inSampleSize = 1;
+        if (options.outWidth > reqWidth || options.outHeight > reqHeight) {
+            int widthRatio = Math.round((float) options.outWidth / (float) reqWidth);
+            int heightRatio = Math.round((float) options.outHeight / (float) reqHeight);
+            inSampleSize = Math.min(widthRatio, heightRatio);
+        }
+        return inSampleSize;
     }
 }

@@ -91,7 +91,7 @@ public class HomePageFragment extends BaseFragment {
 
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
-        inflater.inflate(R.menu.main,menu);
+        inflater.inflate(R.menu.menu_main,menu);
         MenuItem searchItem = menu.findItem(R.id.action_menu_main_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         searchView.setIconifiedByDefault(false);
