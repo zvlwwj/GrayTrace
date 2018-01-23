@@ -1,5 +1,6 @@
 package com.zou.graytrace.activity;
 
+import android.Manifest;
 import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -8,6 +9,7 @@ import android.graphics.drawable.BitmapDrawable;
 import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -24,6 +26,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.zhy.m.permission.MPermissions;
+import com.zhy.m.permission.PermissionDenied;
+import com.zhy.m.permission.PermissionGrant;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Tools;
 
@@ -58,8 +63,8 @@ public class EditEventsActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit_events);
-        ButterKnife.bind(this);
-        initView();
+        MPermissions.requestPermissions(this, 4, Manifest.permission.READ_EXTERNAL_STORAGE);
+
     }
 
     private void initView() {
@@ -97,9 +102,33 @@ public class EditEventsActivity extends AppCompatActivity {
     @OnClick(R.id.iv_add_video)
     public void addVideo(){
         if(et_event_content.isFocused()) {
+
             Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, ADD_VIDEO);
         }
+    }
+
+    /**
+     * 权限请求成功
+     */
+    @PermissionGrant(4)
+    public void requestPermissSuccess(){
+        ButterKnife.bind(this);
+        initView();
+    }
+
+    /**
+     * 权限请求失败
+     */
+    @PermissionDenied(4)
+    public void requestPermissFail(){
+        finish();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        MPermissions.onRequestPermissionsResult(this, requestCode, permissions, grantResults);
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     /**
@@ -135,7 +164,8 @@ public class EditEventsActivity extends AppCompatActivity {
             case ADD_VIDEO:
                 if(resultCode == RESULT_OK){
                     Uri originalUri = data.getData();
-                    insertVideo(originalUri);
+                    Bitmap bm = Tools.getVideoThumbnail(getContentResolver(),originalUri);
+                    insertVideo(bm);
                 }
                 break;
         }
@@ -145,15 +175,14 @@ public class EditEventsActivity extends AppCompatActivity {
     /**
      * 插入video
      */
-    private void insertVideo(Uri originalUri) {
+    private void insertVideo(Bitmap bm) {
 
         View spanView = View.inflate(this,R.layout.span_video,null);
 
         ImageView iv_span_video = spanView.findViewById(R.id.iv_span_video);
         ImageView iv_span_play = spanView.findViewById(R.id.iv_span_play);
 //        Glide.with(this).load(originalUri).into(iv_span_video);
-        iv_span_video.setImageDrawable(getResources().getDrawable(R.mipmap.ic_launcher));
-
+        iv_span_video.setImageBitmap(bm);
 
         BitmapDrawable drawable = Tools.convertView2BitmapDrawable(spanView);
         drawable.setBounds(0,0,Tools.dip2px(this,300),Tools.dip2px(this,150));

@@ -9,5 +9,6 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:src="@mipmap/ic_pause"
-        android:id="@+id/iv_span_play" />
+        android:id="@+id/iv_span_play"
+        android:visibility="gone"/>
 </FrameLayout>
