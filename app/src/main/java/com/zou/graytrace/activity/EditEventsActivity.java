@@ -102,7 +102,6 @@ public class EditEventsActivity extends AppCompatActivity {
     @OnClick(R.id.iv_add_video)
     public void addVideo(){
         if(et_event_content.isFocused()) {
-
             Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, ADD_VIDEO);
         }
@@ -180,12 +179,12 @@ public class EditEventsActivity extends AppCompatActivity {
         View spanView = View.inflate(this,R.layout.span_video,null);
 
         ImageView iv_span_video = spanView.findViewById(R.id.iv_span_video);
-        ImageView iv_span_play = spanView.findViewById(R.id.iv_span_play);
+        final ImageView iv_span_play = spanView.findViewById(R.id.iv_span_play);
 //        Glide.with(this).load(originalUri).into(iv_span_video);
         iv_span_video.setImageBitmap(bm);
 
         BitmapDrawable drawable = Tools.convertView2BitmapDrawable(spanView);
-        drawable.setBounds(0,0,Tools.dip2px(this,300),Tools.dip2px(this,150));
+        drawable.setBounds(0,0,bm.getWidth(),bm.getHeight());
 
 
         ImageSpan imageSpan = new ImageSpan(drawable);

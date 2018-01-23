@@ -163,33 +163,36 @@ public class Tools {
      * @return
      */
 
-    public static Bitmap getVideoThumbnail(ContentResolver cr, Uri uri) {
-        long videoIdLong = ContentUris.parseId(uri);
-        Bitmap bitmap = MediaStore.Video.Thumbnails.getThumbnail(cr, videoIdLong, MediaStore.Video.Thumbnails.MICRO_KIND, null);
-
-        return bitmap;
-    }
-
 //    public static Bitmap getVideoThumbnail(ContentResolver cr, Uri uri) {
 //        Bitmap bitmap = null;
 //        BitmapFactory.Options options = new BitmapFactory.Options();
 //        options.inDither = false;
 //        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//        Cursor cursor = cr.query(uri,new String[] { MediaStore.Video.Media._ID }, null, null, null);
-//
-//        if (cursor == null || cursor.getCount() == 0) {
-//            return null;
-//        }
-//        cursor.moveToFirst();
-//        String videoId = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media._ID));  //image id in image table.s
-//
-//        if (videoId == null) {
-//            return null;
-//        }
-//        cursor.close();
-//        long videoIdLong = Long.parseLong(videoId);
-//        bitmap = MediaStore.Video.Thumbnails.getThumbnail(cr, videoIdLong,MediaStore.Video.Thumbnails.MICRO_KIND, options);
-//
+//        long videoIdLong = ContentUris.parseId(uri);
+//        bitmap = MediaStore.Video.Thumbnails.getThumbnail(cr, videoIdLong, MediaStore.Video.Thumbnails.MICRO_KIND, options);
 //        return bitmap;
 //    }
+
+    public static Bitmap getVideoThumbnail(ContentResolver cr, Uri uri) {
+        Bitmap bitmap = null;
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inDither = false;
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Cursor cursor = cr.query(uri,new String[] { MediaStore.Video.Media._ID,MediaStore.Video.Media.DATA }, null, null, null);
+
+        if (cursor == null || cursor.getCount() == 0) {
+            return null;
+        }
+        cursor.moveToFirst();
+        String videoPath = cursor.getString(cursor.getColumnIndex(MediaStore.Video.Media.DATA));  //image id in image table.s
+
+        if (videoPath == null) {
+            return null;
+        }
+        cursor.close();
+
+        bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
+
+        return bitmap;
+    }
 }
