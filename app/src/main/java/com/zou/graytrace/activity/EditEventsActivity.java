@@ -1,12 +1,8 @@
 package com.zou.graytrace.activity;
 
 import android.Manifest;
-import android.content.ContentResolver;
 import android.content.Intent;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.graphics.drawable.BitmapDrawable;
-import android.media.ThumbnailUtils;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -14,27 +10,17 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.zhy.m.permission.MPermissions;
 import com.zhy.m.permission.PermissionDenied;
 import com.zhy.m.permission.PermissionGrant;
 import com.zou.graytrace.R;
+import com.zou.graytrace.Utils.RichEditText;
 import com.zou.graytrace.Utils.Tools;
-
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -47,6 +33,7 @@ import butterknife.OnClick;
 /**
  * TODO 1.退出Activity动画应该和回退时的不一样
  *      2.编辑时删除图片，要点好多下删除键
+ *      3.android8.0无法找到video路径，找不到解决方案！
  */
 
 
@@ -58,7 +45,7 @@ public class EditEventsActivity extends AppCompatActivity {
     @BindView(R.id.et_event_title)
     EditText et_event_title;
     @BindView(R.id.et_event_content)
-    EditText et_event_content;
+    RichEditText et_event_content;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -154,7 +141,7 @@ public class EditEventsActivity extends AppCompatActivity {
                         Bitmap originalBitmap = Tools.getFitSampleBitmap(getContentResolver().openInputStream(originalUri),Tools.dip2px(this,300),Tools.dip2px(this,150));
                         // 将原始图片的bitmap转换为文件
                         // 上传该文件并获取url
-                        insertPic(originalBitmap);
+                        et_event_content.addImage(originalBitmap,"123456");
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -163,71 +150,11 @@ public class EditEventsActivity extends AppCompatActivity {
             case ADD_VIDEO:
                 if(resultCode == RESULT_OK){
                     Uri originalUri = data.getData();
-                    Bitmap bm = Tools.getVideoThumbnail(getContentResolver(),originalUri);
-                    insertVideo(bm);
+                    Bitmap bm = Tools.getVideoThumbnail(this,originalUri,et_event_content.getWidth(),Tools.dip2px(getApplicationContext(),200));
+                    et_event_content.addVideo(bm,"123456");
                 }
                 break;
         }
 
-    }
-
-    /**
-     * 插入video
-     */
-    private void insertVideo(Bitmap bm) {
-
-        View spanView = View.inflate(this,R.layout.span_video,null);
-
-        ImageView iv_span_video = spanView.findViewById(R.id.iv_span_video);
-        final ImageView iv_span_play = spanView.findViewById(R.id.iv_span_play);
-//        Glide.with(this).load(originalUri).into(iv_span_video);
-        iv_span_video.setImageBitmap(bm);
-
-        BitmapDrawable drawable = Tools.convertView2BitmapDrawable(spanView);
-        drawable.setBounds(0,0,bm.getWidth(),bm.getHeight());
-
-
-        ImageSpan imageSpan = new ImageSpan(drawable);
-        String tempUrl = "<img src=\"" + "img" + "\" />";
-        SpannableString spannableString = new SpannableString(tempUrl);
-        // 用ImageSpan对象替换你指定的字符串
-        spannableString.setSpan(imageSpan, 0, tempUrl.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        // 将选择的图片追加到EditText中光标所在位置
-        int index = et_event_content.getSelectionStart(); // 获取光标所在位置
-        Editable edit_text = et_event_content.getEditableText();
-        if (index < 0 || index >= edit_text.length()) {
-            edit_text.append("\n");
-            edit_text.append(spannableString);
-            edit_text.append("\n");
-        } else {
-            edit_text.insert(index, "\n");
-            edit_text.insert(index, spannableString);
-            edit_text.insert(index, "\n");
-        }
-    }
-
-    /**
-     * 插入图片
-     */
-    private void insertPic(Bitmap bm) {
-        // 根据Bitmap对象创建ImageSpan对象
-        ImageSpan imageSpan = new ImageSpan(this, bm);
-        // 创建一个SpannableString对象，以便插入用ImageSpan对象封装的图像
-        String tempUrl = "<img src=\"" + "img" + "\" />";
-        SpannableString spannableString = new SpannableString(tempUrl);
-        // 用ImageSpan对象替换你指定的字符串
-        spannableString.setSpan(imageSpan, 0, tempUrl.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-        // 将选择的图片追加到EditText中光标所在位置
-        int index = et_event_content.getSelectionStart(); // 获取光标所在位置
-        Editable edit_text = et_event_content.getEditableText();
-        if (index < 0 || index >= edit_text.length()) {
-            edit_text.append("\n");
-            edit_text.append(spannableString);
-            edit_text.append("\n");
-        } else {
-            edit_text.insert(index, "\n");
-            edit_text.insert(index, spannableString);
-            edit_text.insert(index, "\n");
-        }
     }
 }
