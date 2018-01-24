@@ -12,7 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.MotionEvent;
+import android.view.View;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.zhy.m.permission.MPermissions;
@@ -46,6 +49,8 @@ public class EditEventsActivity extends AppCompatActivity {
     EditText et_event_title;
     @BindView(R.id.et_event_content)
     RichEditText et_event_content;
+    @BindView(R.id.scrollView_event_content)
+    ScrollView scrollView_event_content;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,6 +65,14 @@ public class EditEventsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+
+        scrollView_event_content.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                et_event_content.requestFocus();
+                return false;
+            }
+        });
     }
 
     @Override
@@ -92,6 +105,14 @@ public class EditEventsActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, ADD_VIDEO);
         }
+    }
+
+    /**
+     * 点击scrollerView，editText获取焦点
+     */
+    @OnClick(R.id.scrollView_event_content)
+    public void contentFocus(){
+        et_event_content.requestFocus();
     }
 
     /**

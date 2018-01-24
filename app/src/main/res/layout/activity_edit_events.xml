@@ -31,25 +31,27 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/toolbar_upload_edit_events" />
-
-    <com.zou.graytrace.Utils.RichEditText
-        android:id="@+id/et_event_content"
-        android:layout_width="0dp"
+    <ScrollView android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
-        android:gravity="top"
-        android:hint="@string/hint_event_content"
-        android:textSize="14dp"
-        android:background="@null"
-        android:padding="5dp"
+        android:id="@+id/scrollView_event_content"
         app:layout_constraintBottom_toTopOf="@+id/cl_bottom_view"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/et_event_title" />
-
+        app:layout_constraintTop_toBottomOf="@+id/et_event_title">
+        <com.zou.graytrace.Utils.RichEditText
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:id="@+id/et_event_content"
+            android:gravity="top"
+            android:hint="@string/hint_event_content"
+            android:textSize="14dp"
+            android:background="@null"
+            android:padding="5dp" />
+    </ScrollView>
     <android.support.constraint.ConstraintLayout android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"
         xmlns:app="http://schemas.android.com/apk/res-auto"

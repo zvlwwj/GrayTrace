@@ -3,10 +3,13 @@ package com.zou.graytrace.Utils;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Matrix;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextWatcher;
 import android.text.method.LinkMovementMethod;
 import android.text.style.ClickableSpan;
 import android.text.style.ImageSpan;
@@ -109,7 +112,7 @@ public class RichEditText extends android.support.v7.widget.AppCompatEditText {
         int zoomWidth =  getWidth() - (paddingLeft + paddingRight);
         int zoomHeight = (int) (((float)zoomWidth / (float)bmWidth) * bmHeight);
         Bitmap newBitmap = zoomImage(bitmap, zoomWidth,zoomHeight);
-        ImageSpan imgSpan = new ImageSpan(mContext, newBitmap);
+        ImageSpan imgSpan = new ImageSpan(mContext,newBitmap);
         spanString.setSpan(imgSpan, 0, pathTag.length(),
                 Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         spanString.setSpan(new ClickableSpan() {
