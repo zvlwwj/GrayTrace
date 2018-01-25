@@ -10,6 +10,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -22,9 +23,8 @@ import com.zhy.m.permission.MPermissions;
 import com.zhy.m.permission.PermissionDenied;
 import com.zhy.m.permission.PermissionGrant;
 import com.zou.graytrace.R;
-import com.zou.graytrace.Utils.RichEditText;
 import com.zou.graytrace.Utils.Tools;
-
+import com.zou.graytrace.view.EditTextPlus;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
@@ -37,6 +37,8 @@ import butterknife.OnClick;
  * TODO 1.退出Activity动画应该和回退时的不一样
  *      2.编辑时删除图片，要点好多下删除键
  *      3.android8.0无法找到video路径，找不到解决方案！
+ *      4.富文本得到焦点，弹出键盘
+ *      5.删除图片，再添加图片，之前删除的图片又加回来了
  */
 
 
@@ -48,9 +50,11 @@ public class EditEventsActivity extends AppCompatActivity {
     @BindView(R.id.et_event_title)
     EditText et_event_title;
     @BindView(R.id.et_event_content)
-    RichEditText et_event_content;
+    EditTextPlus et_event_content;
     @BindView(R.id.scrollView_event_content)
     ScrollView scrollView_event_content;
+    private static final String TAG="EditEventsActivity";
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -91,6 +95,7 @@ public class EditEventsActivity extends AppCompatActivity {
             case R.id.action_menu_commit:
                 //TODO 提交
                 Toast.makeText(getApplicationContext(),"提交",Toast.LENGTH_SHORT).show();
+                Log.i(TAG,et_event_content.getText().toString());
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -105,14 +110,6 @@ public class EditEventsActivity extends AppCompatActivity {
             Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Video.Media.EXTERNAL_CONTENT_URI);
             startActivityForResult(intent, ADD_VIDEO);
         }
-    }
-
-    /**
-     * 点击scrollerView，editText获取焦点
-     */
-    @OnClick(R.id.scrollView_event_content)
-    public void contentFocus(){
-        et_event_content.requestFocus();
     }
 
     /**
@@ -159,10 +156,12 @@ public class EditEventsActivity extends AppCompatActivity {
                     // 获得图片的uri
                     Uri originalUri = data.getData();
                     try {
-                        Bitmap originalBitmap = Tools.getFitSampleBitmap(getContentResolver().openInputStream(originalUri),Tools.dip2px(this,300),Tools.dip2px(this,150));
+//                        Bitmap originalBitmap = Tools.getFitSampleBitmap(getContentResolver().openInputStream(originalUri),Tools.dip2px(this,300),Tools.dip2px(this,150));
                         // 将原始图片的bitmap转换为文件
                         // 上传该文件并获取url
-                        et_event_content.addImage(originalBitmap,"123456");
+//                        List<String> listPath = new ArrayList<>();
+//                        listPath.add();
+                        et_event_content.addImage(Tools.getPathFromUri(EditEventsActivity.this,originalUri));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -172,7 +171,7 @@ public class EditEventsActivity extends AppCompatActivity {
                 if(resultCode == RESULT_OK){
                     Uri originalUri = data.getData();
                     Bitmap bm = Tools.getVideoThumbnail(this,originalUri,et_event_content.getWidth(),Tools.dip2px(getApplicationContext(),200));
-                    et_event_content.addVideo(bm,"123456");
+                    et_event_content.addVideo(originalUri.getPath(),bm);
                 }
                 break;
         }
