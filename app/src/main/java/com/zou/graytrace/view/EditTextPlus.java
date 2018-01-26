@@ -10,10 +10,12 @@ import android.graphics.drawable.Drawable;
 import android.text.Editable;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.text.style.ImageSpan;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
@@ -30,6 +32,8 @@ import java.util.List;
 
 /**
  * Created by zou on 2018/1/25.
+ * TODO 需要整理无用的代码
+ * TODO 考虑多张图片同时添加的需求
  */
 
 public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
@@ -42,6 +46,7 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
      * 一张图片所占的字符长度
      */
     public static final int IMAGELENGTH = 2;
+    private static final String TAG = "EditTextPlus";
     /**
      * 占位符
      */
@@ -161,7 +166,7 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
             }
             CharSequence sequence = getDrawableStr(path);
             if (sequence != null) {
-                image.add(path);
+                image.add("<img src=\""+path+"\"/>");
                 editable.insert(getSelectionStart(), sequence);
                 editable.insert(getSelectionStart(), "\n");
                 insertImage = true;
@@ -194,7 +199,7 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
             }
             CharSequence sequence = getVideoDrawableStr(path,bm);
             if (sequence != null) {
-                image.add(path);
+                image.add("<video src=\""+path+"\"/>");
                 editable.insert(getSelectionStart(), sequence);
                 editable.insert(getSelectionStart(), "\n");
                 insertImage = true;
@@ -233,14 +238,14 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
      * @param content
      * @return
      */
-    public boolean isImage(String content) {
-        for (int i = 0; i < image.size(); i++) {
-            if (content.indexOf(image.get(i)) != -1) {
-                return true;
-            }
-        }
-        return false;
-    }
+//    public boolean isImage(String content) {
+//        for (int i = 0; i < image.size(); i++) {
+//            if (content.indexOf(image.get(i)) != -1) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     /**
      * 获取去除image后的文字内容
@@ -251,6 +256,10 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
         return submitCon;
     }
 
+
+    public String getTextString(){
+        return this.getText().toString();
+    }
 
     /**
      * 这个TextWatcher用来监听删除和输入的内容如果是图片的话 要相应把list集合中的图片也要移除 不然最后获取到的图片集合是错误的
@@ -263,15 +272,40 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
             //如果小于就是删除操作
             if (s.length() < tempString.length()) {
                 String deletString = tempString.substring(start, start + before);
+                int end = start + before;
+                Log.i(TAG,"deletString : "+deletString);
+                Spanned spanned = getEditableText();
+                ImageSpan[] imageSpans = spanned.getSpans(0,spanned.length(),ImageSpan.class);
+                for (int i = imageSpans.length - 1; i >= 0; i--) {
+                    int startImageSpan = spanned.getSpanStart(imageSpans[i]);
+                    int endImageSpan = spanned.getSpanEnd(imageSpans[i]);
+                    if(end<=endImageSpan&&end>startImageSpan||(start<=endImageSpan&&start>startImageSpan)) {
+                        Editable et = getText();
+                        et.delete(startImageSpan, endImageSpan);
+                    }
+                }
+
+
                 if (image != null && image.size() > 0) {
+                    //重新计算各个图片的范围
                     for (int i = 0; i < image.size(); i++) {
                         //如果删除的内容中包含这张图片 那么就把图片集合中的对应的图片删除
+//                        int imageSpanStart = getTextString().indexOf(image.get(i));
+//                        int imageSpanEnd = imageSpanStart+image.get(i).length();
+//                        Log.i(TAG,"imageSpanStart : "+imageSpanStart+" imageSpanEnd : "+imageSpanEnd+" start : "+start+" end : "+(start + before));
+//                        if(end<=imageSpanEnd&&end>imageSpanStart||(start<=imageSpanEnd&&start>imageSpanStart)){
+//                            getText().delete(imageSpanStart+1,imageSpanEnd+1);
+//                            image.remove(i);
+//                        }
+
+
                         if (deletString.toString().indexOf(image.get(i)) != -1) {
                             image.remove(i);
                             if (onDeleteConteneListener != null) {
                                 onDeleteConteneListener.delete();
                             }
                         }
+
                     }
                 }
             }
@@ -287,19 +321,19 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
             invalidate();
             requestLayout();
 
-            StringBuffer stringBuffer = new StringBuffer(getText().toString());
-            for (int i = 0; i < image.size(); i++) {
-                if (stringBuffer.indexOf(image.get(i)) != -1) {
-                    int index = stringBuffer.indexOf(image.get(i));
-                    stringBuffer.delete(index - 10, index + image.get(i).length() + 3);
-                    stringBuffer.insert(index - 10, placeholder);
-                }
-            }
-
-            if (stringBuffer.toString().indexOf(placeholder) == 0) {
-                stringBuffer.insert(0, " ");
-            }
-            submitCon = stringBuffer.toString();
+//            StringBuffer stringBuffer = new StringBuffer(getText().toString());
+//            for (int i = 0; i < image.size(); i++) {
+//                if (stringBuffer.indexOf(image.get(i)) != -1) {
+//                    int index = stringBuffer.indexOf(image.get(i));
+//                    stringBuffer.delete(index - 10, index + image.get(i).length() + 3);
+//                    stringBuffer.insert(index - 10, placeholder);
+//                }
+//            }
+//
+//            if (stringBuffer.toString().indexOf(placeholder) == 0) {
+//                stringBuffer.insert(0, " ");
+//            }
+//            submitCon = stringBuffer.toString();
         }
 
 

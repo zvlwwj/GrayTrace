@@ -13,10 +13,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ScrollView;
 import android.widget.Toast;
 
 import com.zhy.m.permission.MPermissions;
@@ -35,10 +32,7 @@ import butterknife.OnClick;
 
 /**
  * TODO 1.退出Activity动画应该和回退时的不一样
- *      2.编辑时删除图片，要点好多下删除键
- *      3.android8.0无法找到video路径，找不到解决方案！
- *      4.富文本得到焦点，弹出键盘
- *      5.删除图片，再添加图片，之前删除的图片又加回来了
+ *      2.android8.0无法找到video路径，找不到解决方案！
  */
 
 
@@ -51,8 +45,6 @@ public class EditEventsActivity extends AppCompatActivity {
     EditText et_event_title;
     @BindView(R.id.et_event_content)
     EditTextPlus et_event_content;
-    @BindView(R.id.scrollView_event_content)
-    ScrollView scrollView_event_content;
     private static final String TAG="EditEventsActivity";
 
     @Override
@@ -69,14 +61,6 @@ public class EditEventsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
-
-        scrollView_event_content.setOnTouchListener(new View.OnTouchListener() {
-            @Override
-            public boolean onTouch(View v, MotionEvent event) {
-                et_event_content.requestFocus();
-                return false;
-            }
-        });
     }
 
     @Override
@@ -95,7 +79,11 @@ public class EditEventsActivity extends AppCompatActivity {
             case R.id.action_menu_commit:
                 //TODO 提交
                 Toast.makeText(getApplicationContext(),"提交",Toast.LENGTH_SHORT).show();
-                Log.i(TAG,et_event_content.getText().toString());
+                String text = et_event_content.getText().toString();
+                Log.i(TAG,text);
+                Log.i(TAG,"SelectionStart : "+et_event_content.getSelectionStart());
+                Log.i(TAG,"SelectionEnd : "+et_event_content.getSelectionEnd());
+                Log.i(TAG,"SelectedText : "+text.substring(et_event_content.getSelectionStart(),et_event_content.getSelectionEnd()));
                 break;
         }
         return super.onOptionsItemSelected(item);
