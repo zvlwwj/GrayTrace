@@ -68,7 +68,7 @@ public class HomePageFragment extends BaseFragment {
         List<String> titles = new ArrayList<>();
         titles.add(getString(R.string.tab_title_attention));
         titles.add(getString(R.string.tab_title_recommendation));
-        titles.add(getString(R.string.tab_title_leaderboards));
+        titles.add(getString(R.string.tab_title_official_things));
 
         tabLayout.addTab(tabLayout.newTab().setText(titles.get(0)));
         tabLayout.addTab(tabLayout.newTab().setText(titles.get(1)));

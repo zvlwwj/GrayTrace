@@ -22,8 +22,8 @@
     <string name="hint_death_day">祭日（格式:XXXX-XX-XX，可以为空）</string>
     <string name="select_country">选择国家</string>
     <string name="industry">行业</string>
-    <string name="alive">活着</string>
-    <string name="dead">已死</string>
+    <string name="alive">仍生于忧患</string>
+    <string name="dead">已死于安乐</string>
     <string name="description">描述</string>
     <string name="events">事件</string>
     <string name="add_events">添加事件</string>
@@ -31,4 +31,9 @@
     <string name="commit">提交</string>
     <string name="hint_event_title">请输入标题</string>
     <string name="hint_event_content">添加事件详情...</string>
+    <string name="edit_description">添加描述</string>
+    <string name="hint_description_content">添加对他的描述...</string>
+    <string name="tab_title_official_things">格物堂</string>
+    <string name="login_register">登录/注册</string>
+    <string name="login">登录</string>
 </resources>

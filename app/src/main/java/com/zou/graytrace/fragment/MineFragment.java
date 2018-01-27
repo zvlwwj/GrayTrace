@@ -1,9 +1,17 @@
 package com.zou.graytrace.fragment;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.widget.CardView;
+import android.widget.Toast;
 
 import com.zou.graytrace.R;
+import com.zou.graytrace.activity.LoginActivity;
+
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 /**
  * Created by zou on 2018/1/17.
@@ -33,5 +41,11 @@ public class MineFragment extends BaseFragment {
 
     private void initView() {
 
+    }
+
+    @OnClick(R.id.cardView_Login)
+    void toLogin(){
+        Intent intent = new Intent(getActivity(), LoginActivity.class);
+        startActivity(intent);
     }
 }

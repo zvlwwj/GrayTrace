@@ -22,6 +22,9 @@
         <activity android:name=".activity.UploadCelebrityActivity"/>
         <activity android:name=".activity.EditEventsActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"/>
+        <activity android:name=".activity.EditDescriptionActivity"
+            android:windowSoftInputMode="adjustResize|stateHidden"/>
+        <activity android:name=".activity.LoginActivity" />
     </application>
 
 </manifest>

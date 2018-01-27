@@ -32,7 +32,7 @@ public class BaseFragment extends Fragment{
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         rootView = inflater.inflate(layoutId,null);
-
+        ButterKnife.bind(this,rootView);
         onBaseCreateView();
         return rootView;
     }

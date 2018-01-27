@@ -37,8 +37,9 @@ import butterknife.OnFocusChange;
 //TODO 1.editText获取焦点，但是不弹出键盘
 public class UploadCelebrityActivity extends AppCompatActivity{
     CountryPicker picker;
-    private static final int ADD_EVENTS = 101;
     private static final int SELECT_COVER = 100;
+    private static final int ADD_EVENTS = 101;
+    private static final int ADD_DESCRIPTION = 102;
     @BindView(R.id.toolbar_upload_celebrity)
     Toolbar toolbar_upload_celebrity;
     @BindView(R.id.btn_select_cover)
@@ -71,6 +72,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     TextInputLayout textInputLayout_celebrity_nationality;
     @BindView(R.id.rg_alive)
     RadioGroup rg_alive;
+
 
 
     @Override
@@ -121,7 +123,17 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     Uri uri = data.getData();
                     Glide.with(this).load(uri).into(iv_cover);
                 }
-            break;
+                break;
+            case ADD_EVENTS:
+                if(resultCode == RESULT_OK){
+
+                }
+                break;
+            case ADD_DESCRIPTION:
+                if(resultCode == RESULT_OK){
+
+                }
+                break;
         }
     }
 
@@ -139,7 +151,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     @OnClick(R.id.tv_add_description)
     public void addDescription(){
-        Intent intent = new Intent();
+        Intent intent = new Intent(this,EditDescriptionActivity.class);
+        startActivityForResult(intent,ADD_DESCRIPTION);
 
     }
 
