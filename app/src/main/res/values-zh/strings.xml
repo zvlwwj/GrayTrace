@@ -36,4 +36,7 @@
     <string name="tab_title_official_things">格物堂</string>
     <string name="login_register">登录/注册</string>
     <string name="login">登录</string>
+    <string name="login_welcome">欢迎登陆</string>
+    <string name="input_username">手机号码或邮件</string>
+    <string name="password">密码</string>
 </resources>
