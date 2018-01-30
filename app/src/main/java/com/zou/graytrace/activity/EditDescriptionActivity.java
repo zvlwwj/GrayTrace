@@ -19,6 +19,7 @@ import com.zhy.m.permission.MPermissions;
 import com.zhy.m.permission.PermissionDenied;
 import com.zhy.m.permission.PermissionGrant;
 import com.zou.graytrace.R;
+import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
 import com.zou.graytrace.view.EditTextPlus;
 
@@ -115,10 +116,30 @@ public class EditDescriptionActivity extends AppCompatActivity {
                 break;
             case R.id.action_menu_commit:
                 //TODO 提交
+
+                String type = getIntent().getStringExtra(Constant.INTENT_DESCRIPTION_TYPE);
+                switch (type){
+                    case Constant.DESCRIPTION_TYPE_PEOPLE:
+                        uploadPeopleDescription();
+                        break;
+                    case Constant.DESCRIPTION_TYPE_THINGS:
+                        break;
+                    case Constant.DESCRIPTION_TYPE_EVENTS:
+                        break;
+                }
+
                 Toast.makeText(getApplicationContext(),"提交",Toast.LENGTH_SHORT).show();
                 break;
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    /**
+     * 添加人物描述
+     */
+    private void uploadPeopleDescription() {
+        String username = getIntent().getStringExtra(Constant.INTENT_USER_NAME);
+        String people_name = getIntent().getStringExtra(Constant.INTENT_PEOPLE_NAME);
     }
 
     @Override

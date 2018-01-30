@@ -15,6 +15,7 @@ import android.provider.DocumentsContract;
 import android.provider.MediaStore;
 import android.util.DisplayMetrics;
 import android.view.View;
+import android.widget.EditText;
 
 import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
@@ -210,6 +211,13 @@ public class Tools {
         bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height,
                 ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
         return bitmap;
+    }
+
+    public static boolean isEditTextEmpty(EditText editText){
+        if(editText.getText().toString()==null||editText.getText().toString().trim().length()==0){
+            return true;
+        }
+        return false;
     }
 
     public static String getPathFromUri(final Context context, final Uri uri) {
