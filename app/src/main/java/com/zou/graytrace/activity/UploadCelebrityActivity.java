@@ -11,7 +11,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,6 +18,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RadioGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
@@ -27,8 +27,9 @@ import com.mukesh.countrypicker.CountryPickerListener;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
-import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
+import com.zou.graytrace.bean.GsonSaveDraftPeopleResultBean;
+import com.zou.graytrace.bean.GsonUpdateDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUploadPeopleResultBean;
 
 import java.io.File;
@@ -42,14 +43,11 @@ import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Retrofit;
-import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
-import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import rx.Observable;
 import rx.Observer;
-import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -99,10 +97,18 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     TextInputLayout textInputLayout_celebrity_nationality;
     @BindView(R.id.rg_alive)
     RadioGroup rg_alive;
+    @BindView(R.id.tv_add_description)
+    TextView tv_add_description;
     private File imageFile;
-    private UpLoadPeopleService upLoadPeopleService;
+    private AboutPeopleService aboutPeopleService;
     private GrayTraceApplication app;
     private ProgressDialog loadingDialog;
+    private String description_id;
+    private String event_ids;
+    //若从添加描述或者添加事件中返回则改值为true
+    private boolean isCreatedDraft;
+    //人物草稿ID
+    private String draft_people_id;
 
 
     @Override
@@ -118,7 +124,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     private void initData() {
         app = (GrayTraceApplication) getApplication();
         Retrofit retrofit = app.getRetrofit();
-        upLoadPeopleService = retrofit.create(UpLoadPeopleService.class);
+        aboutPeopleService = retrofit.create(AboutPeopleService.class);
     }
 
     private void initView() {
@@ -185,8 +191,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                 break;
             case ADD_DESCRIPTION:
                 if(resultCode == RESULT_OK){
-
+                    //保存草稿成功
+                    tv_add_description.setText(R.string.edit_description);
                 }
+
                 break;
         }
     }
@@ -210,13 +218,19 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             Toast.makeText(getApplicationContext(),"用户名不能为空",Toast.LENGTH_SHORT).show();
             return;
         }
+        //保存草稿
         Intent intent = new Intent(this,EditDescriptionActivity.class);
         intent.putExtra(Constant.INTENT_DESCRIPTION_TYPE,Constant.DESCRIPTION_TYPE_PEOPLE);
         //TODO 从偏好设置中取出用户名
         intent.putExtra(Constant.INTENT_USER_NAME,"13167231015");
-        intent.putExtra(Constant.INTENT_PEOPLE_NAME,et_celebrity_name.getText().toString());
-        startActivityForResult(intent,ADD_DESCRIPTION);
+        if(!isCreatedDraft) {
+            saveDraft(intent);
+        }else{
+            updateDraft(intent);
+        }
     }
+
+
 
     /**
      * 选择封面
@@ -267,6 +281,174 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     }
 
     /**
+     * 保存到草稿
+     * @param intent 保存草稿成功后的意图
+     */
+    private void saveDraft(@Nullable final Intent intent){
+        showLoadingDialog();
+
+        final MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);//表单类型
+        builder.addFormDataPart("username", "13167231015");
+        if(Tools.isEditTextEmpty(et_celebrity_name)) {
+            hideLoadingDialog();
+            return;
+        }
+        builder.addFormDataPart("name", et_celebrity_name.getText().toString());
+        if(!Tools.isEditTextEmpty(et_celebrity_nationality)) {
+            builder.addFormDataPart("nationality", et_celebrity_nationality.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_birth_place)) {
+            builder.addFormDataPart("birthplace", et_birth_place.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_residence)) {
+            builder.addFormDataPart("residence", et_residence.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_long_sleep_place)) {
+            builder.addFormDataPart("grave_place", et_long_sleep_place.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_birthday)) {
+            builder.addFormDataPart("birth_day", et_birthday.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_death_day)) {
+            builder.addFormDataPart("death_day", et_death_day.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_motto)) {
+            builder.addFormDataPart("motto", et_motto.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_industry)) {
+            builder.addFormDataPart("industry", et_industry.getText().toString());
+        }
+        if(imageFile!=null) {
+            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), imageFile);
+            builder.addFormDataPart("cover", imageFile.getName(), fileBody);
+        }
+        builder.addFormDataPart("time_stamp","201801301419");
+        if(description_id!=null) {
+            builder.addFormDataPart("description_id", description_id);
+        }
+        if(event_ids!=null) {
+            builder.addFormDataPart("event_ids", event_ids);
+        }
+        List<MultipartBody.Part> partList = builder.build().parts();
+        aboutPeopleService.saveDraftPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonSaveDraftPeopleResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        hideLoadingDialog();
+                    }
+
+                    @Override
+                    public void onNext(GsonSaveDraftPeopleResultBean gsonSaveDraftPeopleResultBean) {
+                        hideLoadingDialog();
+                        switch (gsonSaveDraftPeopleResultBean.getCode()){
+                            case 0:
+                                if(intent!=null) {
+                                    draft_people_id = gsonSaveDraftPeopleResultBean.getDraft_people_id();
+                                    isCreatedDraft = true;
+                                    intent.putExtra(Constant.INTENT_PEOPLE_DRAFT_ID,draft_people_id);
+                                    UploadCelebrityActivity.this.startActivity(intent);
+                                }
+                                Toast.makeText(app,"已保存到草稿",Toast.LENGTH_SHORT).show();
+                                break;
+                            default:
+                                Toast.makeText(app,"保存草稿失败",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    /**
+     *更新草稿
+     * @param intent 更新草稿成功后的意图
+     */
+    private void updateDraft(final Intent intent) {
+        showLoadingDialog();
+
+        final MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);//表单类型
+        builder.addFormDataPart("draft_people_id",draft_people_id);
+        builder.addFormDataPart("username", "13167231015");
+        if(Tools.isEditTextEmpty(et_celebrity_name)) {
+            hideLoadingDialog();
+            return;
+        }
+        builder.addFormDataPart("name", et_celebrity_name.getText().toString());
+        if(!Tools.isEditTextEmpty(et_celebrity_nationality)) {
+            builder.addFormDataPart("nationality", et_celebrity_nationality.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_birth_place)) {
+            builder.addFormDataPart("birthplace", et_birth_place.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_residence)) {
+            builder.addFormDataPart("residence", et_residence.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_long_sleep_place)) {
+            builder.addFormDataPart("grave_place", et_long_sleep_place.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_birthday)) {
+            builder.addFormDataPart("birth_day", et_birthday.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_death_day)) {
+            builder.addFormDataPart("death_day", et_death_day.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_motto)) {
+            builder.addFormDataPart("motto", et_motto.getText().toString());
+        }
+        if(!Tools.isEditTextEmpty(et_industry)) {
+            builder.addFormDataPart("industry", et_industry.getText().toString());
+        }
+        if(imageFile!=null) {
+            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), imageFile);
+            builder.addFormDataPart("cover", imageFile.getName(), fileBody);
+        }
+        builder.addFormDataPart("time_stamp","201801301419");
+        if(description_id!=null) {
+            builder.addFormDataPart("description_id", description_id);
+        }
+        if(event_ids!=null) {
+            builder.addFormDataPart("event_ids", event_ids);
+        }
+        List<MultipartBody.Part> partList = builder.build().parts();
+        aboutPeopleService.updateDraftPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonUpdateDraftPeopleResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        hideLoadingDialog();
+                    }
+
+                    @Override
+                    public void onNext(GsonUpdateDraftPeopleResultBean gsonUpdateDraftPeopleResultBean) {
+                        hideLoadingDialog();
+                        switch (gsonUpdateDraftPeopleResultBean.getCode()){
+                            case 0:
+                                if(intent!=null) {
+                                    isCreatedDraft = true;
+                                    intent.putExtra(Constant.INTENT_PEOPLE_DRAFT_ID,draft_people_id);
+                                    UploadCelebrityActivity.this.startActivity(intent);
+                                }
+                                Toast.makeText(app,"已更新草稿",Toast.LENGTH_SHORT).show();
+                                break;
+                            default:
+                                Toast.makeText(app,"更新草稿失败",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    /**
      * 提交
      */
     private void upLoadPeople() {
@@ -308,8 +490,14 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             builder.addFormDataPart("cover", imageFile.getName(), fileBody);
         }
         builder.addFormDataPart("time_stamp","201801301419");
+        if(description_id!=null) {
+            builder.addFormDataPart("description_id", description_id);
+        }
+        if(event_ids!=null) {
+            builder.addFormDataPart("event_ids", event_ids);
+        }
         List<MultipartBody.Part> partList = builder.build().parts();
-        upLoadPeopleService.uploadPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+        aboutPeopleService.uploadPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUploadPeopleResultBean>() {
                     @Override
                     public void onCompleted() {
@@ -327,7 +515,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                         hideLoadingDialog();
                         switch (gsonUploadPeopleResultBean.getCode()){
                             case 0:
-
+                                //TODO 提交成功
                                 break;
                             default:
                                 Toast.makeText(app,"提交失败",Toast.LENGTH_SHORT).show();
@@ -363,9 +551,15 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         }
     }
 
-    interface UpLoadPeopleService{
+    interface AboutPeopleService{
         @Multipart
         @POST("commit/people")
         Observable<GsonUploadPeopleResultBean> uploadPeople(@Part List<MultipartBody.Part> partList);
+        @Multipart
+        @POST("draft/people/commit")
+        Observable<GsonSaveDraftPeopleResultBean> saveDraftPeople(@Part List<MultipartBody.Part> partList);
+        @Multipart
+        @POST("draft/people/update")
+        Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Part List<MultipartBody.Part> partList);
     }
 }

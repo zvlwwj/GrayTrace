@@ -7,8 +7,8 @@ package com.zou.graytrace.Utils;
 public class Constant {
     public static final String INTENT_DESCRIPTION_TYPE = "intent_description_type";
     public static final String INTENT_USER_NAME = "intent_user_name";
-    public static final String INTENT_PEOPLE_NAME = "intent_people_name";
 
+    public static final String INTENT_PEOPLE_DRAFT_ID = "intent_people_draft_id";
     /**
      * INTENT_DESCRIPTION_TYPE
      */

@@ -21,6 +21,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
 
 /**
  * Created by zou on 2017/12/11.
@@ -341,5 +342,11 @@ public class Tools {
      */
     public static boolean isGooglePhotosUri(Uri uri) {
         return "com.google.android.apps.photos.content".equals(uri.getAuthority());
+    }
+
+    public static String getTimeStamp(){
+        SimpleDateFormat sDateFormat =   new SimpleDateFormat("yyyyMMddhhmmss");
+        String    date    =    sDateFormat.format(new java.util.Date());
+        return date;
     }
 }

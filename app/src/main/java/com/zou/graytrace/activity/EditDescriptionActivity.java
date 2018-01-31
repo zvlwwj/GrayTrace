@@ -1,6 +1,7 @@
 package com.zou.graytrace.activity;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -21,11 +23,27 @@ import com.zhy.m.permission.PermissionGrant;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
+import com.zou.graytrace.application.GrayTraceApplication;
+import com.zou.graytrace.bean.GsonSaveDraftPeopleDescriptionResultBean;
+import com.zou.graytrace.bean.GsonUploadDescriptionResultBean;
 import com.zou.graytrace.view.EditTextPlus;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.MultipartBody;
+import retrofit2.Retrofit;
+import retrofit2.http.Multipart;
+import retrofit2.http.POST;
+import retrofit2.http.Part;
+import retrofit2.http.Query;
+import rx.Observable;
+import rx.Observer;
+import rx.Scheduler;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 /**
  * Created by zoujingyi on 2018/1/26.
@@ -38,6 +56,10 @@ public class EditDescriptionActivity extends AppCompatActivity {
     EditTextPlus et_description_content;
     @BindView(R.id.toolbar_edit_description)
     Toolbar toolbar_edit_description;
+    private GrayTraceApplication app;
+    private DescriptionService descriptionService;
+    private AlertDialog saveDraftDialog;
+    private String draft_people_id;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,6 +67,22 @@ public class EditDescriptionActivity extends AppCompatActivity {
         MPermissions.requestPermissions(this, 4, Manifest.permission.READ_EXTERNAL_STORAGE);
     }
 
+    /**
+     * 权限请求成功
+     */
+    @PermissionGrant(4)
+    public void requestPermissionSuccess(){
+        initData();
+        ButterKnife.bind(this);
+        initView();
+    }
+
+    private void initData() {
+        app = (GrayTraceApplication) getApplication();
+        Retrofit retrofit = app.getRetrofit();
+        descriptionService = retrofit.create(DescriptionService.class);
+        draft_people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DRAFT_ID);
+    }
 
     private void initView() {
         setSupportActionBar(toolbar_edit_description);
@@ -53,7 +91,6 @@ public class EditDescriptionActivity extends AppCompatActivity {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
-
     /**
      * 添加视频
      */
@@ -78,14 +115,6 @@ public class EditDescriptionActivity extends AppCompatActivity {
         }
     }
 
-    /**
-     * 权限请求成功
-     */
-    @PermissionGrant(4)
-    public void requestPermissionSuccess(){
-        ButterKnife.bind(this);
-        initView();
-    }
 
     /**
      * 权限请求失败
@@ -112,7 +141,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 //TODO 保存到草稿 返回主界面
-                finish();
+                showSaveDraftDialog();
                 break;
             case R.id.action_menu_commit:
                 //TODO 提交
@@ -132,14 +161,6 @@ public class EditDescriptionActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    /**
-     * 添加人物描述
-     */
-    private void uploadPeopleDescription() {
-        String username = getIntent().getStringExtra(Constant.INTENT_USER_NAME);
-        String people_name = getIntent().getStringExtra(Constant.INTENT_PEOPLE_NAME);
     }
 
     @Override
@@ -167,6 +188,90 @@ public class EditDescriptionActivity extends AppCompatActivity {
                 }
                 break;
         }
+    }
 
+    @Override
+    public void onBackPressed() {
+        showSaveDraftDialog();
+    }
+
+    /**
+     * 上传人物描述
+     */
+    private void uploadPeopleDescription() {
+        String username = getIntent().getStringExtra(Constant.INTENT_USER_NAME);
+        String description_text = et_description_content.getText().toString();
+        String draft_people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DRAFT_ID);
+    }
+
+    /**
+     * 保存人物描述草稿
+     */
+    private void savePeopleDraft(){
+        if(Tools.isEditTextEmpty(et_description_content)){
+            Toast.makeText(app,"文本框为空",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String username = getIntent().getStringExtra(Constant.INTENT_USER_NAME);
+        String draft_people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DRAFT_ID);
+        String description_text = et_description_content.getText().toString();
+        String time_stamp = Tools.getTimeStamp();
+        descriptionService.saveDraftPeopleDescription(username,draft_people_id,description_text,time_stamp)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonSaveDraftPeopleDescriptionResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+
+                    }
+
+                    @Override
+                    public void onNext(GsonSaveDraftPeopleDescriptionResultBean gsonSaveDraftPeopleDescriptionResultBean) {
+                        switch (gsonSaveDraftPeopleDescriptionResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(app,"已保存到草稿",Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_OK);
+                                finish();
+                                break;
+                            default:
+                                Toast.makeText(app,"保存草稿失败",Toast.LENGTH_SHORT).show();
+                                setResult(RESULT_CANCELED);
+                                finish();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    private void showSaveDraftDialog(){
+        if(saveDraftDialog == null){
+            saveDraftDialog =  new AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.dialog_msg_save_draft))
+                    .setPositiveButton(getString(R.string.save), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            savePeopleDraft();
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    }).create();
+        }
+        saveDraftDialog.show();
+    }
+
+    interface DescriptionService{
+        @POST("commit/people/description")
+        Observable<GsonUploadDescriptionResultBean> uploadPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp);
+        @POST("draft/people/description")
+        Observable<GsonSaveDraftPeopleDescriptionResultBean> saveDraftPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp);
     }
 }
