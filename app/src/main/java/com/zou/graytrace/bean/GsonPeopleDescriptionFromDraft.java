@@ -1,13 +1,13 @@
 package com.zou.graytrace.bean;
 
 /**
- * Created by zou on 2018/1/31.
+ * Created by zou on 2018/2/1.
  */
 
-public class GsonUploadDescriptionResultBean {
+public class GsonPeopleDescriptionFromDraft {
     private Integer code;
     private String msg;
-    private String people_description_id;
+    private String description_text;
 
     public Integer getCode() {
         return code;
@@ -25,11 +25,11 @@ public class GsonUploadDescriptionResultBean {
         this.msg = msg;
     }
 
-    public String getPeople_description_id() {
-        return people_description_id;
+    public String getDescription_text() {
+        return description_text;
     }
 
-    public void setPeople_description_id(String people_description_id) {
-        this.people_description_id = people_description_id;
+    public void setDescription_text(String description_text) {
+        this.description_text = description_text;
     }
 }

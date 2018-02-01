@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -31,6 +32,7 @@ import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUpdateDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUploadPeopleResultBean;
+import com.zou.graytrace.view.TextViewContainer;
 
 import java.io.File;
 import java.util.List;
@@ -99,6 +101,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     RadioGroup rg_alive;
     @BindView(R.id.tv_add_description)
     TextView tv_add_description;
+    @BindView(R.id.ll_tv_events)
+    TextViewContainer ll_tv_events;
+    @BindView(R.id.ic_events)
+    ImageView ic_events;
+
     private File imageFile;
     private AboutPeopleService aboutPeopleService;
     private GrayTraceApplication app;
@@ -109,6 +116,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     private boolean isCreatedDraft;
     //人物草稿ID
     private String draft_people_id;
+    //人物描述ID
+    private String people_description_id;
+    //人物描述草稿ID
+    private String draft_people_description_id;
 
 
     @Override
@@ -125,6 +136,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         app = (GrayTraceApplication) getApplication();
         Retrofit retrofit = app.getRetrofit();
         aboutPeopleService = retrofit.create(AboutPeopleService.class);
+        tv_add_description.setTag(Constant.TAG_DESCRIPTION_ADD_NEW);
     }
 
     private void initView() {
@@ -185,18 +197,46 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                 }
                 break;
             case ADD_EVENTS:
-                if(resultCode == RESULT_OK){
+                if(resultCode == Constant.RESULT_EVENTS_COMMIT_OK){
+                    //事件提交成功
+
+                }else if(resultCode == Constant.RESULT_EVENTS_SAVE_DRAFT_OK){
+                    //保存事件草稿成功
+
+                }else if(resultCode == Constant.RESULT_EVENTS_SAVE_DRAFT_FAIL){
+                    //TODO 保存事件草稿失败
 
                 }
+
                 break;
             case ADD_DESCRIPTION:
-                if(resultCode == RESULT_OK){
-                    //保存草稿成功
+                if(resultCode == Constant.RESULT_DESCRIPTION_COMMIT_OK){
+                    //描述提交成功
                     tv_add_description.setText(R.string.edit_description);
+                    tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT);
+                    people_description_id = data.getStringExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID);
+                } else if(resultCode == Constant.RESULT_DESCRIPTION_SAVE_DRAFT_OK){
+                    //保存描述草稿成功
+                    tv_add_description.setText(R.string.edit_description);
+                    tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT_DRAFT);
+                    draft_people_description_id = data.getStringExtra(Constant.INTENT_DRAFT_PEOPLE_DESCRIPTION_ID);
+                }else if(resultCode == Constant.RESULT_DESCRIPTION_SAVE_DRAFT_FAIL){
+                    //TODO 保存描述草稿失败
                 }
 
                 break;
         }
+    }
+
+    int count = 0;
+    @OnClick(R.id.ic_events)
+    public void test(){
+        count ++;
+        int maxMidth = Tools.getScreenWidth(this)-ic_events.getMeasuredWidth()-Tools.dip2px(app,24);
+        ll_tv_events.setMaxWidth(maxMidth);
+        TextView tv_test = new TextView(this);
+        tv_test.setText(count+"测试测试");
+        ll_tv_events.addTextView(tv_test);
     }
 
     /**
@@ -205,7 +245,19 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     @OnClick(R.id.tv_add_events)
     public void addEvents(){
         Intent intent = new Intent(this,EditEventsActivity.class);
-        startActivityForResult(intent,ADD_EVENTS);
+        if (!isCreatedDraft&&Tools.isEditTextEmpty(et_celebrity_name)) {
+            //TODO 设置EditText error
+            Toast.makeText(getApplicationContext(), "姓名不能为空", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        intent.putExtra(Constant.INTENT_EVENTS_TYPE, Constant.EVENTS_TYPE_PEOPLE);
+        intent.putExtra(Constant.INTENT_EVENTS_STATUS, Constant.EVENTS_STATUS_ADD_NEW);
+        //保存或更新草稿
+        if (!isCreatedDraft) {
+            saveDraft(intent, ADD_EVENTS);
+        } else {
+            updateDraft(intent, ADD_EVENTS);
+        }
     }
 
     /**
@@ -213,21 +265,29 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     @OnClick(R.id.tv_add_description)
     public void addDescription(){
-        if(Tools.isEditTextEmpty(et_celebrity_name)){
+        Intent intent = new Intent(this, EditDescriptionActivity.class);
+        if (!isCreatedDraft&&Tools.isEditTextEmpty(et_celebrity_name)) {
             //TODO 设置EditText error
-            Toast.makeText(getApplicationContext(),"用户名不能为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "姓名不能为空", Toast.LENGTH_SHORT).show();
             return;
         }
-        //保存草稿
-        Intent intent = new Intent(this,EditDescriptionActivity.class);
-        intent.putExtra(Constant.INTENT_DESCRIPTION_TYPE,Constant.DESCRIPTION_TYPE_PEOPLE);
-        //TODO 从偏好设置中取出用户名
-        intent.putExtra(Constant.INTENT_USER_NAME,"13167231015");
-        if(!isCreatedDraft) {
-            saveDraft(intent);
-        }else{
-            updateDraft(intent);
+        intent.putExtra(Constant.INTENT_DESCRIPTION_TYPE, Constant.DESCRIPTION_TYPE_PEOPLE);
+        if(Constant.TAG_DESCRIPTION_ADD_NEW.equals(tv_add_description.getTag())) {
+            intent.putExtra(Constant.INTENT_DESCRIPTION_STATUS, Constant.DESCRIPTION_STATUS_ADD_NEW);
+        }else if(Constant.TAG_DESCRIPTION_EDIT.equals(tv_add_description.getTag())){
+            intent.putExtra(Constant.INTENT_DESCRIPTION_STATUS, Constant.DESCRIPTION_STATUS_EDIT);
+            intent.putExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID,people_description_id);
+        }else if(Constant.TAG_DESCRIPTION_EDIT_DRAFT.equals(tv_add_description.getTag())){
+            intent.putExtra(Constant.INTENT_DESCRIPTION_STATUS, Constant.DESCRIPTION_STATUS_EDIT_DRAFT);
+            intent.putExtra(Constant.INTENT_DRAFT_PEOPLE_DESCRIPTION_ID,draft_people_description_id);
         }
+        //保存或更新草稿
+        if (!isCreatedDraft) {
+            saveDraft(intent, ADD_DESCRIPTION);
+        } else {
+            updateDraft(intent, ADD_DESCRIPTION);
+        }
+
     }
 
 
@@ -273,7 +333,6 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                 finish();
                 break;
             case R.id.action_menu_commit:
-                //TODO 提交
                 upLoadPeople();
                 break;
         }
@@ -284,7 +343,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      * 保存到草稿
      * @param intent 保存草稿成功后的意图
      */
-    private void saveDraft(@Nullable final Intent intent){
+    private void saveDraft(@Nullable final Intent intent, final int requestCode){
         showLoadingDialog();
 
         final MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);//表单类型
@@ -352,7 +411,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                     draft_people_id = gsonSaveDraftPeopleResultBean.getDraft_people_id();
                                     isCreatedDraft = true;
                                     intent.putExtra(Constant.INTENT_PEOPLE_DRAFT_ID,draft_people_id);
-                                    UploadCelebrityActivity.this.startActivity(intent);
+                                    UploadCelebrityActivity.this.startActivityForResult(intent,requestCode);
                                 }
                                 Toast.makeText(app,"已保存到草稿",Toast.LENGTH_SHORT).show();
                                 break;
@@ -368,7 +427,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      *更新草稿
      * @param intent 更新草稿成功后的意图
      */
-    private void updateDraft(final Intent intent) {
+    private void updateDraft(final Intent intent, final int requestCode) {
         showLoadingDialog();
 
         final MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);//表单类型
@@ -436,7 +495,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                 if(intent!=null) {
                                     isCreatedDraft = true;
                                     intent.putExtra(Constant.INTENT_PEOPLE_DRAFT_ID,draft_people_id);
-                                    UploadCelebrityActivity.this.startActivity(intent);
+                                    UploadCelebrityActivity.this.startActivityForResult(intent,requestCode);
                                 }
                                 Toast.makeText(app,"已更新草稿",Toast.LENGTH_SHORT).show();
                                 break;
@@ -553,7 +612,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
     interface AboutPeopleService{
         @Multipart
-        @POST("commit/people")
+        @POST("people/commit")
         Observable<GsonUploadPeopleResultBean> uploadPeople(@Part List<MultipartBody.Part> partList);
         @Multipart
         @POST("draft/people/commit")
