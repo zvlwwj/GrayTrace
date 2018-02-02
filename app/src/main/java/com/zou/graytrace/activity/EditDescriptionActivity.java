@@ -225,7 +225,6 @@ public class EditDescriptionActivity extends AppCompatActivity {
                 showSaveDraftDialog();
                 break;
             case R.id.action_menu_commit:
-                //TODO 提交
                 String type = getIntent().getStringExtra(Constant.INTENT_DESCRIPTION_TYPE);
                 switch (type){
                     case Constant.DESCRIPTION_TYPE_PEOPLE:

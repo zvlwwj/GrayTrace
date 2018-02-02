@@ -110,8 +110,6 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     private AboutPeopleService aboutPeopleService;
     private GrayTraceApplication app;
     private ProgressDialog loadingDialog;
-    private String description_id;
-    private String event_ids;
     //若从添加描述或者添加事件中返回则改值为true
     private boolean isCreatedDraft;
     //人物草稿ID
@@ -120,6 +118,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     private String people_description_id;
     //人物描述草稿ID
     private String draft_people_description_id;
+
+    //人物事件ID
+    private String people_event_id;
+    //人物事件草稿ID
+    private String draft_people_event_id;
 
 
     @Override
@@ -146,6 +149,15 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
         et_celebrity_nationality.setInputType(InputType.TYPE_NULL);
+        //设置TextViewContainer的最大宽度
+        int maxWidth = Tools.getScreenWidth(this)-ic_events.getMeasuredWidth()-Tools.dip2px(app,24);
+        ll_tv_events.setMaxWidth(maxWidth);
+        ll_tv_events.setOnMoreTextClickedListener(new TextViewContainer.OnMoreTextClickedListener() {
+            @Override
+            public void onMoreTextClicked() {
+                Toast.makeText(app,"onMoreTextClicked",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void setListener() {
@@ -198,11 +210,15 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                 break;
             case ADD_EVENTS:
                 if(resultCode == Constant.RESULT_EVENTS_COMMIT_OK){
-                    //事件提交成功
-
+                    //事件提交成功,获取标题,事件ID
+                    String title = data.getStringExtra(Constant.INTENT_PEOPLE_EVENT_TITLE);
+                    String id = data.getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
+                    addEventsInContainer(title,Constant.TAG_EVENT_EDIT,id);
                 }else if(resultCode == Constant.RESULT_EVENTS_SAVE_DRAFT_OK){
-                    //保存事件草稿成功
-
+                    //保存事件草稿成功,获取标题，事件草稿ID
+                    String title = data.getStringExtra(Constant.INTENT_PEOPLE_EVENT_TITLE);
+                    String id = data.getStringExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID);
+                    addEventsInContainer(title,Constant.TAG_EVENT_EDIT_DRAFT,id);
                 }else if(resultCode == Constant.RESULT_EVENTS_SAVE_DRAFT_FAIL){
                     //TODO 保存事件草稿失败
 
@@ -228,15 +244,59 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         }
     }
 
+    /**
+     * 将事件添加到TextViewContainer中
+     */
+    private void addEventsInContainer(String title,String tag,String id){
+        TextView event = new TextView(this);
+        event.setText(title);
+        event.setTag(R.string.tag_event_status,tag);
+        event.setTag(R.string.tag_event_status_id,id);
+        event.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(UploadCelebrityActivity.this,EditEventsActivity.class);
+                if (!isCreatedDraft&&Tools.isEditTextEmpty(et_celebrity_name)) {
+                    //TODO 设置EditText error
+                    Toast.makeText(getApplicationContext(), "姓名不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                intent.putExtra(Constant.INTENT_EVENTS_TYPE, Constant.EVENTS_TYPE_PEOPLE);
+                switch ((String)v.getTag(R.string.tag_event_status)){
+                    case Constant.TAG_EVENT_EDIT:
+                        intent.putExtra(Constant.INTENT_EVENTS_STATUS, Constant.EVENTS_STATUS_EDIT);
+                        intent.putExtra(Constant.INTENT_PEOPLE_EVENT_ID,(String)v.getTag(R.string.tag_event_status_id));
+                        break;
+                    case Constant.TAG_EVENT_EDIT_DRAFT:
+                        intent.putExtra(Constant.INTENT_EVENTS_STATUS, Constant.EVENTS_STATUS_EDIT_DRAFT);
+                        intent.putExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID,(String)v.getTag(R.string.tag_event_status_id));
+                        break;
+                }
+                //保存或更新草稿
+                if (!isCreatedDraft) {
+                    saveDraft(intent, ADD_EVENTS);
+                } else {
+                    updateDraft(intent, ADD_EVENTS);
+                }
+            }
+        });
+        ll_tv_events.addTextView(event);
+
+    }
+
     int count = 0;
     @OnClick(R.id.ic_events)
     public void test(){
         count ++;
-        int maxMidth = Tools.getScreenWidth(this)-ic_events.getMeasuredWidth()-Tools.dip2px(app,24);
-        ll_tv_events.setMaxWidth(maxMidth);
         TextView tv_test = new TextView(this);
         tv_test.setText(count+"测试测试");
         ll_tv_events.addTextView(tv_test);
+        ll_tv_events.setOnMoreTextClickedListener(new TextViewContainer.OnMoreTextClickedListener() {
+            @Override
+            public void onMoreTextClicked() {
+                Toast.makeText(app,"onMoreTextClicked",Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     /**
@@ -381,13 +441,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), imageFile);
             builder.addFormDataPart("cover", imageFile.getName(), fileBody);
         }
-        builder.addFormDataPart("time_stamp","201801301419");
-        if(description_id!=null) {
-            builder.addFormDataPart("description_id", description_id);
-        }
-        if(event_ids!=null) {
-            builder.addFormDataPart("event_ids", event_ids);
-        }
+        builder.addFormDataPart("time_stamp",Tools.getTimeStamp());
         List<MultipartBody.Part> partList = builder.build().parts();
         aboutPeopleService.saveDraftPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonSaveDraftPeopleResultBean>() {
@@ -466,13 +520,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), imageFile);
             builder.addFormDataPart("cover", imageFile.getName(), fileBody);
         }
-        builder.addFormDataPart("time_stamp","201801301419");
-        if(description_id!=null) {
-            builder.addFormDataPart("description_id", description_id);
-        }
-        if(event_ids!=null) {
-            builder.addFormDataPart("event_ids", event_ids);
-        }
+        builder.addFormDataPart("time_stamp",Tools.getTimeStamp());
         List<MultipartBody.Part> partList = builder.build().parts();
         aboutPeopleService.updateDraftPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUpdateDraftPeopleResultBean>() {
@@ -549,12 +597,6 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             builder.addFormDataPart("cover", imageFile.getName(), fileBody);
         }
         builder.addFormDataPart("time_stamp","201801301419");
-        if(description_id!=null) {
-            builder.addFormDataPart("description_id", description_id);
-        }
-        if(event_ids!=null) {
-            builder.addFormDataPart("event_ids", event_ids);
-        }
         List<MultipartBody.Part> partList = builder.build().parts();
         aboutPeopleService.uploadPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUploadPeopleResultBean>() {

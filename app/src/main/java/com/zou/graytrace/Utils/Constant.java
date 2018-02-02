@@ -30,8 +30,11 @@ public class Constant {
      */
     public static final String INTENT_EVENTS_TYPE = "intent_events_type";
     public static final String EVENTS_TYPE_PEOPLE = "events_type_people";
+    public static final String EVENTS_TYPE_THINGS = "events_type_things";
     public static final String INTENT_EVENTS_STATUS = "intent_events_status";
-
+    public static final String INTENT_PEOPLE_EVENT_TITLE = "intent_people_event_title";
+    public static final String INTENT_PEOPLE_EVENT_ID = "intent_people_event_id";
+    public static final String INTENT_DRAFT_PEOPLE_EVENT_ID ="intent_draft_people_event_id";
     public static final String EVENTS_STATUS_ADD_NEW = "events_status_add_new";
     public static final String EVENTS_STATUS_EDIT = "events_status_edit";
     public static final String EVENTS_STATUS_EDIT_DRAFT = "events_status_edit_draft";
@@ -40,4 +43,8 @@ public class Constant {
     public static final int RESULT_EVENTS_SAVE_DRAFT_OK = 1001;
     public static final int RESULT_EVENTS_SAVE_DRAFT_FAIL = 1002;
 
+    public static final String TAG_EVENT_EDIT = "tag_event_edit";
+    public static final String TAG_EVENT_EDIT_DRAFT = "tag_event_edit_draft";
+//    public static final int TAG_EVENT_STATUS = 100;
+//    public static final int TAG_EVENT_STATUS_ID = 101;
 }
