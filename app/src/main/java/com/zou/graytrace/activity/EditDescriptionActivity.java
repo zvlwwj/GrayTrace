@@ -130,7 +130,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
                                 et_description_content.setSelection(description.length());
                                 break;
                             default:
-                                Toast.makeText(app,"获取描述失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,"获取数据失败",Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }

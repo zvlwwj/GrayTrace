@@ -60,6 +60,7 @@ public class LoginActivity extends AppCompatActivity {
         setSupportActionBar(toolbar_login);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
+
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowTitleEnabled(false);
         }

@@ -26,6 +26,8 @@ import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
 import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonCommitEventDraftResultBean;
+import com.zou.graytrace.bean.GsonPeopleEvent;
+import com.zou.graytrace.bean.GsonPeopleEventFromDraft;
 import com.zou.graytrace.bean.GsonUpdateEventDraftResultBean;
 import com.zou.graytrace.bean.GsonUploadEventResultBean;
 import com.zou.graytrace.view.EditTextPlus;
@@ -134,14 +136,70 @@ public class EditEventsActivity extends AppCompatActivity {
      * 编辑状态，获取已提交的文本
      */
     private void getEvent(){
+        String people_event_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
+        eventService.getPeopleEvent(people_event_id).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonPeopleEvent>() {
+                    @Override
+                    public void onCompleted() {
 
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonPeopleEvent gsonPeopleEvent) {
+                        switch (gsonPeopleEvent.getCode()){
+                            case 0:
+                                String event_title = gsonPeopleEvent.getEvent_title();
+                                String event_text = gsonPeopleEvent.getEvent_text();
+                                et_event_title.setText(event_title);
+                                et_event_content.setText(event_text);
+                                et_event_content.setSelection(event_text.length());
+                                break;
+                            default:
+                                Toast.makeText(app,"读取数据失败",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
     }
 
     /**
      * 编辑状态，获取草稿中的文本
      */
     private void getEventFromDraft(){
+        String draft_people_event_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID);
+        eventService.getPeopleEventFromDraft(draft_people_event_id).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonPeopleEventFromDraft>() {
+                    @Override
+                    public void onCompleted() {
 
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonPeopleEventFromDraft gsonPeopleEvent) {
+                        switch (gsonPeopleEvent.getCode()){
+                            case 0:
+                                String event_title = gsonPeopleEvent.getEvent_title();
+                                String event_text = gsonPeopleEvent.getEvent_text();
+                                et_event_title.setText(event_title);
+                                et_event_content.setText(event_text);
+                                et_event_content.setSelection(event_text.length());
+                                break;
+                            default:
+                                Toast.makeText(app,"读取数据失败",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
     }
     /**
      * 提交人物事件草稿
@@ -423,5 +481,10 @@ public class EditEventsActivity extends AppCompatActivity {
         Observable<GsonCommitEventDraftResultBean> commitEventDraft(@Query("username")String username, @Query("time_stamp")String time_stamp,@Query("draft_people_id") String draft_people_id,@Query("event_title") String event_title,@Query("event_text")String event_text);
         @POST("draft/people/update/event")
         Observable<GsonUpdateEventDraftResultBean> updateEventDraft(@Query("username")String username, @Query("time_stamp")String time_stamp, @Query("draft_people_event_id")String draft_people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text);
+        @POST("people/get/event")
+        Observable<GsonPeopleEvent> getPeopleEvent(@Query("people_event_id")String people_event_id);
+        @POST("people/get/event_from_draft")
+        Observable<GsonPeopleEventFromDraft> getPeopleEventFromDraft(@Query("draft_people_event_id")String draft_people_event_id);
+
     }
 }
