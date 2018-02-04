@@ -1,6 +1,7 @@
 package com.zou.graytrace.application;
 
 import android.app.Application;
+import android.support.v7.app.AppCompatDelegate;
 
 import com.zou.graytrace.Utils.URL;
 
@@ -17,6 +18,7 @@ public class GrayTraceApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO);
     }
 
     public Retrofit getRetrofit(){
