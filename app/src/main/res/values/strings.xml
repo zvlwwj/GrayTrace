@@ -46,4 +46,5 @@
     <string name="more">更多</string>
     <string name="tag_event_status">表示跳转编辑事件的TextView的TAG的key，用来表示状态</string>
     <string name="tag_event_status_id">表示跳转编辑事件的TextView的TAG的key，用来表示id（事件草稿id或是事件id）</string>
+    <string name="choose_edit_event">事件编辑</string>
 </resources>

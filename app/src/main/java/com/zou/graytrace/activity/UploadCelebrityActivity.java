@@ -1,6 +1,7 @@
 package com.zou.graytrace.activity;
 
 import android.app.ProgressDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -8,6 +9,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.text.InputType;
@@ -32,9 +34,11 @@ import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUpdateDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUploadPeopleResultBean;
+import com.zou.graytrace.bean.PeopleEventText;
 import com.zou.graytrace.view.TextViewContainer;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
@@ -57,7 +61,6 @@ import rx.schedulers.Schedulers;
  * Created by zou on 2018/1/18.
  * 上传界面
  */
-//TODO 1.editText获取焦点，但是不弹出键盘
 public class UploadCelebrityActivity extends AppCompatActivity{
     CountryPicker picker;
     private static final int SELECT_COVER = 100;
@@ -124,6 +127,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     //人物事件草稿ID
     private String draft_people_event_id;
 
+    private ArrayList<PeopleEventText> peopleEventTexts;
+
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -155,7 +160,46 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         ll_tv_events.setOnMoreTextClickedListener(new TextViewContainer.OnMoreTextClickedListener() {
             @Override
             public void onMoreTextClicked() {
-                Toast.makeText(app,"onMoreTextClicked",Toast.LENGTH_SHORT).show();
+                if (!isCreatedDraft&&Tools.isEditTextEmpty(et_celebrity_name)) {
+                    //TODO 设置EditText error
+                    Toast.makeText(getApplicationContext(), "姓名不能为空", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+                String[] singleChoiceItems = new String[peopleEventTexts.size()];
+                for(int i=0;i<singleChoiceItems.length;i++){
+                    singleChoiceItems[i] = peopleEventTexts.get(i).getTitle();
+                }
+                int itemSelected = 0;
+                new AlertDialog.Builder(UploadCelebrityActivity.this)
+                        .setTitle(getString(R.string.choose_edit_event))
+                        .setSingleChoiceItems(singleChoiceItems, itemSelected, new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                Intent intent = new Intent(UploadCelebrityActivity.this,EditEventsActivity.class);
+                                intent.putExtra(Constant.INTENT_EVENTS_TYPE, Constant.EVENTS_TYPE_PEOPLE);
+                                String tag = peopleEventTexts.get(i).getTag();
+                                String id = peopleEventTexts.get(i).getId();
+                                switch (tag){
+                                    case Constant.TAG_EVENT_EDIT:
+                                        intent.putExtra(Constant.INTENT_EVENTS_STATUS, Constant.EVENTS_STATUS_EDIT);
+                                        intent.putExtra(Constant.INTENT_PEOPLE_EVENT_ID,id);
+                                        break;
+                                    case Constant.TAG_EVENT_EDIT_DRAFT:
+                                        intent.putExtra(Constant.INTENT_EVENTS_STATUS, Constant.EVENTS_STATUS_EDIT_DRAFT);
+                                        intent.putExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID,id);
+                                        break;
+                                }
+                                //保存或更新草稿
+                                if (!isCreatedDraft) {
+                                    saveDraft(intent, ADD_EVENTS);
+                                } else {
+                                    updateDraft(intent, ADD_EVENTS);
+                                }
+                                dialogInterface.dismiss();
+                            }
+                        })
+                        .setNegativeButton(getString(R.string.cancel), null)
+                        .show();
             }
         });
     }
@@ -214,6 +258,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     String title = data.getStringExtra(Constant.INTENT_PEOPLE_EVENT_TITLE);
                     String id = data.getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
                     addEventsInContainer(title,Constant.TAG_EVENT_EDIT,id);
+                    String deleted_people_event_draft_id = data.getStringExtra(Constant.INTENT_PEOPLE_EVENT_DELETE_DRAFT_ID);
+                    if(deleted_people_event_draft_id!=null) {
+                        removeDeletedDraftIdInContains(deleted_people_event_draft_id);
+                    }
                 }else if(resultCode == Constant.RESULT_EVENTS_SAVE_DRAFT_OK){
                     //保存事件草稿成功,获取标题，事件草稿ID
                     String title = data.getStringExtra(Constant.INTENT_PEOPLE_EVENT_TITLE);
@@ -229,11 +277,19 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                 if(resultCode == Constant.RESULT_DESCRIPTION_COMMIT_OK){
                     //描述提交成功
                     tv_add_description.setText(R.string.edit_description);
+                    Drawable drawable = getResources().getDrawable(R.drawable.ic_edit);
+                    drawable.setBounds(0,0,Tools.dip2px(this,16),Tools.dip2px(this,16));
+                    tv_add_description.setCompoundDrawables(drawable,null,null,null);
+                    tv_add_description.setCompoundDrawablePadding(Tools.dip2px(this,2));
                     tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT);
                     people_description_id = data.getStringExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID);
                 } else if(resultCode == Constant.RESULT_DESCRIPTION_SAVE_DRAFT_OK){
                     //保存描述草稿成功
                     tv_add_description.setText(R.string.edit_description);
+                    Drawable drawable = getResources().getDrawable(R.drawable.ic_edit);
+                    drawable.setBounds(0,0,Tools.dip2px(this,16),Tools.dip2px(this,16));
+                    tv_add_description.setCompoundDrawables(drawable,null,null,null);
+                    tv_add_description.setCompoundDrawablePadding(Tools.dip2px(this,2));
                     tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT_DRAFT);
                     draft_people_description_id = data.getStringExtra(Constant.INTENT_DRAFT_PEOPLE_DESCRIPTION_ID);
                 }else if(resultCode == Constant.RESULT_DESCRIPTION_SAVE_DRAFT_FAIL){
@@ -248,6 +304,28 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      * 将事件添加到TextViewContainer中
      */
     private void addEventsInContainer(String title,String tag,String id){
+        //添加事件数据到内存中
+        if(peopleEventTexts == null){
+            peopleEventTexts = new ArrayList<>();
+        }
+        for(int i=0;i<peopleEventTexts.size();i++){
+            if(id.equals(peopleEventTexts.get(i).getId())&&tag.equals(peopleEventTexts.get(i).getTag())){
+                peopleEventTexts.remove(i);
+            }
+        }
+        peopleEventTexts.add(new PeopleEventText(title,tag,id));
+
+        for(int i=0;i<ll_tv_events.getChildCount();i++){
+            View child = ll_tv_events.getChildAt(i);
+            String status = (String) child.getTag(R.string.tag_event_status);
+            String status_id = (String)child.getTag(R.string.tag_event_status_id);
+            //如果添加的TextView status和status_id 都相同，则认为是同一个，只要覆盖title，不用重新new
+            if(tag.equals(status)&&id.equals(status_id)){
+                TextView tv = (TextView) child;
+                tv.setText(title);
+                return;
+            }
+        }
         TextView event = new TextView(this);
         event.setText(title);
         event.setTag(R.string.tag_event_status,tag);
@@ -284,19 +362,14 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
     }
 
-    int count = 0;
-    @OnClick(R.id.ic_events)
-    public void test(){
-        count ++;
-        TextView tv_test = new TextView(this);
-        tv_test.setText(count+"测试测试");
-        ll_tv_events.addTextView(tv_test);
-        ll_tv_events.setOnMoreTextClickedListener(new TextViewContainer.OnMoreTextClickedListener() {
-            @Override
-            public void onMoreTextClicked() {
-                Toast.makeText(app,"onMoreTextClicked",Toast.LENGTH_SHORT).show();
+    private void removeDeletedDraftIdInContains(String deleted_people_event_draft_id){
+        for(int i=0;i<ll_tv_events.getChildCount();i++){
+            View child = ll_tv_events.getChildAt(i);
+            if(Constant.TAG_EVENT_EDIT_DRAFT.equals(child.getTag(R.string.tag_event_status))
+                    && deleted_people_event_draft_id.equals(child.getTag(R.string.tag_event_status_id))){
+                ll_tv_events.removeView(child);
             }
-        });
+        }
     }
 
     /**
@@ -664,3 +737,75 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Part List<MultipartBody.Part> partList);
     }
 }
+//
+//                       _oo0oo_
+//                      o8888888o
+//                      88" . "88
+//                      (| -_- |)
+//                      0\  =  /0
+//                    ___/`---'\___
+//                  .' \\|     |// '.
+//                 / \\|||  :  |||// \
+//                / _||||| -:- |||||- \
+//               |   | \\\  -  /// |   |
+//               | \_|  ''\---/''  |_/ |
+//               \  .-\__  '-'  ___/-. /
+//             ___'. .'  /--.--\  `. .'___
+//          ."" '<  `.___\_<|>_/___.' >' "".
+//         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+//         \  \ `_.   \_ __\ /__ _/   .-` /  /
+//     =====`-.____`.___ \_____/___.-`___.-'=====
+//                       `=---='
+//
+//
+//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//               佛祖保佑         永无BUG
+//
+//
+//
+
+/*code is far away from bug with the animal protecting
+    *  ┏┓　　　┏┓
+    *┏┛┻━━━┛┻┓
+    *┃　　　　　　　┃ 　
+    *┃　　　━　　　┃
+    *┃　┳┛　┗┳　┃
+    *┃　　　　　　　┃
+    *┃　　　┻　　　┃
+    *┃　　　　　　　┃
+    *┗━┓　　　┏━┛
+    *　　┃　　　┃神兽保佑
+    *　　┃　　　┃代码无BUG！
+    *　　┃　　　┗━━━┓
+    *　　┃　　　　　　　┣┓
+    *　　┃　　　　　　　┏┛
+    *　　┗┓┓┏━┳┓┏┛
+    *　　　┃┫┫　┃┫┫
+    *　　　┗┻┛　┗┻┛
+    *　　　
+    */
+
+/**
+ *　　　　　　　　┏┓　　　┏┓+ +
+ *　　　　　　　┏┛┻━━━┛┻┓ + +
+ *　　　　　　　┃　　　　　　　┃ 　
+ *　　　　　　　┃　　　━　　　┃ ++ + + +
+ *　　　　　　 ████━████ ┃+
+ *　　　　　　　┃　　　　　　　┃ +
+ *　　　　　　　┃　　　┻　　　┃
+ *　　　　　　　┃　　　　　　　┃ + +
+ *　　　　　　　┗━┓　　　┏━┛
+ *　　　　　　　　　┃　　　┃　　　　　　　　　　　
+ *　　　　　　　　　┃　　　┃ + + + +
+ *　　　　　　　　　┃　　　┃　　　　Code is far away from bug with the animal protecting　　　　　　　
+ *　　　　　　　　　┃　　　┃ + 　　　　神兽保佑,代码无bug　　
+ *　　　　　　　　　┃　　　┃
+ *　　　　　　　　　┃　　　┃　　+　　　　　　　　　
+ *　　　　　　　　　┃　 　　┗━━━┓ + +
+ *　　　　　　　　　┃ 　　　　　　　┣┓
+ *　　　　　　　　　┃ 　　　　　　　┏┛
+ *　　　　　　　　　┗┓┓┏━┳┓┏┛ + + + +
+ *　　　　　　　　　　┃┫┫　┃┫┫
+ *　　　　　　　　　　┗┻┛　┗┻┛+ + + +
+ */

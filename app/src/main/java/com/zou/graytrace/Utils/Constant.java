@@ -45,6 +45,8 @@ public class Constant {
 
     public static final String TAG_EVENT_EDIT = "tag_event_edit";
     public static final String TAG_EVENT_EDIT_DRAFT = "tag_event_edit_draft";
+    public static final String INTENT_PEOPLE_EVENT_DELETE_DRAFT_ID = "intent_people_event_delete_draft_id";
+
 //    public static final int TAG_EVENT_STATUS = 100;
 //    public static final int TAG_EVENT_STATUS_ID = 101;
 }

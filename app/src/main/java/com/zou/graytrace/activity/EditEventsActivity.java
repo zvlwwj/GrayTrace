@@ -29,6 +29,7 @@ import com.zou.graytrace.bean.GsonCommitEventDraftResultBean;
 import com.zou.graytrace.bean.GsonPeopleEvent;
 import com.zou.graytrace.bean.GsonPeopleEventFromDraft;
 import com.zou.graytrace.bean.GsonUpdateEventDraftResultBean;
+import com.zou.graytrace.bean.GsonUpdateEventResultBean;
 import com.zou.graytrace.bean.GsonUploadEventResultBean;
 import com.zou.graytrace.view.EditTextPlus;
 
@@ -108,15 +109,24 @@ public class EditEventsActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 //TODO 保存到草稿 返回主界面
-                showSaveDraftDialog();
+                if(Constant.EVENTS_STATUS_EDIT.equals(stauts)) {
+                    //编辑提交的文本状态，点close，直接退出
+                    finish();
+                }else{
+                    //编辑草稿的文本状态或者是添加状态，点close，弹出保存草稿的弹出框
+                    showSaveDraftDialog();
+                }
                 break;
             case R.id.action_menu_commit:
                 //TODO 提交
-                Toast.makeText(getApplicationContext(),"提交",Toast.LENGTH_SHORT).show();
                 String type = getIntent().getStringExtra(Constant.INTENT_EVENTS_TYPE);
                 switch (type){
                     case Constant.EVENTS_TYPE_PEOPLE:
-                        uploadPeopleEvent();
+                        if(Constant.EVENTS_STATUS_EDIT.equals(stauts)) {
+                            updatePeopleEvent();
+                        }else{
+                            uploadPeopleEvent();
+                        }
                         break;
                     case Constant.EVENTS_TYPE_THINGS:
                         
@@ -126,6 +136,8 @@ public class EditEventsActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
     @Override
     public void onBackPressed() {
@@ -157,7 +169,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 String event_text = gsonPeopleEvent.getEvent_text();
                                 et_event_title.setText(event_title);
                                 et_event_content.setText(event_text);
-                                et_event_content.setSelection(event_text.length());
+                                et_event_content.requestFocus(event_text.length());
                                 break;
                             default:
                                 Toast.makeText(app,"读取数据失败",Toast.LENGTH_SHORT).show();
@@ -192,7 +204,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 String event_text = gsonPeopleEvent.getEvent_text();
                                 et_event_title.setText(event_title);
                                 et_event_content.setText(event_text);
-                                et_event_content.setSelection(event_text.length());
+                                et_event_content.requestFocus(event_text.length());
                                 break;
                             default:
                                 Toast.makeText(app,"读取数据失败",Toast.LENGTH_SHORT).show();
@@ -323,10 +335,11 @@ public class EditEventsActivity extends AppCompatActivity {
         //TODO
         String username = "13167231015";
         String draft_people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DRAFT_ID);
+        String draft_people_event_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID);
         String title = et_event_title.getText().toString();
         String event_text = et_event_content.getText().toString();
         String time_stamp = Tools.getTimeStamp();
-        eventService.uploadPeopleEvent(username,draft_people_id,title,event_text,time_stamp)
+        eventService.uploadPeopleEvent(username,draft_people_id,draft_people_event_id,title,event_text,time_stamp)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUploadEventResultBean>() {
                     @Override
@@ -349,6 +362,11 @@ public class EditEventsActivity extends AppCompatActivity {
                                 String title = et_event_title.getText().toString();
                                 data.putExtra(Constant.INTENT_PEOPLE_EVENT_TITLE,title);
                                 data.putExtra(Constant.INTENT_PEOPLE_EVENT_ID,gsonUploadEventResultBean.getPeople_event_id());
+                                //如果是编辑草稿的模式，则提交完成后将删除的草稿ID返回
+                                if(Constant.EVENTS_STATUS_EDIT_DRAFT.equals(stauts)){
+                                    String people_event_draft_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID);
+                                    data.putExtra(Constant.INTENT_PEOPLE_EVENT_DELETE_DRAFT_ID,people_event_draft_id);
+                                }
                                 setResult(Constant.RESULT_DESCRIPTION_COMMIT_OK,data);
                                 finish();
                                 break;
@@ -359,8 +377,64 @@ public class EditEventsActivity extends AppCompatActivity {
                     }
                 });
     }
+    /**
+     * 更新人物事件
+     */
+    private void updatePeopleEvent() {
+        if(Tools.isEditTextEmpty(et_event_title)){
+            Toast.makeText(app,"标题为空",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if(Tools.isEditTextEmpty(et_event_content)){
+            Toast.makeText(app,"内容为空",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //TODO
+        String username = "13167231015";
+        String draft_people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DRAFT_ID);
+        String people_event_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
+        String title = et_event_title.getText().toString();
+        String event_text = et_event_content.getText().toString();
+        String time_stamp = Tools.getTimeStamp();
+        eventService.updatePeopleEvent(username,draft_people_id,people_event_id,title,event_text,time_stamp)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonUpdateEventResultBean>() {
+                    @Override
+                    public void onCompleted() {
 
+                    }
 
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonUpdateEventResultBean gsonUpdateEventResultBean) {
+                        switch (gsonUpdateEventResultBean.getCode()){
+                            case 0:
+                                //提交成功，返回标题和ID到前一个界面
+                                Toast.makeText(app,"提交成功",Toast.LENGTH_SHORT).show();
+                                Intent data = new Intent();
+                                String title = et_event_title.getText().toString();
+                                String id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
+                                data.putExtra(Constant.INTENT_PEOPLE_EVENT_TITLE,title);
+                                data.putExtra(Constant.INTENT_PEOPLE_EVENT_ID,id);
+                                //如果是编辑草稿的模式，则提交完成后将删除的草稿ID返回
+                                if(Constant.EVENTS_STATUS_EDIT_DRAFT.equals(stauts)){
+                                    String people_event_draft_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID);
+                                    data.putExtra(Constant.INTENT_PEOPLE_EVENT_DELETE_DRAFT_ID,people_event_draft_id);
+                                }
+                                setResult(Constant.RESULT_DESCRIPTION_COMMIT_OK,data);
+                                finish();
+                                break;
+                            default:
+                                Toast.makeText(app,"提交失败，请重试",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
 
     /**
      * 权限请求成功
@@ -476,7 +550,9 @@ public class EditEventsActivity extends AppCompatActivity {
 
     interface EventService{
         @POST("people/commit/event")
-        Observable<GsonUploadEventResultBean> uploadPeopleEvent(@Query("username")String username, @Query("draft_people_id")String draft_people_id, @Query("event_title")String event_title, @Query("event_text")String event_text, @Query("time_stamp")String time_stamp);
+        Observable<GsonUploadEventResultBean> uploadPeopleEvent(@Query("username")String username, @Query("draft_people_id")String draft_people_id, @Query("draft_people_event_id")String draft_people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text, @Query("time_stamp")String time_stamp);
+        @POST("people/update/event")
+        Observable<GsonUpdateEventResultBean> updatePeopleEvent(@Query("username")String username, @Query("draft_people_id")String draft_people_id, @Query("people_event_id")String people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text, @Query("time_stamp")String time_stamp);
         @POST("draft/people/commit/event")
         Observable<GsonCommitEventDraftResultBean> commitEventDraft(@Query("username")String username, @Query("time_stamp")String time_stamp,@Query("draft_people_id") String draft_people_id,@Query("event_title") String event_title,@Query("event_text")String event_text);
         @POST("draft/people/update/event")
@@ -485,6 +561,5 @@ public class EditEventsActivity extends AppCompatActivity {
         Observable<GsonPeopleEvent> getPeopleEvent(@Query("people_event_id")String people_event_id);
         @POST("people/get/event_from_draft")
         Observable<GsonPeopleEventFromDraft> getPeopleEventFromDraft(@Query("draft_people_event_id")String draft_people_event_id);
-
     }
 }

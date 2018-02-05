@@ -1,6 +1,7 @@
 package com.zou.graytrace.view;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
 import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.AttributeSet;
@@ -25,7 +26,7 @@ import retrofit2.http.GET;
 public class TextViewContainer extends LinearLayout {
     private int maxWidth;
     private TextView moreTextView;
-    private static final int TEXT_VIEW_WIDTH = 90;//dp
+    private static final int TEXT_VIEW_WIDTH = 100;//dp
     private static final int TEXT_MORE_WIDTH = 50;//dp
     private boolean hasMoreTextView;
     private OnMoreTextClickedListener onMoreTextClickedListener;
@@ -46,8 +47,11 @@ public class TextViewContainer extends LinearLayout {
 
     private void init() {
         moreTextView = new TextView(getContext());
-        moreTextView.setLayoutParams(new LayoutParams(Tools.dip2px(getContext(),TEXT_MORE_WIDTH),LinearLayout.LayoutParams.WRAP_CONTENT));
+        LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+        lp.setMargins(Tools.dip2px(getContext(),5),0,Tools.dip2px(getContext(),5),0);
+        moreTextView.setLayoutParams(lp);
         moreTextView.setText(R.string.more);
+        moreTextView.setTextColor(getResources().getColor(R.color.colorAccent));
     }
 
     public void setMaxWidth(int maxWidth) {
@@ -55,8 +59,15 @@ public class TextViewContainer extends LinearLayout {
     }
 
     public void addTextView(TextView child){
-        child.setLayoutParams(new LayoutParams(Tools.dip2px(getContext(),TEXT_VIEW_WIDTH),LayoutParams.WRAP_CONTENT));
+        Drawable drawable = getResources().getDrawable(R.drawable.ic_edit);
+        drawable.setBounds(0,0,Tools.dip2px(getContext(),16),Tools.dip2px(getContext(),16));
+        child.setCompoundDrawables(drawable,null,null,null);
+        child.setCompoundDrawablePadding(Tools.dip2px(getContext(),2));
+        LayoutParams lp = new LayoutParams(Tools.dip2px(getContext(),TEXT_VIEW_WIDTH),LayoutParams.WRAP_CONTENT);
+//        lp.setMargins(Tools.dip2px(getContext(),5),0,0,0);
+        child.setLayoutParams(lp);
         child.setEllipsize(TextUtils.TruncateAt.valueOf("END"));
+        child.setTextColor(getResources().getColor(R.color.colorAccent));
         child.setSingleLine();
         if(hasMoreTextView){
             super.addView(child,0);

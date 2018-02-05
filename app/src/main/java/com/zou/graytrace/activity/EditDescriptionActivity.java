@@ -12,7 +12,6 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -27,23 +26,18 @@ import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonPeopleDescription;
 import com.zou.graytrace.bean.GsonPeopleDescriptionFromDraft;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleDescriptionResultBean;
+import com.zou.graytrace.bean.GsonUpdateDescriptionResultBean;
 import com.zou.graytrace.bean.GsonUploadDescriptionResultBean;
 import com.zou.graytrace.view.EditTextPlus;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import okhttp3.MultipartBody;
 import retrofit2.Retrofit;
-import retrofit2.http.Multipart;
 import retrofit2.http.POST;
-import retrofit2.http.Part;
 import retrofit2.http.Query;
 import rx.Observable;
 import rx.Observer;
-import rx.Scheduler;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -127,7 +121,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
                             case 0:
                                 String description = gsonPeopleDescription.getDescription_text();
                                 et_description_content.setText(description);
-                                et_description_content.setSelection(description.length());
+                                et_description_content.requestFocus(description.length());
                                 break;
                             default:
                                 Toast.makeText(app,"获取数据失败",Toast.LENGTH_SHORT).show();
@@ -142,7 +136,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
      */
     private void getDescriptionFromDraft(){
         String draft_people_description_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_DESCRIPTION_ID);
-        descriptionService.getPeopleDescriptionFromDarft(draft_people_description_id)
+        descriptionService.getPeopleDescriptionFromDraft(draft_people_description_id)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonPeopleDescriptionFromDraft>() {
@@ -162,7 +156,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
                             case 0:
                                 String description = gsonPeopleDescriptionFromDraft.getDescription_text();
                                 et_description_content.setText(description);
-                                et_description_content.setSelection(description.length());
+                                et_description_content.requestFocus(description.length());
                                 break;
                             default:
                                 Toast.makeText(app,"获取描述失败",Toast.LENGTH_SHORT).show();
@@ -222,13 +216,21 @@ public class EditDescriptionActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 //TODO 保存到草稿 返回主界面
-                showSaveDraftDialog();
+                if(Constant.DESCRIPTION_STATUS_EDIT.equals(stauts)) {
+                    finish();
+                }else{
+                    showSaveDraftDialog();
+                }
                 break;
             case R.id.action_menu_commit:
                 String type = getIntent().getStringExtra(Constant.INTENT_DESCRIPTION_TYPE);
                 switch (type){
                     case Constant.DESCRIPTION_TYPE_PEOPLE:
-                        uploadPeopleDescription();
+                        if(Constant.DESCRIPTION_STATUS_EDIT.equals(stauts)) {
+                            updatePeopleDescription();
+                        }else{
+                            uploadPeopleDescription();
+                        }
                         break;
                     case Constant.DESCRIPTION_TYPE_THINGS:
                         break;
@@ -241,6 +243,8 @@ public class EditDescriptionActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -307,6 +311,48 @@ public class EditDescriptionActivity extends AppCompatActivity {
                                 Toast.makeText(app,"提交成功",Toast.LENGTH_SHORT).show();
                                 Intent data = new Intent();
                                 data.putExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID,gsonUploadDescriptionResultBean.getPeople_description_id());
+                                setResult(Constant.RESULT_DESCRIPTION_COMMIT_OK,data);
+                                finish();
+                                break;
+                            default:
+                                Toast.makeText(app,"提交失败，请重试",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    private void updatePeopleDescription() {
+        if(Tools.isEditTextEmpty(et_description_content)){
+            Toast.makeText(app,"文本框为空",Toast.LENGTH_SHORT).show();
+            return;
+        }
+        //TODO
+        String username = "13167231015";
+        final String people_description_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID);
+        String description_text = et_description_content.getText().toString();
+        String time_stamp = Tools.getTimeStamp();
+
+        descriptionService.updatePeopleDescription(username,people_description_id,description_text,time_stamp)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonUpdateDescriptionResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonUpdateDescriptionResultBean gsonUpdateDescriptionResultBean) {
+                        switch (gsonUpdateDescriptionResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(app,"提交成功",Toast.LENGTH_SHORT).show();
+                                Intent data = new Intent();
+                                data.putExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID,people_description_id);
                                 setResult(Constant.RESULT_DESCRIPTION_COMMIT_OK,data);
                                 finish();
                                 break;
@@ -388,11 +434,13 @@ public class EditDescriptionActivity extends AppCompatActivity {
     interface DescriptionService{
         @POST("people/commit/description")
         Observable<GsonUploadDescriptionResultBean> uploadPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp);
+        @POST("people/update/description")
+        Observable<GsonUpdateDescriptionResultBean> updatePeopleDescription(@Query("username")String username, @Query("people_description_id")String people_description_id, @Query("description_text")String description_text, @Query("time_stamp")String time_stamp);
         @POST("draft/people/description")
         Observable<GsonSaveDraftPeopleDescriptionResultBean> saveDraftPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp);
         @POST("people/get/description")
         Observable<GsonPeopleDescription> getPeopleDescription(@Query("people_description_id")String people_description_id);
         @POST("people/get/description_from_draft")
-        Observable<GsonPeopleDescriptionFromDraft> getPeopleDescriptionFromDarft(@Query("draft_people_description_id")String draft_people_description_id);
+        Observable<GsonPeopleDescriptionFromDraft> getPeopleDescriptionFromDraft(@Query("draft_people_description_id")String draft_people_description_id);
     }
 }
