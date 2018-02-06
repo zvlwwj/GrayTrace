@@ -5,9 +5,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -22,17 +24,22 @@ import com.zhy.m.permission.PermissionGrant;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
+import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonPeopleDescription;
 import com.zou.graytrace.bean.GsonPeopleDescriptionFromDraft;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleDescriptionResultBean;
 import com.zou.graytrace.bean.GsonUpdateDescriptionResultBean;
 import com.zou.graytrace.bean.GsonUploadDescriptionResultBean;
+import com.zou.graytrace.bean.GsonUploadFileResultBean;
 import com.zou.graytrace.view.EditTextPlus;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.MultipartBody;
 import retrofit2.Retrofit;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -44,7 +51,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by zoujingyi on 2018/1/26.
  */
-
+@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class EditDescriptionActivity extends AppCompatActivity {
     private static final int ADD_IMAGE = 100;
     private static final int ADD_VIDEO = 101;
@@ -57,6 +64,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
     private AlertDialog saveDraftDialog;
     //表示是否在编辑状态
     private String stauts;
+    private GrayTraceApplication.PublicService publicService;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -78,6 +86,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
         app = (GrayTraceApplication) getApplication();
         Retrofit retrofit = app.getRetrofit();
         descriptionService = retrofit.create(DescriptionService.class);
+        publicService = retrofit.create(GrayTraceApplication.PublicService.class);
         stauts = getIntent().getStringExtra(Constant.INTENT_DESCRIPTION_STATUS);
         if(Constant.DESCRIPTION_STATUS_ADD_NEW.equals(stauts)){
 
@@ -246,6 +255,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
 
 
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
@@ -257,7 +267,36 @@ public class EditDescriptionActivity extends AppCompatActivity {
 //                        Bitmap originalBitmap = Tools.getFitSampleBitmap(getContentResolver().openInputStream(originalUri),Tools.dip2px(this,300),Tools.dip2px(this,150));
                         // 将原始图片的bitmap转换为文件
                         // 上传该文件并获取url
-                        et_description_content.addImage(Tools.getPathFromUri(EditDescriptionActivity.this,originalUri));
+                        String url = URL.BASE_PIC_DESCRIPTION;
+                        String fileName = "username"+"_"+Tools.getTimeStamp()+".png";
+                        String path = Tools.getPathFromUri(EditDescriptionActivity.this,originalUri);
+                        et_description_content.addImage(path,url,fileName);
+                        //TODO
+                        List<MultipartBody.Part> partList = Tools.getFilePartList(path,url,fileName);
+                        publicService.uploadFile(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Observer<GsonUploadFileResultBean>() {
+                                    @Override
+                                    public void onCompleted() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onNext(GsonUploadFileResultBean gsonUploadFileResultBean) {
+                                        switch (gsonUploadFileResultBean.getCode()){
+                                            case 0:
+                                                Toast.makeText(app,"上传文件成功",Toast.LENGTH_SHORT).show();
+                                                break;
+                                            default:
+                                                Toast.makeText(app,"上传文件失败",Toast.LENGTH_SHORT).show();
+                                                break;
+                                        }
+                                    }
+                                });
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -266,8 +305,37 @@ public class EditDescriptionActivity extends AppCompatActivity {
             case ADD_VIDEO:
                 if(resultCode == RESULT_OK){
                     Uri originalUri = data.getData();
-                    Bitmap bm = Tools.getVideoThumbnail(this,originalUri,et_description_content.getWidth(),Tools.dip2px(getApplicationContext(),200));
-                    et_description_content.addVideo(originalUri.getPath(),bm);
+                    String path = Tools.getPathFromUri(this,originalUri);
+                    Bitmap bm = Tools.getVideoThumbnail(path,et_description_content.getWidth(),Tools.dip2px(getApplicationContext(),200));
+                    String url = URL.BASE_VIDEO_DESCRIPTION;
+                    //TODO 替换username
+                    String fileName = "username"+"_"+Tools.getTimeStamp()+".mp4";
+                    et_description_content.addVideo(url,bm,fileName);
+                    List<MultipartBody.Part> partList = Tools.getFilePartList(path,url,fileName);
+                    publicService.uploadFile(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Observer<GsonUploadFileResultBean>() {
+                                @Override
+                                public void onCompleted() {
+
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    Toast.makeText(EditDescriptionActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onNext(GsonUploadFileResultBean gsonUploadFileResultBean) {
+                                    switch (gsonUploadFileResultBean.getCode()){
+                                        case 0:
+                                            Toast.makeText(EditDescriptionActivity.this,"上传文件成功",Toast.LENGTH_SHORT).show();
+                                            break;
+                                        default:
+                                            Toast.makeText(EditDescriptionActivity.this,"上传文件失败",Toast.LENGTH_SHORT).show();
+                                            break;
+                                    }
+                                }
+                            });
                 }
                 break;
         }

@@ -1,5 +1,6 @@
 package com.zou.graytrace.Utils;
 
+import android.annotation.TargetApi;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -13,15 +14,22 @@ import android.os.Build;
 import android.os.Environment;
 import android.provider.DocumentsContract;
 import android.provider.MediaStore;
+import android.support.annotation.RequiresApi;
 import android.util.DisplayMetrics;
 import android.view.View;
 import android.widget.EditText;
 
 import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.util.List;
+
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 
 /**
  * Created by zou on 2017/12/11.
@@ -190,7 +198,7 @@ public class Tools {
 //        return bitmap;
 //    }
 
-    public static Bitmap getVideoThumbnail(Context context, Uri uri,int width,int height) {
+    public static Bitmap getVideoThumbnail(String videoPath,int width,int height) {
 //        Bitmap bitmap = null;
 //        BitmapFactory.Options options = new BitmapFactory.Options();
 //        options.inDither = false;
@@ -207,7 +215,6 @@ public class Tools {
 //            return null;
 //        }
 //        cursor.close();
-        String videoPath = getPathFromUri(context,uri);
         Bitmap bitmap = ThumbnailUtils.createVideoThumbnail(videoPath, MediaStore.Video.Thumbnails.MINI_KIND);
         bitmap = ThumbnailUtils.extractThumbnail(bitmap, width, height,
                 ThumbnailUtils.OPTIONS_RECYCLE_INPUT);
@@ -221,12 +228,12 @@ public class Tools {
         return false;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public static String getPathFromUri(final Context context, final Uri uri) {
 
-        final boolean isKitKat = Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT;
 
         // DocumentProvider
-        if (isKitKat && DocumentsContract.isDocumentUri(context, uri)) {
+        if (DocumentsContract.isDocumentUri(context, uri)) {
             // ExternalStorageProvider
             if (isExternalStorageDocument(uri)) {
                 final String docId = DocumentsContract.getDocumentId(uri);
@@ -275,10 +282,11 @@ public class Tools {
         else if ("content".equalsIgnoreCase(uri.getScheme())) {
 
             // Return the remote address
-            if (isGooglePhotosUri(uri))
+            if (isGooglePhotosUri(uri)) {
                 return uri.getLastPathSegment();
-
-            return getDataColumn(context, uri, null, null);
+            }
+            String path = getDataColumn(context, uri, null, null);
+            return path;
         }
         // File
         else if ("file".equalsIgnoreCase(uri.getScheme())) {
@@ -296,17 +304,13 @@ public class Tools {
         final String[] projection = {
                 column
         };
-
-        try {
-            cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
-                    null);
-            if (cursor != null && cursor.moveToFirst()) {
-                final int index = cursor.getColumnIndexOrThrow(column);
-                return cursor.getString(index);
-            }
-        } finally {
-            if (cursor != null)
-                cursor.close();
+        cursor = context.getContentResolver().query(uri, projection, selection, selectionArgs,
+                null);
+        if (cursor != null && cursor.moveToFirst()) {
+            final int index = cursor.getColumnIndexOrThrow(column);
+            String path = cursor.getString(index);
+            cursor.close();
+            return path;
         }
         return null;
     }
@@ -348,5 +352,23 @@ public class Tools {
         SimpleDateFormat sDateFormat =   new SimpleDateFormat("yyyyMMddhhmmss");
         String    date    =    sDateFormat.format(new java.util.Date());
         return date;
+    }
+
+    public static List<MultipartBody.Part> getFilePartList(String path,String url,String fileNmae){
+        RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"), new File(path));
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        builder.addFormDataPart("file",fileNmae,fileBody);
+        builder.addFormDataPart("url",url);
+        List<MultipartBody.Part> partList = builder.build().parts();
+        return partList;
+    }
+
+    public static List<MultipartBody.Part> getFilePartList(File file,String url,String fileNmae){
+        RequestBody fileBody = RequestBody.create(MediaType.parse("multipart/form-data"),file);
+        MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);
+        builder.addFormDataPart("file",fileNmae,fileBody);
+        builder.addFormDataPart("url",url);
+        List<MultipartBody.Part> partList = builder.build().parts();
+        return partList;
     }
 }

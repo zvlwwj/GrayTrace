@@ -5,8 +5,10 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
@@ -30,9 +32,11 @@ import com.mukesh.countrypicker.CountryPickerListener;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
+import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUpdateDraftPeopleResultBean;
+import com.zou.graytrace.bean.GsonUploadFileResultBean;
 import com.zou.graytrace.bean.GsonUploadPeopleResultBean;
 import com.zou.graytrace.bean.PeopleEventText;
 import com.zou.graytrace.view.TextViewContainer;
@@ -56,11 +60,39 @@ import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-
+//
+//                       _oo0oo_
+//                      o8888888o
+//                      88" . "88
+//                      (| -_- |)
+//                      0\  =  /0
+//                    ___/`---'\___
+//                  .' \\|     |// '.
+//                 / \\|||  :  |||// \
+//                / _||||| -:- |||||- \
+//               |   | \\\  -  /// |   |
+//               | \_|  ''\---/''  |_/ |
+//               \  .-\__  '-'  ___/-. /
+//             ___'. .'  /--.--\  `. .'___
+//          ."" '<  `.___\_<|>_/___.' >' "".
+//         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
+//         \  \ `_.   \_ __\ /__ _/   .-` /  /
+//     =====`-.____`.___ \_____/___.-`___.-'=====
+//                       `=---='
+//
+//
+//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+//
+//               佛祖保佑         永无BUG
+//
+//
+//
 /**
  * Created by zou on 2018/1/18.
  * 上传界面
+ * TODO 没有考虑正在上传封面时用户点击上传的情况
  */
+@RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class UploadCelebrityActivity extends AppCompatActivity{
     CountryPicker picker;
     private static final int SELECT_COVER = 100;
@@ -111,6 +143,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
     private File imageFile;
     private AboutPeopleService aboutPeopleService;
+    private GrayTraceApplication.PublicService publicService;
     private GrayTraceApplication app;
     private ProgressDialog loadingDialog;
     //若从添加描述或者添加事件中返回则改值为true
@@ -129,7 +162,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
     private ArrayList<PeopleEventText> peopleEventTexts;
 
-
+    private String cover_url;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -242,6 +275,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         }
     }
 
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode) {
@@ -250,6 +284,35 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     Uri uri = data.getData();
                     Glide.with(this).load(uri).into(iv_cover);
                     imageFile = new File(Tools.getPathFromUri(this,uri));
+                    //TODO 替换username
+                    String fileName = "username"+"_"+Tools.getTimeStamp()+".png";
+                    String url = URL.BASE_PIC_COVER;
+                    cover_url = url + fileName;
+                    List<MultipartBody.Part> partList = Tools.getFilePartList(imageFile, url,fileName);
+                    publicService.uploadFile(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Observer<GsonUploadFileResultBean>() {
+                                @Override
+                                public void onCompleted() {
+
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    Toast.makeText(UploadCelebrityActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onNext(GsonUploadFileResultBean gsonUploadFileResultBean) {
+                                    switch (gsonUploadFileResultBean.getCode()){
+                                        case 0:
+                                            Toast.makeText(UploadCelebrityActivity.this,"上传图片成功",Toast.LENGTH_SHORT).show();
+                                            break;
+                                        default:
+                                            Toast.makeText(UploadCelebrityActivity.this,"上传图片失败",Toast.LENGTH_SHORT).show();
+                                            break;
+                                    }
+                                }
+                            });
                 }
                 break;
             case ADD_EVENTS:
@@ -680,7 +743,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UploadCelebrityActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
                         hideLoadingDialog();
                     }
 
@@ -689,10 +752,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                         hideLoadingDialog();
                         switch (gsonUploadPeopleResultBean.getCode()){
                             case 0:
-                                //TODO 提交成功
+                                Toast.makeText(UploadCelebrityActivity.this,"提交成功",Toast.LENGTH_SHORT).show();
+                                finish();
                                 break;
                             default:
-                                Toast.makeText(app,"提交失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UploadCelebrityActivity.this,"提交失败",Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -737,75 +801,5 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Part List<MultipartBody.Part> partList);
     }
 }
-//
-//                       _oo0oo_
-//                      o8888888o
-//                      88" . "88
-//                      (| -_- |)
-//                      0\  =  /0
-//                    ___/`---'\___
-//                  .' \\|     |// '.
-//                 / \\|||  :  |||// \
-//                / _||||| -:- |||||- \
-//               |   | \\\  -  /// |   |
-//               | \_|  ''\---/''  |_/ |
-//               \  .-\__  '-'  ___/-. /
-//             ___'. .'  /--.--\  `. .'___
-//          ."" '<  `.___\_<|>_/___.' >' "".
-//         | | :  `- \`.;`\ _ /`;.`/ - ` : | |
-//         \  \ `_.   \_ __\ /__ _/   .-` /  /
-//     =====`-.____`.___ \_____/___.-`___.-'=====
-//                       `=---='
-//
-//
-//     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-//
-//               佛祖保佑         永无BUG
-//
-//
-//
 
-/*code is far away from bug with the animal protecting
-    *  ┏┓　　　┏┓
-    *┏┛┻━━━┛┻┓
-    *┃　　　　　　　┃ 　
-    *┃　　　━　　　┃
-    *┃　┳┛　┗┳　┃
-    *┃　　　　　　　┃
-    *┃　　　┻　　　┃
-    *┃　　　　　　　┃
-    *┗━┓　　　┏━┛
-    *　　┃　　　┃神兽保佑
-    *　　┃　　　┃代码无BUG！
-    *　　┃　　　┗━━━┓
-    *　　┃　　　　　　　┣┓
-    *　　┃　　　　　　　┏┛
-    *　　┗┓┓┏━┳┓┏┛
-    *　　　┃┫┫　┃┫┫
-    *　　　┗┻┛　┗┻┛
-    *　　　
-    */
 
-/**
- *　　　　　　　　┏┓　　　┏┓+ +
- *　　　　　　　┏┛┻━━━┛┻┓ + +
- *　　　　　　　┃　　　　　　　┃ 　
- *　　　　　　　┃　　　━　　　┃ ++ + + +
- *　　　　　　 ████━████ ┃+
- *　　　　　　　┃　　　　　　　┃ +
- *　　　　　　　┃　　　┻　　　┃
- *　　　　　　　┃　　　　　　　┃ + +
- *　　　　　　　┗━┓　　　┏━┛
- *　　　　　　　　　┃　　　┃　　　　　　　　　　　
- *　　　　　　　　　┃　　　┃ + + + +
- *　　　　　　　　　┃　　　┃　　　　Code is far away from bug with the animal protecting　　　　　　　
- *　　　　　　　　　┃　　　┃ + 　　　　神兽保佑,代码无bug　　
- *　　　　　　　　　┃　　　┃
- *　　　　　　　　　┃　　　┃　　+　　　　　　　　　
- *　　　　　　　　　┃　 　　┗━━━┓ + +
- *　　　　　　　　　┃ 　　　　　　　┣┓
- *　　　　　　　　　┃ 　　　　　　　┏┛
- *　　　　　　　　　┗┓┓┏━┳┓┏┛ + + + +
- *　　　　　　　　　　┃┫┫　┃┫┫
- *　　　　　　　　　　┗┻┛　┗┻┛+ + + +
- */

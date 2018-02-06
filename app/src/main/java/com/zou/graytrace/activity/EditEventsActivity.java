@@ -5,9 +5,11 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -24,18 +26,27 @@ import com.zhy.m.permission.PermissionGrant;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
+import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonCommitEventDraftResultBean;
+import com.zou.graytrace.bean.GsonDeleteFileResultBean;
 import com.zou.graytrace.bean.GsonPeopleEvent;
 import com.zou.graytrace.bean.GsonPeopleEventFromDraft;
 import com.zou.graytrace.bean.GsonUpdateEventDraftResultBean;
 import com.zou.graytrace.bean.GsonUpdateEventResultBean;
 import com.zou.graytrace.bean.GsonUploadEventResultBean;
+import com.zou.graytrace.bean.GsonUploadFileResultBean;
 import com.zou.graytrace.view.EditTextPlus;
+
+import java.io.File;
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import okhttp3.MediaType;
+import okhttp3.MultipartBody;
+import okhttp3.RequestBody;
 import retrofit2.Retrofit;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -47,10 +58,34 @@ import rx.schedulers.Schedulers;
 /**
  * Created by zou on 2018/1/22.
  */
-
+/**
+ *　　　　　　　　┏┓　　　┏┓+ +
+ *　　　　　　　┏┛┻━━━┛┻┓ + +
+ *　　　　　　　┃　　　　　　　┃ 　
+ *　　　　　　　┃　　　━　　　┃ ++ + + +
+ *　　　　　　 ████━████ ┃+
+ *　　　　　　　┃　　　　　　　┃ +
+ *　　　　　　　┃　　　┻　　　┃
+ *　　　　　　　┃　　　　　　　┃ + +
+ *　　　　　　　┗━┓　　　┏━┛
+ *　　　　　　　　　┃　　　┃　　　　　　　　　　　
+ *　　　　　　　　　┃　　　┃ + + + +
+ *　　　　　　　　　┃　　　┃　　　　Code is far away from bug with the animal protecting　　　　　　　
+ *　　　　　　　　　┃　　　┃ + 　　　　神兽保佑,代码无bug　　
+ *　　　　　　　　　┃　　　┃
+ *　　　　　　　　　┃　　　┃　　+　　　　　　　　　
+ *　　　　　　　　　┃　 　　┗━━━┓ + +
+ *　　　　　　　　　┃ 　　　　　　　┣┓
+ *　　　　　　　　　┃ 　　　　　　　┏┛
+ *　　　　　　　　　┗┓┓┏━┳┓┏┛ + + + +
+ *　　　　　　　　　　┃┫┫　┃┫┫
+ *　　　　　　　　　　┗┻┛　┗┻┛+ + + +
+ */
 /**
  * TODO 1.退出Activity动画应该和回退时的不一样
- *      2.android8.0无法找到video路径，找不到解决方案！
+ * TODO 2.android8.0无法找到video路径，找不到解决方案！
+ * TODO 3.上传图片或视频的过程中删除的判断
+ * TODO 4.上传视频的进度没有
  */
 
 
@@ -68,6 +103,7 @@ public class EditEventsActivity extends AppCompatActivity {
     private String stauts;
     private EventService eventService;
     private AlertDialog saveDraftDialog;
+    private GrayTraceApplication.PublicService publicService;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,6 +116,7 @@ public class EditEventsActivity extends AppCompatActivity {
         app = (GrayTraceApplication) getApplication();
         Retrofit retrofit = app.getRetrofit();
         eventService = retrofit.create(EventService.class);
+        publicService = retrofit.create(GrayTraceApplication.PublicService.class);
         stauts = getIntent().getStringExtra(Constant.INTENT_EVENTS_STATUS);
         if(Constant.EVENTS_STATUS_ADD_NEW.equals(stauts)){
 
@@ -96,6 +133,36 @@ public class EditEventsActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+        et_event_content.setOnDeleteContentListener(new EditTextPlus.OnDeleteContentListener() {
+            @Override
+            public void onDrawableDeleted(String url) {
+                //删除url指定文件
+                publicService.deleteFile(url).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<GsonDeleteFileResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(EditEventsActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonDeleteFileResultBean gsonDeleteFileResultBean) {
+                        switch (gsonDeleteFileResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(EditEventsActivity.this,"删除文件成功",Toast.LENGTH_SHORT).show();
+                                break;
+                            default:
+                                Toast.makeText(EditEventsActivity.this,"删除文件失败",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+            }
+        });
     }
 
     @Override
@@ -486,6 +553,7 @@ public class EditEventsActivity extends AppCompatActivity {
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         switch (requestCode){
@@ -499,7 +567,36 @@ public class EditEventsActivity extends AppCompatActivity {
                         // 上传该文件并获取url
 //                        List<String> listPath = new ArrayList<>();
 //                        listPath.add();
-                        et_event_content.addImage(Tools.getPathFromUri(EditEventsActivity.this,originalUri));
+                        String url = URL.BASE_PIC_EVENT;
+                        String fileName = "username"+"_"+Tools.getTimeStamp()+".png";
+                        String path = Tools.getPathFromUri(EditEventsActivity.this,originalUri);
+                        et_event_content.addImage(path,url,fileName);
+                        //TODO 上传图片
+                        List<MultipartBody.Part> partList = Tools.getFilePartList(path,url,fileName);
+                        publicService.uploadFile(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                                .subscribe(new Observer<GsonUploadFileResultBean>() {
+                                    @Override
+                                    public void onCompleted() {
+
+                                    }
+
+                                    @Override
+                                    public void onError(Throwable e) {
+                                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                                    }
+
+                                    @Override
+                                    public void onNext(GsonUploadFileResultBean gsonUploadFileResultBean) {
+                                        switch (gsonUploadFileResultBean.getCode()){
+                                            case 0:
+                                                Toast.makeText(app,"上传文件成功",Toast.LENGTH_SHORT).show();
+                                                break;
+                                            default:
+                                                Toast.makeText(app,"上传文件失败",Toast.LENGTH_SHORT).show();
+                                                break;
+                                        }
+                                    }
+                                });
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
@@ -508,8 +605,36 @@ public class EditEventsActivity extends AppCompatActivity {
             case ADD_VIDEO:
                 if(resultCode == RESULT_OK){
                     Uri originalUri = data.getData();
-                    Bitmap bm = Tools.getVideoThumbnail(this,originalUri,et_event_content.getWidth(),Tools.dip2px(getApplicationContext(),200));
-                    et_event_content.addVideo(originalUri.getPath(),bm);
+                    String path = Tools.getPathFromUri(this,originalUri);
+                    Bitmap bm = Tools.getVideoThumbnail(path,et_event_content.getWidth(),Tools.dip2px(getApplicationContext(),200));
+                    String url = URL.BASE_VIDEO_EVENT;
+                    String fileName = "username"+"_"+Tools.getTimeStamp()+".mp4";
+                    et_event_content.addVideo(url,bm,fileName);
+                    List<MultipartBody.Part> partList = Tools.getFilePartList(path,url,fileName);
+                    publicService.uploadFile(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                            .subscribe(new Observer<GsonUploadFileResultBean>() {
+                                @Override
+                                public void onCompleted() {
+
+                                }
+
+                                @Override
+                                public void onError(Throwable e) {
+                                    Toast.makeText(EditEventsActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                                }
+
+                                @Override
+                                public void onNext(GsonUploadFileResultBean gsonUploadFileResultBean) {
+                                    switch (gsonUploadFileResultBean.getCode()){
+                                        case 0:
+                                            Toast.makeText(EditEventsActivity.this,"上传文件成功",Toast.LENGTH_SHORT).show();
+                                            break;
+                                        default:
+                                            Toast.makeText(EditEventsActivity.this,"上传文件失败",Toast.LENGTH_SHORT).show();
+                                            break;
+                                    }
+                                }
+                            });
                 }
                 break;
         }

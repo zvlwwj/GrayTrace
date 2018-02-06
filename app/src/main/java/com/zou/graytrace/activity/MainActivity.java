@@ -24,6 +24,26 @@ import com.zou.graytrace.fragment.NotificationFragment;
 import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+/*code is far away from bug with the animal protecting
+    *  ┏┓　　　┏┓
+    *┏┛┻━━━┛┻┓
+    *┃　　　　　　　┃ 　
+    *┃　　　━　　　┃
+    *┃　┳┛　┗┳　┃
+    *┃　　　　　　　┃
+    *┃　　　┻　　　┃
+    *┃　　　　　　　┃
+    *┗━┓　　　┏━┛
+    *　　┃　　　┃神兽保佑
+    *　　┃　　　┃代码无BUG！
+    *　　┃　　　┗━━━┓
+    *　　┃　　　　　　　┣┓
+    *　　┃　　　　　　　┏┛
+    *　　┗┓┓┏━┳┓┏┛
+    *　　　┃┫┫　┃┫┫
+    *　　　┗┻┛　┗┻┛
+    *　　　
+    */
 @RequiresApi(api = Build.VERSION_CODES.KITKAT)
 public class MainActivity extends AppCompatActivity {
     @BindView(R.id.bottom_navigation)

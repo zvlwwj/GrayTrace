@@ -37,38 +37,20 @@ import java.util.List;
  */
 
 public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
+    private static String TAG = "EditTextPlus";
     /**
      * 最大输入字符
      */
     public static final int MAXLENGTH = 2000;
 
-    /**
-     * 一张图片所占的字符长度
-     */
-    public static final int IMAGELENGTH = 2;
-    private static final String TAG = "EditTextPlus";
-    /**
-     * 占位符
-     */
-    private String placeholder = "&";
 
-    /**
-     * 最大添加图片数量
-     */
-    private int maxImage = 8;
     private Context mContext;
-
-    private String submitCon = "";
     private boolean insertImage = false;
 
-    private OnInsertionImageListener onInsertionImageListener;
-    private OnDeleteConteneListener onDeleteConteneListener;
+    private OnDeleteContentListener onDeleteContentListener;
 
     private float startY;
     private float startX;
-    private float selectionStart;
-
-    private List<String> image = new ArrayList<>();
 
     public EditTextPlus(Context context) {
         super(context);
@@ -87,74 +69,12 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
         addTextChangedListener(watcher);
     }
 
-
-
-    public interface OnInsertionImageListener {
-        /**
-         * 插入图片时的监听
-         */
-        void insertion();
-    }
-
-    public void setOnInsertionImageListener(OnInsertionImageListener onInsertionImageListener) {
-        this.onInsertionImageListener = onInsertionImageListener;
-    }
-
-    public interface OnDeleteConteneListener {
-        /**
-         * 删除图片的监听
-         */
-        void delete();
-    }
-
-    public void setOnDeleteConteneListener(OnDeleteConteneListener onDeleteConteneListener) {
-        this.onDeleteConteneListener = onDeleteConteneListener;
-    }
-
-
     /**
-     * 添加图片集合
+     * 添加图片
      *
-     * @param list
+     * @param
      */
-    public void addImage(List<String> list) {
-        if (getTextContent().length() + IMAGELENGTH > MAXLENGTH) {
-            Toast.makeText(mContext, "输入的内容超过最大限制", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Editable editable = getText();
-        for (int i = 0; i < list.size(); i++) {
-            if (getImage().size() >= maxImage) {
-                Toast.makeText(mContext, "图片超过最大数量", Toast.LENGTH_SHORT).show();
-                return;
-            }
-            if (list.get(i) != null && !TextUtils.isEmpty(list.get(i))) {
-                if (!TextUtils.isEmpty(getText().toString()) && !insertImage) {
-                    //如果第一张就是图片不用换行
-                    editable.insert(getSelectionStart(), "\n");
-                } else if (getSelectionStart() < getText().length()) {
-                    //当从中间插入时
-                    editable.insert(getSelectionStart(), "\n");
-                }
-                CharSequence sequence = getDrawableStr(list.get(i));
-                if (sequence != null) {
-                    image.add(list.get(i));
-                    editable.insert(getSelectionStart(), sequence);
-                    editable.insert(getSelectionStart(), "\n");
-                    insertImage = true;
-                }
-            } else {
-                Toast.makeText(mContext, "图片路径为空", Toast.LENGTH_SHORT).show();
-            }
-        }
-        //让光标始终在最后
-        this.setSelection(getText().toString().length());
-        if (onInsertionImageListener != null) {
-            onInsertionImageListener.insertion();
-        }
-    }
-
-    public void addImage(String path) {
+    public void addImage(String path,String url,String fileName) {
         Editable editable = getText();
         if (path != null && !TextUtils.isEmpty(path)) {
             if (!TextUtils.isEmpty(getText().toString()) && !insertImage) {
@@ -164,9 +84,8 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
                 //当从中间插入时
                 editable.insert(getSelectionStart(), "\n");
             }
-            CharSequence sequence = getDrawableStr(path);
+            CharSequence sequence = getDrawableStr(path,url+fileName);
             if (sequence != null) {
-                image.add("<img src=\""+path+"\"/>");
                 editable.insert(getSelectionStart(), sequence);
                 editable.insert(getSelectionStart(), "\n");
                 insertImage = true;
@@ -177,9 +96,6 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
 
         //让光标始终在最后
         this.setSelection(getText().toString().length());
-        if (onInsertionImageListener != null) {
-            onInsertionImageListener.insertion();
-        }
     }
 
     /**
@@ -187,9 +103,9 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
      *
      * @param
      */
-    public void addVideo(String path,Bitmap bm) {
+    public void addVideo(String url,Bitmap bm,String fileName) {
         Editable editable = getText();
-        if (path != null && !TextUtils.isEmpty(path)) {
+        if (url != null && !TextUtils.isEmpty(url)) {
             if (!TextUtils.isEmpty(getText().toString()) && !insertImage) {
                 //如果第一张就是图片不用换行
                 editable.insert(getSelectionStart(), "\n");
@@ -197,9 +113,8 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
                 //当从中间插入时
                 editable.insert(getSelectionStart(), "\n");
             }
-            CharSequence sequence = getVideoDrawableStr(path,bm);
+            CharSequence sequence = getVideoDrawableStr(url+fileName,bm);
             if (sequence != null) {
-                image.add("<video src=\""+path+"\"/>");
                 editable.insert(getSelectionStart(), sequence);
                 editable.insert(getSelectionStart(), "\n");
                 insertImage = true;
@@ -210,70 +125,21 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
 
         //让光标始终在最后
         this.setSelection(getText().toString().length());
-        if (onInsertionImageListener != null) {
-            onInsertionImageListener.insertion();
-        }
     }
 
-
-
-    /**
-     * 获取插入的图片列表
-     *
-     * @return
-     */
-    public List<String> getImage() {
-        List<String> picPaths = new ArrayList<>();
-        String content = this.getText().toString();
-        for (int i = 0; i < image.size(); i++) {
-            if (content.indexOf(image.get(i)) != -1) {
-                picPaths.add(image.get(i));
-            }
-        }
-        return picPaths;
-    }
-
-    /**
-     * 判断传进来的字符串是否是一个图片地址
-     * @param content
-     * @return
-     */
-//    public boolean isImage(String content) {
-//        for (int i = 0; i < image.size(); i++) {
-//            if (content.indexOf(image.get(i)) != -1) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
-
-    /**
-     * 获取去除image后的文字内容
-     *
-     * @return
-     */
-    public String getTextContent() {
-        return submitCon;
-    }
-
-
-    public String getTextString(){
-        return this.getText().toString();
-    }
 
     /**
      * 这个TextWatcher用来监听删除和输入的内容如果是图片的话 要相应把list集合中的图片也要移除 不然最后获取到的图片集合是错误的
      */
     private String tempString;
+
     private TextWatcher watcher = new TextWatcher() {
         @Override
         public void onTextChanged(CharSequence s, int start, int before, int count) {
             insertImage = false;
             //如果小于就是删除操作
             if (s.length() < tempString.length()) {
-                String deletString = tempString.substring(start, start + before);
                 int end = start + before;
-                Log.i(TAG,"deletString : "+deletString);
                 Spanned spanned = getEditableText();
                 ImageSpan[] imageSpans = spanned.getSpans(0,spanned.length(),ImageSpan.class);
                 for (int i = imageSpans.length - 1; i >= 0; i--) {
@@ -281,31 +147,13 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
                     int endImageSpan = spanned.getSpanEnd(imageSpans[i]);
                     if(end<=endImageSpan&&end>startImageSpan||(start<=endImageSpan&&start>startImageSpan)) {
                         Editable et = getText();
+                        String imageSpan = et.toString().substring(startImageSpan,endImageSpan);
+                        String url = imageSpan.substring(12,imageSpan.length()-3);
                         et.delete(startImageSpan, endImageSpan);
-                    }
-                }
-
-
-                if (image != null && image.size() > 0) {
-                    //重新计算各个图片的范围
-                    for (int i = 0; i < image.size(); i++) {
-                        //如果删除的内容中包含这张图片 那么就把图片集合中的对应的图片删除
-//                        int imageSpanStart = getTextString().indexOf(image.get(i));
-//                        int imageSpanEnd = imageSpanStart+image.get(i).length();
-//                        Log.i(TAG,"imageSpanStart : "+imageSpanStart+" imageSpanEnd : "+imageSpanEnd+" start : "+start+" end : "+(start + before));
-//                        if(end<=imageSpanEnd&&end>imageSpanStart||(start<=imageSpanEnd&&start>imageSpanStart)){
-//                            getText().delete(imageSpanStart+1,imageSpanEnd+1);
-//                            image.remove(i);
-//                        }
-
-
-                        if (deletString.toString().indexOf(image.get(i)) != -1) {
-                            image.remove(i);
-                            if (onDeleteConteneListener != null) {
-                                onDeleteConteneListener.delete();
-                            }
+                        Log.i(TAG,"url : "+url);
+                        if(onDeleteContentListener!=null){
+                            onDeleteContentListener.onDrawableDeleted(url);
                         }
-
                     }
                 }
             }
@@ -320,23 +168,7 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
         public void afterTextChanged(Editable s) {
             invalidate();
             requestLayout();
-
-//            StringBuffer stringBuffer = new StringBuffer(getText().toString());
-//            for (int i = 0; i < image.size(); i++) {
-//                if (stringBuffer.indexOf(image.get(i)) != -1) {
-//                    int index = stringBuffer.indexOf(image.get(i));
-//                    stringBuffer.delete(index - 10, index + image.get(i).length() + 3);
-//                    stringBuffer.insert(index - 10, placeholder);
-//                }
-//            }
-//
-//            if (stringBuffer.toString().indexOf(placeholder) == 0) {
-//                stringBuffer.insert(0, " ");
-//            }
-//            submitCon = stringBuffer.toString();
         }
-
-
     };
 
     /**
@@ -345,8 +177,8 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
      * @param picPath
      * @return
      */
-    private CharSequence getDrawableStr(String picPath) {
-        String str = "<img src=\"" + picPath + "\"/>";
+    private CharSequence getDrawableStr(String picPath,String url) {
+        String str = "<img src=\"" + url + "\"/>";
         Bitmap bm = createImageThumbnail(picPath);
         final SpannableString ss = new SpannableString(str);
         // 定义插入图片
@@ -379,14 +211,9 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
         return ss;
     }
 
-    /**
-     * 编辑插入的内容
-     *
-     * @param picPath
-     * @return
-     */
-    private CharSequence getVideoDrawableStr(String picPath,Bitmap bm) {
-        String str = "<video src=\"" + picPath + "\"/>";
+
+    private CharSequence getVideoDrawableStr(String url,Bitmap bm) {
+        String str = "<video src=\"" + url + "\"/>";
         final SpannableString ss = new SpannableString(str);
         // 定义插入图片
         View spanView = View.inflate(getContext(), R.layout.span_video,null);
@@ -417,12 +244,6 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
         VerticalCenterImageSpan span = new VerticalCenterImageSpan(drawable, 1);
         //SPAN_INCLUSIVE_EXCLUSIVE 会导致删除后面的文字消失
         ss.setSpan(span, 0, ss.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-      /*
-      Spannable.SPAN_EXCLUSIVE_EXCLUSIVE：前后都不包括，即在指定范围的前面和后面插入新字符都不会应用新样式
-      Spannable.SPAN_EXCLUSIVE_INCLUSIVE：前面不包括，后面包括。即仅在范围字符的后面插入新字符时会应用新样式
-      Spannable.SPAN_INCLUSIVE_EXCLUSIVE：前面包括，后面不包括。
-      Spannable.SPAN_INCLUSIVE_INCLUSIVE：前后都包括。
-       */
         return ss;
     }
 
@@ -489,7 +310,6 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
             case MotionEvent.ACTION_DOWN:
                 startY = event.getRawY();
                 startX = event.getRawX();
-                selectionStart = getSelectionStart();
                 break;
             case MotionEvent.ACTION_MOVE:
                 break;
@@ -505,5 +325,13 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
                 break;
         }
         return super.dispatchTouchEvent(event);
+    }
+
+    public interface OnDeleteContentListener{
+        void onDrawableDeleted(String url);
+    }
+
+    public void setOnDeleteContentListener(OnDeleteContentListener onDeleteContentListener){
+        this.onDeleteContentListener = onDeleteContentListener;
     }
 }
