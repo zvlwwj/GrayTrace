@@ -56,6 +56,7 @@ import retrofit2.Retrofit;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
+import retrofit2.http.Query;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
@@ -540,46 +541,26 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      * @param intent 保存草稿成功后的意图
      */
     private void saveDraft(@Nullable final Intent intent, final int requestCode){
-        showLoadingDialog();
-
-        final MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);//表单类型
-        builder.addFormDataPart("username", "13167231015");
         if(Tools.isEditTextEmpty(et_celebrity_name)) {
             hideLoadingDialog();
             return;
         }
-        builder.addFormDataPart("name", et_celebrity_name.getText().toString());
-        if(!Tools.isEditTextEmpty(et_celebrity_nationality)) {
-            builder.addFormDataPart("nationality", et_celebrity_nationality.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_birth_place)) {
-            builder.addFormDataPart("birthplace", et_birth_place.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_residence)) {
-            builder.addFormDataPart("residence", et_residence.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_long_sleep_place)) {
-            builder.addFormDataPart("grave_place", et_long_sleep_place.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_birthday)) {
-            builder.addFormDataPart("birth_day", et_birthday.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_death_day)) {
-            builder.addFormDataPart("death_day", et_death_day.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_motto)) {
-            builder.addFormDataPart("motto", et_motto.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_industry)) {
-            builder.addFormDataPart("industry", et_industry.getText().toString());
-        }
-        if(imageFile!=null) {
-            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), imageFile);
-            builder.addFormDataPart("cover", imageFile.getName(), fileBody);
-        }
-        builder.addFormDataPart("time_stamp",Tools.getTimeStamp());
-        List<MultipartBody.Part> partList = builder.build().parts();
-        aboutPeopleService.saveDraftPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+        showLoadingDialog();
+        //TODO 替换用户名
+        String username = "13167231015";
+        String name = et_celebrity_name.getText().toString();
+        String nationality = et_celebrity_nationality.getText().toString();
+        String birthplace = et_birth_place.getText().toString();
+        String residence = et_residence.getText().toString();
+        String grave_place = et_long_sleep_place.getText().toString();
+        String birth_day = et_birthday.getText().toString();
+        String death_day = et_death_day.getText().toString();
+        String motto = et_motto.getText().toString();
+        String industry = et_industry.getText().toString();
+        String cover_url = this.cover_url;
+        String time_stamp = Tools.getTimeStamp();
+        aboutPeopleService.saveDraftPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonSaveDraftPeopleResultBean>() {
                     @Override
                     public void onCompleted() {
@@ -619,46 +600,22 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     private void updateDraft(final Intent intent, final int requestCode) {
         showLoadingDialog();
-
-        final MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);//表单类型
-        builder.addFormDataPart("draft_people_id",draft_people_id);
-        builder.addFormDataPart("username", "13167231015");
-        if(Tools.isEditTextEmpty(et_celebrity_name)) {
-            hideLoadingDialog();
-            return;
-        }
-        builder.addFormDataPart("name", et_celebrity_name.getText().toString());
-        if(!Tools.isEditTextEmpty(et_celebrity_nationality)) {
-            builder.addFormDataPart("nationality", et_celebrity_nationality.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_birth_place)) {
-            builder.addFormDataPart("birthplace", et_birth_place.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_residence)) {
-            builder.addFormDataPart("residence", et_residence.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_long_sleep_place)) {
-            builder.addFormDataPart("grave_place", et_long_sleep_place.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_birthday)) {
-            builder.addFormDataPart("birth_day", et_birthday.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_death_day)) {
-            builder.addFormDataPart("death_day", et_death_day.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_motto)) {
-            builder.addFormDataPart("motto", et_motto.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_industry)) {
-            builder.addFormDataPart("industry", et_industry.getText().toString());
-        }
-        if(imageFile!=null) {
-            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), imageFile);
-            builder.addFormDataPart("cover", imageFile.getName(), fileBody);
-        }
-        builder.addFormDataPart("time_stamp",Tools.getTimeStamp());
-        List<MultipartBody.Part> partList = builder.build().parts();
-        aboutPeopleService.updateDraftPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+        //TODO 替换用户名
+        String username = "13167231015";
+        String name = et_celebrity_name.getText().toString();
+        String nationality = et_celebrity_nationality.getText().toString();
+        String birthplace = et_birth_place.getText().toString();
+        String residence = et_residence.getText().toString();
+        String grave_place = et_long_sleep_place.getText().toString();
+        String birth_day = et_birthday.getText().toString();
+        String death_day = et_death_day.getText().toString();
+        String motto = et_motto.getText().toString();
+        String industry = et_industry.getText().toString();
+        String cover_url = this.cover_url;
+        String time_stamp = Tools.getTimeStamp();
+        final String draft_people_id = this.draft_people_id;
+        aboutPeopleService.updateDraftPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,draft_people_id)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUpdateDraftPeopleResultBean>() {
                     @Override
                     public void onCompleted() {
@@ -696,45 +653,21 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     private void upLoadPeople() {
         showLoadingDialog();
-
-        final MultipartBody.Builder builder = new MultipartBody.Builder().setType(MultipartBody.FORM);//表单类型
-        builder.addFormDataPart("username", "13167231015");
-        if(Tools.isEditTextEmpty(et_celebrity_name)) {
-            hideLoadingDialog();
-            return;
-        }
-        builder.addFormDataPart("name", et_celebrity_name.getText().toString());
-        if(!Tools.isEditTextEmpty(et_celebrity_nationality)) {
-            builder.addFormDataPart("nationality", et_celebrity_nationality.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_birth_place)) {
-            builder.addFormDataPart("birthplace", et_birth_place.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_residence)) {
-            builder.addFormDataPart("residence", et_residence.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_long_sleep_place)) {
-            builder.addFormDataPart("grave_place", et_long_sleep_place.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_birthday)) {
-            builder.addFormDataPart("birth_day", et_birthday.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_death_day)) {
-            builder.addFormDataPart("death_day", et_death_day.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_motto)) {
-            builder.addFormDataPart("motto", et_motto.getText().toString());
-        }
-        if(!Tools.isEditTextEmpty(et_industry)) {
-            builder.addFormDataPart("industry", et_industry.getText().toString());
-        }
-        if(imageFile!=null) {
-            RequestBody fileBody = RequestBody.create(MediaType.parse("image/jpg"), imageFile);
-            builder.addFormDataPart("cover", imageFile.getName(), fileBody);
-        }
-        builder.addFormDataPart("time_stamp","201801301419");
-        List<MultipartBody.Part> partList = builder.build().parts();
-        aboutPeopleService.uploadPeople(partList).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+        //TODO 替换用户名
+        String username = "13167231015";
+        String name = et_celebrity_name.getText().toString();
+        String nationality = et_celebrity_nationality.getText().toString();
+        String birthplace = et_birth_place.getText().toString();
+        String residence = et_residence.getText().toString();
+        String grave_place = et_long_sleep_place.getText().toString();
+        String birth_day = et_birthday.getText().toString();
+        String death_day = et_death_day.getText().toString();
+        String motto = et_motto.getText().toString();
+        String industry = et_industry.getText().toString();
+        String cover_url = this.cover_url;
+        String time_stamp = Tools.getTimeStamp();
+        aboutPeopleService.uploadPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,draft_people_id)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUploadPeopleResultBean>() {
                     @Override
                     public void onCompleted() {
@@ -792,13 +725,29 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     interface AboutPeopleService{
         @Multipart
         @POST("people/commit")
-        Observable<GsonUploadPeopleResultBean> uploadPeople(@Part List<MultipartBody.Part> partList);
-        @Multipart
+        Observable<GsonUploadPeopleResultBean> uploadPeople(@Query("uploader")String uploader,@Query("name")String name,
+                                                            @Query("nationality")String nationality,@Query("birthplace")String birthplace,
+                                                            @Query("residence")String residence,@Query("grave_place")String grave_place,
+                                                            @Query("birth_day")String birth_day,@Query("death_day")String death_day,
+                                                            @Query("motto")String motto,@Query("industry")String industry,
+                                                            @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
+                                                            @Query("draft_people_id")String draft_people_id);
         @POST("draft/people/commit")
-        Observable<GsonSaveDraftPeopleResultBean> saveDraftPeople(@Part List<MultipartBody.Part> partList);
+        Observable<GsonSaveDraftPeopleResultBean> saveDraftPeople(@Query("uploader")String uploader,@Query("name")String name,
+                                                                  @Query("nationality")String nationality,@Query("birthplace")String birthplace,
+                                                                  @Query("residence")String residence,@Query("grave_place")String grave_place,
+                                                                  @Query("birth_day")String birth_day,@Query("death_day")String death_day,
+                                                                  @Query("motto")String motto,@Query("industry")String industry,
+                                                                  @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp);
         @Multipart
         @POST("draft/people/update")
-        Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Part List<MultipartBody.Part> partList);
+        Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Query("uploader")String uploader,@Query("name")String name,
+                                                                      @Query("nationality")String nationality,@Query("birthplace")String birthplace,
+                                                                      @Query("residence")String residence,@Query("grave_place")String grave_place,
+                                                                      @Query("birth_day")String birth_day,@Query("death_day")String death_day,
+                                                                      @Query("motto")String motto,@Query("industry")String industry,
+                                                                      @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
+                                                                      @Query("draft_people_id")String draft_people_id);
     }
 }
 
