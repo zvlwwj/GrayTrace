@@ -7,6 +7,7 @@ package com.zou.graytrace.bean;
 public class GsonLoginBean {
     private Integer code;
     private String msg;
+    private Integer user_id;
 
     public Integer getCode() {
         return code;
@@ -24,4 +25,11 @@ public class GsonLoginBean {
         this.msg = msg;
     }
 
+    public Integer getUser_id() {
+        return user_id;
+    }
+
+    public void setUser_id(Integer user_id) {
+        this.user_id = user_id;
+    }
 }

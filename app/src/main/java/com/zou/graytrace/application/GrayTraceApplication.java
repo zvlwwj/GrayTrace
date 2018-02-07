@@ -1,10 +1,12 @@
 package com.zou.graytrace.application;
 
 import android.app.Application;
+import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatDelegate;
 
 import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.bean.GsonDeleteFileResultBean;
+import com.zou.graytrace.bean.GsonLoginBean;
 import com.zou.graytrace.bean.GsonUploadFileResultBean;
 
 import java.util.List;
@@ -29,6 +31,7 @@ import rx.Observable;
  */
 public class GrayTraceApplication extends Application {
     private Retrofit retrofit;
+    private SharedPreferences accountSharedPreferences;
     @Override
     public void onCreate() {
         super.onCreate();
@@ -47,6 +50,17 @@ public class GrayTraceApplication extends Application {
     }
 
     /**
+     * 获取用户相关的SharedPreferences
+     * @return
+     */
+    public SharedPreferences getAccountSharedPreferences(){
+        if(accountSharedPreferences==null){
+            accountSharedPreferences = getSharedPreferences("account",MODE_PRIVATE);
+        }
+        return accountSharedPreferences;
+    }
+
+    /**
      * 可以共用的接口
      */
     public interface PublicService{
@@ -55,5 +69,7 @@ public class GrayTraceApplication extends Application {
         Observable<GsonUploadFileResultBean> uploadFile(@Part List<MultipartBody.Part> partList);
         @POST("deleteFile")
         Observable<GsonDeleteFileResultBean> deleteFile(@Query("url") String url);
+        @POST("login")
+        Observable<GsonLoginBean> toLogin(@Query("username")String username, @Query("password") String pwd);
     }
 }

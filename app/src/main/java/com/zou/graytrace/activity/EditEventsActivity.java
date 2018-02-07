@@ -424,7 +424,7 @@ public class EditEventsActivity extends AppCompatActivity {
                         switch (gsonUploadEventResultBean.getCode()){
                             case 0:
                                 //提交成功，返回标题和ID到前一个界面
-                                Toast.makeText(app,"提交成功",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditEventsActivity.this,"提交成功",Toast.LENGTH_SHORT).show();
                                 Intent data = new Intent();
                                 String title = et_event_title.getText().toString();
                                 data.putExtra(Constant.INTENT_PEOPLE_EVENT_TITLE,title);
@@ -438,7 +438,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             default:
-                                Toast.makeText(app,"提交失败，请重试",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditEventsActivity.this,"提交失败，请重试",Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }

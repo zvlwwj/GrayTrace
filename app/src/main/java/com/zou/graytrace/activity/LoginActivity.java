@@ -1,16 +1,19 @@
 package com.zou.graytrace.activity;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Base64;
 import android.view.MenuItem;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AutoCompleteTextView;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.R;
 import com.zou.graytrace.bean.GsonLoginBean;
@@ -39,8 +42,11 @@ public class LoginActivity extends AppCompatActivity {
     EditText et_password;
     @BindView(R.id.tv_user_name)
     AutoCompleteTextView tv_user_name;
-    GrayTraceApplication application;
-    LoginService loginService;
+    private GrayTraceApplication application;
+    private GrayTraceApplication.PublicService publicService;
+    private SharedPreferences sp;
+    public static final int RESULT_LOGIN_OK = 1000;
+    public static final int RESULT_LOGIN_CANCEL = 1001;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -52,8 +58,9 @@ public class LoginActivity extends AppCompatActivity {
 
     private void initData() {
         application = (GrayTraceApplication) getApplication();
+        sp = application.getAccountSharedPreferences();
         Retrofit retrofit = application.getRetrofit();
-        loginService = retrofit.create(LoginService.class);
+        publicService = retrofit.create(GrayTraceApplication.PublicService.class);
     }
 
     private void initView(){
@@ -83,6 +90,7 @@ public class LoginActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 //离开登陆界面
+                setResult(RESULT_LOGIN_CANCEL);
                 finish();
                 break;
         }
@@ -94,9 +102,9 @@ public class LoginActivity extends AppCompatActivity {
      */
     @OnClick(R.id.btn_login)
     void login(){
-        String username = tv_user_name.getText().toString();
-        String password = et_password.getText().toString();
-        loginService.toLogin(username,password)
+        final String username = tv_user_name.getText().toString();
+        final String password = et_password.getText().toString();
+        publicService.toLogin(username,password)
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe(new Observer<GsonLoginBean>() {
@@ -107,21 +115,34 @@ public class LoginActivity extends AppCompatActivity {
 
                 @Override
                 public void onError(Throwable e) {
-                    Toast.makeText(getApplicationContext(),"服务器错误",Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
                 }
 
                 @Override
                 public void onNext(GsonLoginBean gsonLoginBean) {
                     int code = gsonLoginBean.getCode();
-                    String msg = gsonLoginBean.getMsg();
-                    Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_SHORT).show();
-
+                    switch (code){
+                        case 0:
+                            Toast.makeText(LoginActivity.this,"登录成功",Toast.LENGTH_SHORT).show();
+                            //TODO 保存到偏好设置
+                            String base64Account = Base64.encodeToString(username.getBytes(), Base64.DEFAULT);
+                            String base64Password = Base64.encodeToString(password.getBytes(),Base64.DEFAULT);
+                            int user_id = gsonLoginBean.getUser_id();
+                            sp.edit().putString(Constant.SP_ACCOUNT,base64Account).apply();
+                            sp.edit().putString(Constant.SP_PASSWORD,base64Password).apply();
+                            sp.edit().putInt(Constant.SP_USER_ID,user_id).apply();
+                            sp.edit().putBoolean(Constant.SP_IS_LOGIN,true).apply();
+                            setResult(RESULT_LOGIN_OK);
+                            finish();
+                            break;
+                        case -1:
+                            Toast.makeText(LoginActivity.this,"用户名/密码错误",Toast.LENGTH_SHORT).show();
+                            break;
+                        case -2:
+                            Toast.makeText(LoginActivity.this,"没有该用户",Toast.LENGTH_SHORT).show();
+                            break;
+                    }
                 }
             });
-    }
-
-    interface LoginService{
-        @POST("login")
-        Observable<GsonLoginBean> toLogin(@Query("username")String username, @Query("password") String pwd);
     }
 }

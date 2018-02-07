@@ -46,6 +46,13 @@ public class Constant {
     public static final String TAG_EVENT_EDIT = "tag_event_edit";
     public static final String TAG_EVENT_EDIT_DRAFT = "tag_event_edit_draft";
     public static final String INTENT_PEOPLE_EVENT_DELETE_DRAFT_ID = "intent_people_event_delete_draft_id";
+    /**
+     * 关于用户
+     */
+    public static final String SP_ACCOUNT = "sp_account";
+    public static final String SP_PASSWORD = "sp_password";
+    public static final String SP_IS_LOGIN = "sp_is_login";
+    public static final String SP_USER_ID = "sp_user_id";
 
 //    public static final int TAG_EVENT_STATUS = 100;
 //    public static final int TAG_EVENT_STATUS_ID = 101;

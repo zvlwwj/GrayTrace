@@ -178,6 +178,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         app = (GrayTraceApplication) getApplication();
         Retrofit retrofit = app.getRetrofit();
         aboutPeopleService = retrofit.create(AboutPeopleService.class);
+        publicService = retrofit.create(GrayTraceApplication.PublicService.class);
         tv_add_description.setTag(Constant.TAG_DESCRIPTION_ADD_NEW);
     }
 
@@ -723,9 +724,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     }
 
     interface AboutPeopleService{
-        @Multipart
         @POST("people/commit")
-        Observable<GsonUploadPeopleResultBean> uploadPeople(@Query("uploader")String uploader,@Query("name")String name,
+        Observable<GsonUploadPeopleResultBean> uploadPeople(@Query("username")String uploader,@Query("name")String name,
                                                             @Query("nationality")String nationality,@Query("birthplace")String birthplace,
                                                             @Query("residence")String residence,@Query("grave_place")String grave_place,
                                                             @Query("birth_day")String birth_day,@Query("death_day")String death_day,
@@ -733,7 +733,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                             @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
                                                             @Query("draft_people_id")String draft_people_id);
         @POST("draft/people/commit")
-        Observable<GsonSaveDraftPeopleResultBean> saveDraftPeople(@Query("uploader")String uploader,@Query("name")String name,
+        Observable<GsonSaveDraftPeopleResultBean> saveDraftPeople(@Query("username")String uploader,@Query("name")String name,
                                                                   @Query("nationality")String nationality,@Query("birthplace")String birthplace,
                                                                   @Query("residence")String residence,@Query("grave_place")String grave_place,
                                                                   @Query("birth_day")String birth_day,@Query("death_day")String death_day,
@@ -741,7 +741,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                                   @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp);
         @Multipart
         @POST("draft/people/update")
-        Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Query("uploader")String uploader,@Query("name")String name,
+        Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Query("username")String uploader,@Query("name")String name,
                                                                       @Query("nationality")String nationality,@Query("birthplace")String birthplace,
                                                                       @Query("residence")String residence,@Query("grave_place")String grave_place,
                                                                       @Query("birth_day")String birth_day,@Query("death_day")String death_day,
