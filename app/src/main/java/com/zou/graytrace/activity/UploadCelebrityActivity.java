@@ -739,7 +739,6 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                                   @Query("birth_day")String birth_day,@Query("death_day")String death_day,
                                                                   @Query("motto")String motto,@Query("industry")String industry,
                                                                   @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp);
-        @Multipart
         @POST("draft/people/update")
         Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Query("username")String uploader,@Query("name")String name,
                                                                       @Query("nationality")String nationality,@Query("birthplace")String birthplace,

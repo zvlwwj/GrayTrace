@@ -54,4 +54,10 @@
     <string name="exit_login">退出登录</string>
     <string name="confirm">确认</string>
     <string name="exit_login_msg">是否确认退出登录？</string>
+    <string name="tab_creation_people">人物</string>
+    <string name="tab_creation_things">事物</string>
+    <string name="tab_creation_events">事件</string>
+    <string name="tab_creation_article">文章</string>
+    <string name="count_draft">个草稿</string>
+    <string name="draft_box">草稿箱</string>
 </resources>

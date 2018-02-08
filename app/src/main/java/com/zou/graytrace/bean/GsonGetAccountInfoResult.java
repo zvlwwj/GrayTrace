@@ -39,12 +39,15 @@ public class GsonGetAccountInfoResult {
         private String draft_people_ids;
         private String draft_thing_ids;
         private String draft_event_ids;
+        private String draft_article_ids;
         private String people_ids;
         private String thing_ids;
         private String event_ids;
+        private String article_ids;
         private String collection_people_ids;
         private String collection_thing_ids;
         private String collection_event_ids;
+        private String collection_article_ids;
 
         public String getNick_name() {
             return nick_name;
@@ -132,6 +135,30 @@ public class GsonGetAccountInfoResult {
 
         public void setCollection_event_ids(String collection_event_ids) {
             this.collection_event_ids = collection_event_ids;
+        }
+
+        public String getDraft_article_ids() {
+            return draft_article_ids;
+        }
+
+        public void setDraft_article_ids(String draft_article_ids) {
+            this.draft_article_ids = draft_article_ids;
+        }
+
+        public String getArticle_ids() {
+            return article_ids;
+        }
+
+        public void setArticle_ids(String article_ids) {
+            this.article_ids = article_ids;
+        }
+
+        public String getCollection_article_ids() {
+            return collection_article_ids;
+        }
+
+        public void setCollection_article_ids(String collection_article_ids) {
+            this.collection_article_ids = collection_article_ids;
         }
     }
 }

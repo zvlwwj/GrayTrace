@@ -54,6 +54,11 @@ public class Constant {
     public static final String SP_IS_LOGIN = "sp_is_login";
     public static final String SP_USER_ID = "sp_user_id";
 
+    /**
+     * 我的创作
+     */
+    public static final String INTENT_DRAFT_BOX_COUNT = "intent_draft_box_count";
+
 //    public static final int TAG_EVENT_STATUS = 100;
 //    public static final int TAG_EVENT_STATUS_ID = 101;
 }

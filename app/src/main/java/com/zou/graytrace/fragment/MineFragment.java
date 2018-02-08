@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.CardView;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -16,6 +17,7 @@ import com.bumptech.glide.Glide;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.activity.LoginActivity;
+import com.zou.graytrace.activity.MyCreationActivity;
 import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonGetAccountInfoResult;
 
@@ -41,6 +43,8 @@ public class MineFragment extends BaseFragment {
     View ll_login_view;
     @BindView(R.id.cardView_unlogin)
     View cardView_unlogin;
+    @BindView(R.id.tv_draft_count)
+    TextView tv_draft_count;
     private static MineFragment instance;
     private boolean isLogin;
     private int user_id;
@@ -49,6 +53,7 @@ public class MineFragment extends BaseFragment {
     private SharedPreferences sharedPreferences;
     private AlertDialog exitLoginDialog;
     private static final int REQUEST_LOGIN = 100;
+    private int draft_count;
     public static synchronized MineFragment getInstance() {
         if (instance == null) {
             instance = new MineFragment();
@@ -65,6 +70,11 @@ public class MineFragment extends BaseFragment {
     @Override
     protected void onBaseCreateView() {
         super.onBaseCreateView();
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
         initData();
     }
 
@@ -117,6 +127,31 @@ public class MineFragment extends BaseFragment {
                             case 0:
                                 String nick_name = gsonGetAccountInfoResult.getInfo().getNick_name();
                                 String avatar_url = gsonGetAccountInfoResult.getInfo().getAvatar_url();
+                                String draft_people_ids = gsonGetAccountInfoResult.getInfo().getDraft_people_ids();
+                                String draft_thing_ids = gsonGetAccountInfoResult.getInfo().getDraft_thing_ids();
+                                String draft_event_ids = gsonGetAccountInfoResult.getInfo().getDraft_event_ids();
+                                String draft_article_ids = gsonGetAccountInfoResult.getInfo().getDraft_article_ids();
+                                int draft_people_count=0;
+                                int draft_things_count=0;
+                                int draft_events_count=0;
+                                int draft_article_count=0;
+                                if(draft_people_ids!=null){
+                                    draft_people_count = draft_people_ids.split(",").length;
+                                }
+                                if(draft_thing_ids!=null){
+                                    draft_things_count = draft_thing_ids.split(",").length;
+                                }
+                                if(draft_event_ids!=null){
+                                    draft_events_count = draft_event_ids.split(",").length;
+                                }
+                                if(draft_article_ids!=null){
+                                    draft_article_count = draft_article_ids.split(",").length;
+                                }
+
+                                draft_count = draft_people_count+draft_things_count+draft_events_count+draft_article_count;
+                                if(draft_count!=0){
+                                    tv_draft_count.setText(draft_count+getResources().getString(R.string.count_draft));
+                                }
                                 if(nick_name!=null) {
                                     tv_nick_name.setText(nick_name);
                                 }else{
@@ -180,12 +215,39 @@ public class MineFragment extends BaseFragment {
     }
 
     /**
+     * 我的创作
+     */
+    @OnClick(R.id.rl_mine_creation)
+    void toMyCreation(){
+        Intent intent = new Intent(getActivity(), MyCreationActivity.class);
+        intent.putExtra(Constant.INTENT_DRAFT_BOX_COUNT,draft_count);
+        startActivity(intent);
+    }
+
+    /**
+     * 我的收藏
+     */
+    @OnClick(R.id.rl_mine_collection)
+    void toMyCollection(){
+
+    }
+
+    /**
+     * 我的关注
+     */
+    @OnClick(R.id.rl_mine_care)
+    void toMyCare(){
+
+    }
+
+    /**
      * 退出登录
      */
     @OnClick(R.id.cardView_account_exit)
     void exitLogin(){
         showExitLoginDialog();
     }
+
 
     interface GetAccountInfoService{
         @POST("get/accountInfo")
