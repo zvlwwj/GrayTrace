@@ -1,13 +1,15 @@
 package com.zou.graytrace.bean;
 
+import java.util.List;
+
 /**
  * Created by zou on 2018/2/8.
  */
 
 public class GsonGetCreationPeopleSampleResultBean {
-    Integer code;
-    String msg;
-
+    private Integer code;
+    private String msg;
+    private List<Info> infos = null;
     public Integer getCode() {
         return code;
     }
@@ -22,5 +24,43 @@ public class GsonGetCreationPeopleSampleResultBean {
 
     public void setMsg(String msg) {
         this.msg = msg;
+    }
+
+    public List<Info> getInfos() {
+        return infos;
+    }
+
+    public void setInfos(List<Info> infos) {
+        this.infos = infos;
+    }
+
+    public class Info {
+        private String name;
+        private String descriptionText;
+        private String coverUrl;
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
+        }
+
+        public String getDescriptionText() {
+            return descriptionText;
+        }
+
+        public void setDescriptionText(String descriptionText) {
+            this.descriptionText = descriptionText;
+        }
+
+        public String getCoverUrl() {
+            return coverUrl;
+        }
+
+        public void setCoverUrl(String coverUrl) {
+            this.coverUrl = coverUrl;
+        }
     }
 }

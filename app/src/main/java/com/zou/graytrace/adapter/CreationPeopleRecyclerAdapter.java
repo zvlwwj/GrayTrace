@@ -2,6 +2,7 @@ package com.zou.graytrace.adapter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
@@ -27,7 +28,8 @@ public class CreationPeopleRecyclerAdapter extends RecyclerView.Adapter<Creation
 
     @Override
     public CreationPeopleRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View v = View.inflate(parent.getContext(), R.layout.item_creation_people,null);
+//        View v = View.inflate(parent.getContext(), R.layout.item_creation_people,null);
+        View v = LayoutInflater.from(parent.getContext()).inflate( R.layout.item_creation_people,parent,false);
         ViewHolder viewHolder = new ViewHolder(v);
         return viewHolder;
     }
@@ -35,9 +37,18 @@ public class CreationPeopleRecyclerAdapter extends RecyclerView.Adapter<Creation
     @Override
     public void onBindViewHolder(CreationPeopleRecyclerAdapter.ViewHolder holder, int position) {
         ItemCreationPeople itemCreationPeople = itemCreationPeoples.get(position);
-        holder.tv_item_creation_people_title.setText(itemCreationPeople.getTitle());
-        holder.tv_item_creation_people_content.setText(itemCreationPeople.getContent());
-        Glide.with(context).load(itemCreationPeople.getCover_url()).into(holder.iv_item_creation_people_cover);
+        String title = itemCreationPeople.getTitle();
+        String content = itemCreationPeople.getContent();
+        String cover_url = itemCreationPeople.getCover_url();
+        if(title!=null) {
+            holder.tv_item_creation_people_title.setText(title);
+        }
+        if(content!=null) {
+            holder.tv_item_creation_people_content.setText(content);
+        }
+        if(cover_url!=null) {
+            Glide.with(context).load(cover_url).into(holder.iv_item_creation_people_cover);
+        }
     }
 
     @Override
