@@ -59,6 +59,13 @@ public class Constant {
      */
     public static final String INTENT_DRAFT_BOX_COUNT = "intent_draft_box_count";
 
+    /**
+     *关于人物
+     */
+    public static final String INTENT_PEOPLE_STATUS = "intent_people_status";
+    public static final String PEOPLE_STATUS_ADD_NEW = "people_status_add_new";
+    public static final String PEOPLE_STATUS_EDIT = "people_status_edit";
+    public static final String PEOPLE_STATUS_EDIT_DRAFT = "people_status_edit_draft";
 //    public static final int TAG_EVENT_STATUS = 100;
 //    public static final int TAG_EVENT_STATUS_ID = 101;
 }

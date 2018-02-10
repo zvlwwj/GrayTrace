@@ -17,6 +17,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.zou.graytrace.R;
+import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
 import com.zou.graytrace.activity.UploadCelebrityActivity;
 import com.zou.graytrace.adapter.FragmentAdapter;
@@ -118,6 +119,7 @@ public class HomePageFragment extends BaseFragment {
             case R.id.action_menu_main_upload:
                 //TODO 跳转到上传Activity
                 Intent intent = new Intent(getActivity(), UploadCelebrityActivity.class);
+                intent.putExtra(Constant.INTENT_PEOPLE_STATUS,Constant.PEOPLE_STATUS_ADD_NEW);
                 startActivity(intent);
                 return true;
             default:

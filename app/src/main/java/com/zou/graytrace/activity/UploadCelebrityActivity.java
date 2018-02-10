@@ -164,6 +164,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     private ArrayList<PeopleEventText> peopleEventTexts;
 
     private String cover_url;
+
+    private AlertDialog saveDraftDialog;
+
+    private String stauts;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -180,6 +184,12 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         aboutPeopleService = retrofit.create(AboutPeopleService.class);
         publicService = retrofit.create(GrayTraceApplication.PublicService.class);
         tv_add_description.setTag(Constant.TAG_DESCRIPTION_ADD_NEW);
+        stauts = getIntent().getStringExtra(Constant.INTENT_PEOPLE_STATUS);
+        if(Constant.PEOPLE_STATUS_EDIT.equals(stauts)){
+
+        }else if(Constant.PEOPLE_STATUS_EDIT_DRAFT.equals(stauts)){
+
+        }
     }
 
     private void initView() {
@@ -528,7 +538,13 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         switch (item.getItemId()){
             case android.R.id.home:
                 //TODO 给个dialog提示 返回主界面
-                finish();
+                if(Constant.PEOPLE_STATUS_EDIT.equals(stauts)) {
+                    //编辑提交的人物状态，点close，直接退出
+                    finish();
+                }else{
+                    //编辑人物草稿状态或者是添加新人物状态，点close，弹出保存草稿的弹出框
+                    showSaveDraftDialog();
+                }
                 break;
             case R.id.action_menu_commit:
                 upLoadPeople();
@@ -541,7 +557,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      * 保存到草稿
      * @param intent 保存草稿成功后的意图
      */
-    private void saveDraft(@Nullable final Intent intent, final int requestCode){
+    private void saveDraft(@Nullable final Intent intent, @Nullable final int requestCode){
         if(Tools.isEditTextEmpty(et_celebrity_name)) {
             hideLoadingDialog();
             return;
@@ -695,6 +711,26 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                         }
                     }
                 });
+    }
+
+    private void showSaveDraftDialog(){
+        if(saveDraftDialog == null){
+            saveDraftDialog =  new AlertDialog.Builder(this)
+                    .setMessage(getString(R.string.dialog_msg_save_draft))
+                    .setPositiveButton(getString(R.string.save), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            saveDraft(null,0);
+                        }
+                    })
+                    .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            finish();
+                        }
+                    }).create();
+        }
+        saveDraftDialog.show();
     }
 
     /**
