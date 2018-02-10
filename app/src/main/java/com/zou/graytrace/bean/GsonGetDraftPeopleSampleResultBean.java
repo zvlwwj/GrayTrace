@@ -6,7 +6,7 @@ import java.util.List;
  * Created by zou on 2018/2/8.
  */
 
-public class GsonGetCreationPeopleSampleResultBean {
+public class GsonGetDraftPeopleSampleResultBean {
     private Integer code;
     private String msg;
     private List<Info> infos = null;
@@ -38,7 +38,7 @@ public class GsonGetCreationPeopleSampleResultBean {
         private String name;
         private String descriptionText;
         private String coverUrl;
-        private String people_id;
+        private String draft_people_id;
 
         public String getName() {
             return name;
@@ -64,12 +64,12 @@ public class GsonGetCreationPeopleSampleResultBean {
             this.coverUrl = coverUrl;
         }
 
-        public String getPeople_id() {
-            return people_id;
+        public String getDraft_people_id() {
+            return draft_people_id;
         }
 
-        public void setPeople_id(String people_id) {
-            this.people_id = people_id;
+        public void setDraft_people_id(String draft_people_id) {
+            this.draft_people_id = draft_people_id;
         }
     }
 }

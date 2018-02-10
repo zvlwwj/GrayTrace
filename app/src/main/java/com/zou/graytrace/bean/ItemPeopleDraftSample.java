@@ -4,10 +4,11 @@ package com.zou.graytrace.bean;
  * Created by zou on 2018/2/8.
  */
 
-public class ItemCreationPeople {
+public class ItemPeopleDraftSample {
     private String title;
     private String content;
     private String cover_url;
+    private String draft_people_id;
 
     public String getTitle() {
         return title;
@@ -31,5 +32,13 @@ public class ItemCreationPeople {
 
     public void setCover_url(String cover_url) {
         this.cover_url = cover_url;
+    }
+
+    public String getDraft_people_id() {
+        return draft_people_id;
+    }
+
+    public void setDraft_people_id(String draft_people_id) {
+        this.draft_people_id = draft_people_id;
     }
 }

@@ -29,6 +29,7 @@
         <activity android:name=".activity.LoginActivity"
             android:windowSoftInputMode="adjustResize|stateHidden"/>
         <activity android:name=".activity.MyCreationActivity"/>
+        <activity android:name=".activity.DraftBoxActivity"/>
     </application>
 
 </manifest>

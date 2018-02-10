@@ -10,7 +10,8 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.zou.graytrace.R;
-import com.zou.graytrace.bean.ItemCreationPeople;
+import com.zou.graytrace.bean.ItemPeopleDraftSample;
+import com.zou.graytrace.bean.ItemPeopleSample;
 
 import java.util.ArrayList;
 
@@ -18,16 +19,16 @@ import java.util.ArrayList;
  * Created by zou on 2018/2/8.
  */
 
-public class CreationPeopleRecyclerAdapter extends RecyclerView.Adapter<CreationPeopleRecyclerAdapter.ViewHolder>{
-    private ArrayList<ItemCreationPeople> itemCreationPeoples;
+public class DraftPeopleRecyclerAdapter extends RecyclerView.Adapter<DraftPeopleRecyclerAdapter.ViewHolder>{
+    private ArrayList<ItemPeopleDraftSample> itemDraftPeoples;
     private Context context;
-    public CreationPeopleRecyclerAdapter(Context context, ArrayList<ItemCreationPeople> itemCreationPeoples){
-        this.itemCreationPeoples = itemCreationPeoples;
+    public DraftPeopleRecyclerAdapter(Context context, ArrayList<ItemPeopleDraftSample> itemDraftPeoples){
+        this.itemDraftPeoples = itemDraftPeoples;
         this.context = context;
     }
 
     @Override
-    public CreationPeopleRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public DraftPeopleRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
 //        View v = View.inflate(parent.getContext(), R.layout.item_creation_people,null);
         View v = LayoutInflater.from(parent.getContext()).inflate( R.layout.item_creation_people,parent,false);
         ViewHolder viewHolder = new ViewHolder(v);
@@ -35,11 +36,11 @@ public class CreationPeopleRecyclerAdapter extends RecyclerView.Adapter<Creation
     }
 
     @Override
-    public void onBindViewHolder(CreationPeopleRecyclerAdapter.ViewHolder holder, int position) {
-        ItemCreationPeople itemCreationPeople = itemCreationPeoples.get(position);
-        String title = itemCreationPeople.getTitle();
-        String content = itemCreationPeople.getContent();
-        String cover_url = itemCreationPeople.getCover_url();
+    public void onBindViewHolder(DraftPeopleRecyclerAdapter.ViewHolder holder, int position) {
+        ItemPeopleDraftSample itemPeopleDraftSample = itemDraftPeoples.get(position);
+        String title = itemPeopleDraftSample.getTitle();
+        String content = itemPeopleDraftSample.getContent();
+        String cover_url = itemPeopleDraftSample.getCover_url();
         if(title!=null) {
             holder.tv_item_creation_people_title.setText(title);
         }
@@ -53,7 +54,7 @@ public class CreationPeopleRecyclerAdapter extends RecyclerView.Adapter<Creation
 
     @Override
     public int getItemCount() {
-        return itemCreationPeoples.size();
+        return itemDraftPeoples.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
