@@ -1,14 +1,17 @@
 package com.zou.graytrace.fragment;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.Toast;
 
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
+import com.zou.graytrace.activity.UploadCelebrityActivity;
 import com.zou.graytrace.adapter.PeopleRecyclerAdapter;
 import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonGetCreationPeopleSampleResultBean;
@@ -59,7 +62,10 @@ public class CreationPeopleFragment extends BaseFragment{
         super.onBaseCreateView();
         initData();
         initView();
+        setListener();
     }
+
+
 
     private void initData() {
         sharedPreferences = application.getAccountSharedPreferences();
@@ -72,6 +78,19 @@ public class CreationPeopleFragment extends BaseFragment{
         adapter = new PeopleRecyclerAdapter(getContext(),itemCreationPeoples);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setAdapter(adapter);
+    }
+    private void setListener() {
+        adapter.setOnItemClickListener(new PeopleRecyclerAdapter.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                ItemPeopleSample itemPeopleSample = itemCreationPeoples.get(position);
+                String people_id = itemPeopleSample.getPeople_id();
+                Intent intent = new Intent(getActivity(), UploadCelebrityActivity.class);
+                intent.putExtra(Constant.INTENT_PEOPLE_STATUS,Constant.PEOPLE_STATUS_EDIT);
+                intent.putExtra(Constant.INTENT_PEOPLE_ID,people_id);
+                startActivity(intent);
+            }
+        });
     }
 
     private void getList(int user_id) {

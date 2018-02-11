@@ -14,13 +14,16 @@ import com.zou.graytrace.bean.ItemPeopleSample;
 
 import java.util.ArrayList;
 
+import butterknife.OnClick;
+
 /**
  * Created by zou on 2018/2/8.
  */
 
-public class PeopleRecyclerAdapter extends RecyclerView.Adapter<PeopleRecyclerAdapter.ViewHolder>{
+public class PeopleRecyclerAdapter extends RecyclerView.Adapter<PeopleRecyclerAdapter.ViewHolder> implements View.OnClickListener{
     private ArrayList<ItemPeopleSample> itemCreationPeoples;
     private Context context;
+    private OnItemClickListener mOnItemClickListener = null;
     public PeopleRecyclerAdapter(Context context, ArrayList<ItemPeopleSample> itemCreationPeoples){
         this.itemCreationPeoples = itemCreationPeoples;
         this.context = context;
@@ -31,8 +34,11 @@ public class PeopleRecyclerAdapter extends RecyclerView.Adapter<PeopleRecyclerAd
 //        View v = View.inflate(parent.getContext(), R.layout.item_creation_people,null);
         View v = LayoutInflater.from(parent.getContext()).inflate( R.layout.item_creation_people,parent,false);
         ViewHolder viewHolder = new ViewHolder(v);
+        v.setOnClickListener(this);
         return viewHolder;
     }
+
+
 
     @Override
     public void onBindViewHolder(PeopleRecyclerAdapter.ViewHolder holder, int position) {
@@ -49,12 +55,22 @@ public class PeopleRecyclerAdapter extends RecyclerView.Adapter<PeopleRecyclerAd
         if(cover_url!=null) {
             Glide.with(context).load(cover_url).into(holder.iv_item_creation_people_cover);
         }
+        holder.itemView.setTag(position);
     }
 
     @Override
     public int getItemCount() {
         return itemCreationPeoples.size();
     }
+
+    @Override
+    public void onClick(View v) {
+        if (mOnItemClickListener != null) {
+            //注意这里使用getTag方法获取position
+            mOnItemClickListener.onItemClick(v,(int)v.getTag());
+        }
+    }
+
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tv_item_creation_people_title;
@@ -66,5 +82,14 @@ public class PeopleRecyclerAdapter extends RecyclerView.Adapter<PeopleRecyclerAd
             tv_item_creation_people_content = itemView.findViewById(R.id.tv_item_creation_people_content);
             iv_item_creation_people_cover = itemView.findViewById(R.id.iv_item_creation_people_cover);
         }
+    }
+
+    //define interface
+    public interface OnItemClickListener {
+        void onItemClick(View view , int position);
+    }
+
+    public void setOnItemClickListener(OnItemClickListener listener) {
+        this.mOnItemClickListener = listener;
     }
 }

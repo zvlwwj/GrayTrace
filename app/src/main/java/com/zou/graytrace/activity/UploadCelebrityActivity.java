@@ -34,6 +34,7 @@ import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
 import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
+import com.zou.graytrace.bean.GsonGetPeopleResultBean;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUpdateDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUploadFileResultBean;
@@ -186,9 +187,9 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         tv_add_description.setTag(Constant.TAG_DESCRIPTION_ADD_NEW);
         stauts = getIntent().getStringExtra(Constant.INTENT_PEOPLE_STATUS);
         if(Constant.PEOPLE_STATUS_EDIT.equals(stauts)){
-
+            getPeopleInfo();
         }else if(Constant.PEOPLE_STATUS_EDIT_DRAFT.equals(stauts)){
-
+            getPeopleInfoFromDraft();
         }
     }
 
@@ -445,6 +446,43 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                 ll_tv_events.removeView(child);
             }
         }
+    }
+
+    /**
+     * 获取人物信息
+     */
+    private void getPeopleInfo() {
+        String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+        aboutPeopleService.getPeopleInfo(people_id).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<GsonGetPeopleResultBean>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(UploadCelebrityActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNext(GsonGetPeopleResultBean gsonGetPeopleResultBean) {
+                switch (gsonGetPeopleResultBean.getCode()){
+                    case 0:
+                        
+                        break;
+                    default:
+                        Toast.makeText(UploadCelebrityActivity.this,"获取人物信息失败",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
+    }
+
+    /**
+     * 获取人物草稿中的信息
+     */
+    private void getPeopleInfoFromDraft() {
+        String draft_people_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_ID);
     }
 
     /**
@@ -768,6 +806,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                             @Query("motto")String motto,@Query("industry")String industry,
                                                             @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
                                                             @Query("draft_people_id")String draft_people_id);
+
+        @POST("people/get")
+        Observable<GsonGetPeopleResultBean> getPeopleInfo(@Query("people_id")String people_id);
+
         @POST("draft/people/commit")
         Observable<GsonSaveDraftPeopleResultBean> saveDraftPeople(@Query("username")String uploader,@Query("name")String name,
                                                                   @Query("nationality")String nationality,@Query("birthplace")String birthplace,
