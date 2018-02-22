@@ -31,7 +31,6 @@ public class PeopleRecyclerAdapter extends RecyclerView.Adapter<PeopleRecyclerAd
 
     @Override
     public PeopleRecyclerAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-//        View v = View.inflate(parent.getContext(), R.layout.item_creation_people,null);
         View v = LayoutInflater.from(parent.getContext()).inflate( R.layout.item_creation_people,parent,false);
         ViewHolder viewHolder = new ViewHolder(v);
         v.setOnClickListener(this);
@@ -84,7 +83,6 @@ public class PeopleRecyclerAdapter extends RecyclerView.Adapter<PeopleRecyclerAd
         }
     }
 
-    //define interface
     public interface OnItemClickListener {
         void onItemClick(View view , int position);
     }

@@ -34,6 +34,7 @@ import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
 import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
+import com.zou.graytrace.bean.GsonGetDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonGetPeopleResultBean;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonUpdateDraftPeopleResultBean;
@@ -468,7 +469,79 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             public void onNext(GsonGetPeopleResultBean gsonGetPeopleResultBean) {
                 switch (gsonGetPeopleResultBean.getCode()){
                     case 0:
-                        
+                        //封面
+                        String cover_url = gsonGetPeopleResultBean.getInfo().getCover_url();
+                        if(cover_url!=null){
+                            Glide.with(UploadCelebrityActivity.this).load(cover_url).into(iv_cover);
+                        }
+                        //alive=0表示活着，alive=1表示死了
+                        int alive = gsonGetPeopleResultBean.getInfo().getAlive();
+                        if(alive == 1){
+                            rg_alive.check(R.id.rb_dead);
+                        }
+                        //姓名栏
+                        String name = gsonGetPeopleResultBean.getInfo().getName();
+                        if(name!=null){
+                            et_celebrity_name.setText(name);
+                        }
+                        //生日
+                        String birthDay = gsonGetPeopleResultBean.getInfo().getBirth_day();
+                        if(birthDay!=null){
+                            et_birthday.setText(birthDay);
+                        }
+                        //祭日
+                        String deathDay = gsonGetPeopleResultBean.getInfo().getDeath_day();
+                        if(deathDay!=null){
+                            et_death_day.setText(deathDay);
+                        }
+                        //国籍
+                        String nationality = gsonGetPeopleResultBean.getInfo().getNationality();
+                        if(nationality!=null){
+                            et_celebrity_nationality.setText(nationality);
+                        }
+                        //出生地
+                        String birthPlace = gsonGetPeopleResultBean.getInfo().getBirthplace();
+                        if(birthPlace!=null){
+                            et_birth_place.setText(birthPlace);
+                        }
+                        //长眠地
+                        String longSleepPlace = gsonGetPeopleResultBean.getInfo().getGrave_place();
+                        if(longSleepPlace!=null){
+                            et_long_sleep_place.setText(longSleepPlace);
+                        }
+                        //居住地
+                        String residence = gsonGetPeopleResultBean.getInfo().getResidence();
+                        if(residence!=null){
+                            et_residence.setText(residence);
+                        }
+                        //行业
+                        String industry = gsonGetPeopleResultBean.getInfo().getIndustry();
+                        if(industry!=null) {
+                            et_industry.setText(industry);
+                        }
+                        //一句话描述
+                        String motto = gsonGetPeopleResultBean.getInfo().getMotto();
+                        if(motto!=null) {
+                            et_motto.setText(motto);
+                        }
+                        //描述
+                        String people_description_id = gsonGetPeopleResultBean.getInfo().getDescription().getDescription_id();
+                        if(people_description_id != null){
+                            UploadCelebrityActivity.this.people_description_id = people_description_id;
+                            tv_add_description.setText(R.string.edit_description);
+                            Drawable drawable = getResources().getDrawable(R.drawable.ic_edit);
+                            drawable.setBounds(0,0,Tools.dip2px(UploadCelebrityActivity.this,16),Tools.dip2px(UploadCelebrityActivity.this,16));
+                            tv_add_description.setCompoundDrawables(drawable,null,null,null);
+                            tv_add_description.setCompoundDrawablePadding(Tools.dip2px(UploadCelebrityActivity.this,2));
+                            tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT);
+                        }
+                        //事件
+                        ArrayList<GsonGetPeopleResultBean.Info.Event> events = gsonGetPeopleResultBean.getInfo().getEvents();
+                        if(events!=null&&events.size()>0){
+                            for(GsonGetPeopleResultBean.Info.Event event : events){
+                                addEventsInContainer(event.getEvent_title(),Constant.TAG_EVENT_EDIT,event.getEvent_id());
+                            }
+                        }
                         break;
                     default:
                         Toast.makeText(UploadCelebrityActivity.this,"获取人物信息失败",Toast.LENGTH_SHORT).show();
@@ -483,6 +556,101 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     private void getPeopleInfoFromDraft() {
         String draft_people_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_ID);
+        aboutPeopleService.getDraftPeopleInfo(draft_people_id).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<GsonGetDraftPeopleResultBean>() {
+            @Override
+            public void onCompleted() {
+
+            }
+
+            @Override
+            public void onError(Throwable e) {
+                Toast.makeText(UploadCelebrityActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onNext(GsonGetDraftPeopleResultBean gsonGetDraftPeopleResultBean) {
+                switch (gsonGetDraftPeopleResultBean.getCode()){
+                    case 0:
+                        //封面
+                        String cover_url = gsonGetDraftPeopleResultBean.getInfo().getCover_url();
+                        if(cover_url!=null){
+                            Glide.with(UploadCelebrityActivity.this).load(cover_url).into(iv_cover);
+                        }
+                        //alive=0表示活着，alive=1表示死了
+                        int alive = gsonGetDraftPeopleResultBean.getInfo().getAlive();
+                        if(alive == 1){
+                            rg_alive.check(R.id.rb_dead);
+                        }
+                        //姓名栏
+                        String name = gsonGetDraftPeopleResultBean.getInfo().getName();
+                        if(name!=null){
+                            et_celebrity_name.setText(name);
+                        }
+                        //生日
+                        String birthDay = gsonGetDraftPeopleResultBean.getInfo().getBirth_day();
+                        if(birthDay!=null){
+                            et_birthday.setText(birthDay);
+                        }
+                        //祭日
+                        String deathDay = gsonGetDraftPeopleResultBean.getInfo().getDeath_day();
+                        if(deathDay!=null){
+                            et_death_day.setText(deathDay);
+                        }
+                        //国籍
+                        String nationality = gsonGetDraftPeopleResultBean.getInfo().getNationality();
+                        if(nationality!=null){
+                            et_celebrity_nationality.setText(nationality);
+                        }
+                        //出生地
+                        String birthPlace = gsonGetDraftPeopleResultBean.getInfo().getBirthplace();
+                        if(birthPlace!=null){
+                            et_birth_place.setText(birthPlace);
+                        }
+                        //长眠地
+                        String longSleepPlace = gsonGetDraftPeopleResultBean.getInfo().getGrave_place();
+                        if(longSleepPlace!=null){
+                            et_long_sleep_place.setText(longSleepPlace);
+                        }
+                        //居住地
+                        String residence = gsonGetDraftPeopleResultBean.getInfo().getResidence();
+                        if(residence!=null){
+                            et_residence.setText(residence);
+                        }
+                        //行业
+                        String industry = gsonGetDraftPeopleResultBean.getInfo().getIndustry();
+                        if(industry!=null) {
+                            et_industry.setText(industry);
+                        }
+                        //一句话描述
+                        String motto = gsonGetDraftPeopleResultBean.getInfo().getMotto();
+                        if(motto!=null) {
+                            et_motto.setText(motto);
+                        }
+                        //描述
+                        String people_description_id = gsonGetDraftPeopleResultBean.getInfo().getDescription().getDescription_id();
+                        if(people_description_id != null){
+                            UploadCelebrityActivity.this.people_description_id = people_description_id;
+                            tv_add_description.setText(R.string.edit_description);
+                            Drawable drawable = getResources().getDrawable(R.drawable.ic_edit);
+                            drawable.setBounds(0,0,Tools.dip2px(UploadCelebrityActivity.this,16),Tools.dip2px(UploadCelebrityActivity.this,16));
+                            tv_add_description.setCompoundDrawables(drawable,null,null,null);
+                            tv_add_description.setCompoundDrawablePadding(Tools.dip2px(UploadCelebrityActivity.this,2));
+                            tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT);
+                        }
+                        //事件
+                        ArrayList<GsonGetDraftPeopleResultBean.Info.Event> events = gsonGetDraftPeopleResultBean.getInfo().getEvents();
+                        if(events!=null&&events.size()>0){
+                            for(GsonGetDraftPeopleResultBean.Info.Event event : events){
+                                addEventsInContainer(event.getEvent_title(),Constant.TAG_EVENT_EDIT,event.getEvent_id());
+                            }
+                        }
+                        break;
+                    default:
+                        Toast.makeText(UploadCelebrityActivity.this,"获取人物草稿信息失败",Toast.LENGTH_SHORT).show();
+                        break;
+                }
+            }
+        });
     }
 
     /**
@@ -809,6 +977,9 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
         @POST("people/get")
         Observable<GsonGetPeopleResultBean> getPeopleInfo(@Query("people_id")String people_id);
+
+        @POST("draft/people/get")
+        Observable<GsonGetDraftPeopleResultBean> getDraftPeopleInfo(@Query("draft_people_id")String draft_people_id);
 
         @POST("draft/people/commit")
         Observable<GsonSaveDraftPeopleResultBean> saveDraftPeople(@Query("username")String uploader,@Query("name")String name,

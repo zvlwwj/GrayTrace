@@ -59,4 +59,6 @@
     <string name="tab_creation_article">文章</string>
     <string name="count_draft">个草稿</string>
     <string name="draft_box">草稿箱</string>
+    <string name="nav_people">人物</string>
+    <string name="nav_edit">编辑</string>
 </resources>

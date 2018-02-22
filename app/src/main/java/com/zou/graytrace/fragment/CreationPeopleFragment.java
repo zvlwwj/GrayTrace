@@ -11,6 +11,7 @@ import android.widget.Toast;
 
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
+import com.zou.graytrace.activity.PeopleActivity;
 import com.zou.graytrace.activity.UploadCelebrityActivity;
 import com.zou.graytrace.adapter.PeopleRecyclerAdapter;
 import com.zou.graytrace.application.GrayTraceApplication;
@@ -85,8 +86,8 @@ public class CreationPeopleFragment extends BaseFragment{
             public void onItemClick(View view, int position) {
                 ItemPeopleSample itemPeopleSample = itemCreationPeoples.get(position);
                 String people_id = itemPeopleSample.getPeople_id();
-                Intent intent = new Intent(getActivity(), UploadCelebrityActivity.class);
-                intent.putExtra(Constant.INTENT_PEOPLE_STATUS,Constant.PEOPLE_STATUS_EDIT);
+                Intent intent = new Intent(getActivity(), PeopleActivity.class);
+                intent.putExtra(Constant.INTENT_PEOPLE_FROM,Constant.PEOPLE_FROM_CREATION);
                 intent.putExtra(Constant.INTENT_PEOPLE_ID,people_id);
                 startActivity(intent);
             }
@@ -117,6 +118,7 @@ public class CreationPeopleFragment extends BaseFragment{
                                     itemCreationPeople.setTitle(info.getName());
                                     itemCreationPeople.setContent(info.getDescriptionText());
                                     itemCreationPeople.setCover_url(info.getCoverUrl());
+                                    itemCreationPeople.setPeople_id(info.getPeople_id());
                                     itemCreationPeoples.add(itemCreationPeople);
                                 }
                                 adapter.notifyDataSetChanged();

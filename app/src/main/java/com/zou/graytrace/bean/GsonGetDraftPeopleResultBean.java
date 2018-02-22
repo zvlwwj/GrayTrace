@@ -3,10 +3,10 @@ package com.zou.graytrace.bean;
 import java.util.ArrayList;
 
 /**
- * Created by zou on 2018/2/11.
+ * Created by zou on 2018/2/22.
  */
 
-public class GsonGetPeopleResultBean {
+public class GsonGetDraftPeopleResultBean {
     private Integer code;
     private String msg;
     private Info info;
@@ -20,10 +20,7 @@ public class GsonGetPeopleResultBean {
         private String grave_place;
         private String birth_day;
         private String death_day;
-        private String article_ids;
-        private int reputation;
         private Description description;
-        private int comment_count;
         private String motto;
         private String industry;
         private ArrayList<Event> events;
@@ -150,30 +147,6 @@ public class GsonGetPeopleResultBean {
 
         public void setDeath_day(String death_day) {
             this.death_day = death_day;
-        }
-
-        public String getArticle_ids() {
-            return article_ids;
-        }
-
-        public void setArticle_ids(String article_ids) {
-            this.article_ids = article_ids;
-        }
-
-        public int getReputation() {
-            return reputation;
-        }
-
-        public void setReputation(int reputation) {
-            this.reputation = reputation;
-        }
-
-        public int getComment_count() {
-            return comment_count;
-        }
-
-        public void setComment_count(int comment_count) {
-            this.comment_count = comment_count;
         }
 
         public String getMotto() {
