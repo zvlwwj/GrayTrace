@@ -460,12 +460,11 @@ public class EditEventsActivity extends AppCompatActivity {
         //TODO
         String username = "13167231015";
         String draft_people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DRAFT_ID);
-        String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
         String people_event_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
         String title = et_event_title.getText().toString();
         String event_text = et_event_content.getText().toString();
         String time_stamp = Tools.getTimeStamp();
-        eventService.updatePeopleEvent(username,draft_people_id,people_event_id,title,event_text,time_stamp,people_id)
+        eventService.updatePeopleEvent(username,draft_people_id,people_event_id,title,event_text,time_stamp)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUpdateEventResultBean>() {
                     @Override
@@ -679,7 +678,7 @@ public class EditEventsActivity extends AppCompatActivity {
         @POST("people/commit/event")
         Observable<GsonUploadEventResultBean> uploadPeopleEvent(@Query("username")String username, @Query("draft_people_id")String draft_people_id, @Query("draft_people_event_id")String draft_people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text, @Query("time_stamp")String time_stamp, @Query("people_id")String people_id);
         @POST("people/update/event")
-        Observable<GsonUpdateEventResultBean> updatePeopleEvent(@Query("username")String username, @Query("draft_people_id")String draft_people_id, @Query("people_event_id")String people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text, @Query("time_stamp")String time_stamp,@Query("people_id")String people_id);
+        Observable<GsonUpdateEventResultBean> updatePeopleEvent(@Query("username")String username, @Query("draft_people_id")String draft_people_id, @Query("people_event_id")String people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text, @Query("time_stamp")String time_stamp);
         @POST("draft/people/commit/event")
         Observable<GsonCommitEventDraftResultBean> commitEventDraft(@Query("username")String username, @Query("time_stamp")String time_stamp,@Query("draft_people_id") String draft_people_id,@Query("event_title") String event_title,@Query("event_text")String event_text);
         @POST("draft/people/update/event")

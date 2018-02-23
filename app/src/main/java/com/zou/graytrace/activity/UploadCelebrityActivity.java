@@ -253,6 +253,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                     } else {
                                         updateDraft(intent, ADD_EVENTS);
                                     }
+                                }else if(stauts.equals(Constant.PEOPLE_STATUS_EDIT)){
+                                    String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+                                    intent.putExtra(Constant.INTENT_PEOPLE_ID,people_id);
+                                    startActivityForResult(intent,ADD_EVENTS);
                                 }
                                 dialogInterface.dismiss();
                             }
@@ -448,6 +452,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     } else {
                         updateDraft(intent, ADD_EVENTS);
                     }
+                }else if(stauts.equals(Constant.PEOPLE_STATUS_EDIT)){
+                    String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+                    intent.putExtra(Constant.INTENT_PEOPLE_ID,people_id);
+                    startActivityForResult(intent,ADD_EVENTS);
                 }
             }
         });
@@ -690,6 +698,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             } else {
                 updateDraft(intent, ADD_EVENTS);
             }
+        }else if(stauts.equals(Constant.PEOPLE_STATUS_EDIT)){
+            String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+            intent.putExtra(Constant.INTENT_PEOPLE_ID,people_id);
+            startActivityForResult(intent,ADD_EVENTS);
         }
     }
 
@@ -721,6 +733,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             } else {
                 updateDraft(intent, ADD_DESCRIPTION);
             }
+        }else if(stauts.equals(Constant.PEOPLE_STATUS_EDIT)){
+            String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+            intent.putExtra(Constant.INTENT_PEOPLE_ID,people_id);
+            startActivityForResult(intent,ADD_DESCRIPTION);
         }
 
     }

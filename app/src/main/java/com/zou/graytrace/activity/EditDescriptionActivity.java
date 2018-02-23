@@ -359,7 +359,8 @@ public class EditDescriptionActivity extends AppCompatActivity {
         String draft_people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DRAFT_ID);
         String description_text = et_description_content.getText().toString();
         String time_stamp = Tools.getTimeStamp();
-        descriptionService.uploadPeopleDescription(username,draft_people_id,description_text,time_stamp)
+        String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+        descriptionService.uploadPeopleDescription(username,draft_people_id,description_text,time_stamp,people_id)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUploadDescriptionResultBean>() {
                     @Override
@@ -400,7 +401,6 @@ public class EditDescriptionActivity extends AppCompatActivity {
         final String people_description_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID);
         String description_text = et_description_content.getText().toString();
         String time_stamp = Tools.getTimeStamp();
-
         descriptionService.updatePeopleDescription(username,people_description_id,description_text,time_stamp)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUpdateDescriptionResultBean>() {
@@ -501,7 +501,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
 
     interface DescriptionService{
         @POST("people/commit/description")
-        Observable<GsonUploadDescriptionResultBean> uploadPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp);
+        Observable<GsonUploadDescriptionResultBean> uploadPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp,@Query("people_id")String people_id);
         @POST("people/update/description")
         Observable<GsonUpdateDescriptionResultBean> updatePeopleDescription(@Query("username")String username, @Query("people_description_id")String people_description_id, @Query("description_text")String description_text, @Query("time_stamp")String time_stamp);
         @POST("draft/people/description")
