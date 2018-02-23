@@ -42,8 +42,8 @@ public class TextViewPeopleContainer extends LinearLayout {
     public void addEvent(String event_title,String event_text){
         TextView tv_title = new TextView(getContext());
         tv_title.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT));
-        tv_title.setTextSize(Tools.dip2px(getContext(),22));
         tv_title.setText(event_title);
+        tv_title.setTextSize(22);
         addView(tv_title);
         //TODO 显示富文本(图片和影像)
         TextView tv_text = new TextView(getContext());

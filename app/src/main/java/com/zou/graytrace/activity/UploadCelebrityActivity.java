@@ -63,6 +63,13 @@ import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
+/**
+ * 草稿箱进入------提交人物
+ * 我的创作进入----更新人物--（不能进入草稿箱了）
+ * 添加新的人物进入-提交人物
+ */
+
+
 //
 //                       _oo0oo_
 //                      o8888888o
@@ -170,6 +177,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     private AlertDialog saveDraftDialog;
 
     private String stauts;
+
+    private boolean alive = true;
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -190,6 +199,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         if(Constant.PEOPLE_STATUS_EDIT.equals(stauts)){
             getPeopleInfo();
         }else if(Constant.PEOPLE_STATUS_EDIT_DRAFT.equals(stauts)){
+            isCreatedDraft = true;
             getPeopleInfoFromDraft();
         }
     }
@@ -237,10 +247,12 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                         break;
                                 }
                                 //保存或更新草稿
-                                if (!isCreatedDraft) {
-                                    saveDraft(intent, ADD_EVENTS);
-                                } else {
-                                    updateDraft(intent, ADD_EVENTS);
+                                if(stauts.equals(Constant.PEOPLE_STATUS_ADD_NEW)||stauts.equals(Constant.PEOPLE_STATUS_EDIT_DRAFT)) {
+                                    if (!isCreatedDraft) {
+                                        saveDraft(intent, ADD_EVENTS);
+                                    } else {
+                                        updateDraft(intent, ADD_EVENTS);
+                                    }
                                 }
                                 dialogInterface.dismiss();
                             }
@@ -261,12 +273,14 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                         textInputLayout_death_day.setVisibility(View.GONE);
                         ic_long_sleep.setVisibility(View.GONE);
                         textInputLayout_long_sleep_place.setVisibility(View.GONE);
+                        alive = true;
                         break;
                     case R.id.rb_dead:
                         ic_death_day.setVisibility(View.VISIBLE);
                         textInputLayout_death_day.setVisibility(View.VISIBLE);
                         ic_long_sleep.setVisibility(View.VISIBLE);
                         textInputLayout_long_sleep_place.setVisibility(View.VISIBLE);
+                        alive = false;
                         break;
                 }
             }
@@ -427,11 +441,13 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                         intent.putExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID,(String)v.getTag(R.string.tag_event_status_id));
                         break;
                 }
-                //保存或更新草稿
-                if (!isCreatedDraft) {
-                    saveDraft(intent, ADD_EVENTS);
-                } else {
-                    updateDraft(intent, ADD_EVENTS);
+                //若是ADD_NEW或者EDIT_DRAFT 则保存或更新草稿
+                if(stauts.equals(Constant.PEOPLE_STATUS_ADD_NEW)||stauts.equals(Constant.PEOPLE_STATUS_EDIT_DRAFT)){
+                    if (!isCreatedDraft) {
+                        saveDraft(intent, ADD_EVENTS);
+                    } else {
+                        updateDraft(intent, ADD_EVENTS);
+                    }
                 }
             }
         });
@@ -556,6 +572,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     private void getPeopleInfoFromDraft() {
         String draft_people_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_ID);
+        UploadCelebrityActivity.this.draft_people_id = draft_people_id;
         aboutPeopleService.getDraftPeopleInfo(draft_people_id).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread()).subscribe(new Observer<GsonGetDraftPeopleResultBean>() {
             @Override
             public void onCompleted() {
@@ -667,10 +684,12 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         intent.putExtra(Constant.INTENT_EVENTS_TYPE, Constant.EVENTS_TYPE_PEOPLE);
         intent.putExtra(Constant.INTENT_EVENTS_STATUS, Constant.EVENTS_STATUS_ADD_NEW);
         //保存或更新草稿
-        if (!isCreatedDraft) {
-            saveDraft(intent, ADD_EVENTS);
-        } else {
-            updateDraft(intent, ADD_EVENTS);
+        if(stauts.equals(Constant.PEOPLE_STATUS_ADD_NEW)||stauts.equals(Constant.PEOPLE_STATUS_EDIT_DRAFT)) {
+            if (!isCreatedDraft) {
+                saveDraft(intent, ADD_EVENTS);
+            } else {
+                updateDraft(intent, ADD_EVENTS);
+            }
         }
     }
 
@@ -696,10 +715,12 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             intent.putExtra(Constant.INTENT_DRAFT_PEOPLE_DESCRIPTION_ID,draft_people_description_id);
         }
         //保存或更新草稿
-        if (!isCreatedDraft) {
-            saveDraft(intent, ADD_DESCRIPTION);
-        } else {
-            updateDraft(intent, ADD_DESCRIPTION);
+        if(stauts.equals(Constant.PEOPLE_STATUS_ADD_NEW)||stauts.equals(Constant.PEOPLE_STATUS_EDIT_DRAFT)) {
+            if (!isCreatedDraft) {
+                saveDraft(intent, ADD_DESCRIPTION);
+            } else {
+                updateDraft(intent, ADD_DESCRIPTION);
+            }
         }
 
     }
@@ -753,7 +774,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                 }
                 break;
             case R.id.action_menu_commit:
-                upLoadPeople();
+                if(stauts.equals(Constant.PEOPLE_STATUS_EDIT)){
+                    updatePeople();
+                }else {
+                    upLoadPeople();
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -782,7 +807,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         String industry = et_industry.getText().toString();
         String cover_url = this.cover_url;
         String time_stamp = Tools.getTimeStamp();
-        aboutPeopleService.saveDraftPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp)
+        int alive = this.alive?0:1;
+        String event_ids = getEventIds();
+        String description_id = UploadCelebrityActivity.this.people_description_id;
+
+        aboutPeopleService.saveDraftPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,alive,event_ids,description_id)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonSaveDraftPeopleResultBean>() {
                     @Override
@@ -806,6 +835,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                     isCreatedDraft = true;
                                     intent.putExtra(Constant.INTENT_PEOPLE_DRAFT_ID,draft_people_id);
                                     UploadCelebrityActivity.this.startActivityForResult(intent,requestCode);
+                                }else{
+                                    finish();
                                 }
                                 Toast.makeText(app,"已保存到草稿",Toast.LENGTH_SHORT).show();
                                 break;
@@ -815,6 +846,23 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                         }
                     }
                 });
+    }
+
+    private String getEventIds(){
+        String event_ids = null;
+        if(peopleEventTexts!=null&&peopleEventTexts.size()>0){
+            StringBuilder stringBuilder = new StringBuilder();
+            for(PeopleEventText peopleEventText:peopleEventTexts){
+                if(peopleEventText.getTag().equals(Constant.TAG_EVENT_EDIT)) {
+                    stringBuilder.append(peopleEventText.getId()).append(",");
+                }
+            }
+            if(stringBuilder.length()>0){
+                stringBuilder.deleteCharAt(stringBuilder.length()-1);
+            }
+            event_ids = stringBuilder.toString();
+        }
+        return event_ids;
     }
 
     /**
@@ -837,7 +885,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         String cover_url = this.cover_url;
         String time_stamp = Tools.getTimeStamp();
         final String draft_people_id = this.draft_people_id;
-        aboutPeopleService.updateDraftPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,draft_people_id)
+        int alive = this.alive?0:1;
+        String event_ids = getEventIds();
+        String description_id = UploadCelebrityActivity.this.people_description_id;
+        aboutPeopleService.updateDraftPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,draft_people_id,alive,event_ids,description_id)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUpdateDraftPeopleResultBean>() {
                     @Override
@@ -860,6 +911,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                     isCreatedDraft = true;
                                     intent.putExtra(Constant.INTENT_PEOPLE_DRAFT_ID,draft_people_id);
                                     UploadCelebrityActivity.this.startActivityForResult(intent,requestCode);
+                                }else{
+                                    finish();
                                 }
                                 Toast.makeText(app,"已更新草稿",Toast.LENGTH_SHORT).show();
                                 break;
@@ -889,7 +942,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         String industry = et_industry.getText().toString();
         String cover_url = this.cover_url;
         String time_stamp = Tools.getTimeStamp();
-        aboutPeopleService.uploadPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,draft_people_id)
+        int alive = this.alive?0:1;
+        aboutPeopleService.uploadPeople(username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,draft_people_id,alive)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUploadPeopleResultBean>() {
                     @Override
@@ -918,6 +972,55 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     }
                 });
     }
+    /**
+     * 更新
+     */
+    private void updatePeople(){
+        showLoadingDialog();
+        //TODO 替换用户名
+        String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+        String username = "13167231015";
+        String name = et_celebrity_name.getText().toString();
+        String nationality = et_celebrity_nationality.getText().toString();
+        String birthplace = et_birth_place.getText().toString();
+        String residence = et_residence.getText().toString();
+        String grave_place = et_long_sleep_place.getText().toString();
+        String birth_day = et_birthday.getText().toString();
+        String death_day = et_death_day.getText().toString();
+        String motto = et_motto.getText().toString();
+        String industry = et_industry.getText().toString();
+        String cover_url = this.cover_url;
+        String time_stamp = Tools.getTimeStamp();
+        int alive = this.alive?0:1;
+        aboutPeopleService.updatePeople(people_id,username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,draft_people_id,alive)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonUploadPeopleResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(UploadCelebrityActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                        hideLoadingDialog();
+                    }
+
+                    @Override
+                    public void onNext(GsonUploadPeopleResultBean gsonUploadPeopleResultBean) {
+                        hideLoadingDialog();
+                        switch (gsonUploadPeopleResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(UploadCelebrityActivity.this,"更新成功",Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+                            default:
+                                Toast.makeText(UploadCelebrityActivity.this,"更新失败",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
 
     private void showSaveDraftDialog(){
         if(saveDraftDialog == null){
@@ -926,7 +1029,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     .setPositiveButton(getString(R.string.save), new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
-                            saveDraft(null,0);
+                            if(!isCreatedDraft) {
+                                saveDraft(null, 0);
+                            }else{
+                                updateDraft(null,0);
+                            }
                         }
                     })
                     .setNegativeButton(getString(R.string.cancel), new DialogInterface.OnClickListener() {
@@ -965,6 +1072,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         }
     }
 
+    @Override
+    public void onBackPressed() {
+        showSaveDraftDialog();
+    }
+
     interface AboutPeopleService{
         @POST("people/commit")
         Observable<GsonUploadPeopleResultBean> uploadPeople(@Query("username")String uploader,@Query("name")String name,
@@ -973,7 +1085,17 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                             @Query("birth_day")String birth_day,@Query("death_day")String death_day,
                                                             @Query("motto")String motto,@Query("industry")String industry,
                                                             @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
-                                                            @Query("draft_people_id")String draft_people_id);
+                                                            @Query("draft_people_id")String draft_people_id,@Query("alive")int alive);
+
+        @POST("people/update")
+        Observable<GsonUploadPeopleResultBean> updatePeople(@Query("people_id")String people_id,
+                                                            @Query("username")String uploader,@Query("name")String name,
+                                                            @Query("nationality")String nationality,@Query("birthplace")String birthplace,
+                                                            @Query("residence")String residence,@Query("grave_place")String grave_place,
+                                                            @Query("birth_day")String birth_day,@Query("death_day")String death_day,
+                                                            @Query("motto")String motto,@Query("industry")String industry,
+                                                            @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
+                                                            @Query("draft_people_id")String draft_people_id,@Query("alive")int alive);
 
         @POST("people/get")
         Observable<GsonGetPeopleResultBean> getPeopleInfo(@Query("people_id")String people_id);
@@ -987,7 +1109,9 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                                   @Query("residence")String residence,@Query("grave_place")String grave_place,
                                                                   @Query("birth_day")String birth_day,@Query("death_day")String death_day,
                                                                   @Query("motto")String motto,@Query("industry")String industry,
-                                                                  @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp);
+                                                                  @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
+                                                                  @Query("alive")int alive,@Query("event_ids")String event_ids,
+                                                                  @Query("description_id")String description_id);
         @POST("draft/people/update")
         Observable<GsonUpdateDraftPeopleResultBean> updateDraftPeople(@Query("username")String uploader,@Query("name")String name,
                                                                       @Query("nationality")String nationality,@Query("birthplace")String birthplace,
@@ -995,7 +1119,9 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                                       @Query("birth_day")String birth_day,@Query("death_day")String death_day,
                                                                       @Query("motto")String motto,@Query("industry")String industry,
                                                                       @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
-                                                                      @Query("draft_people_id")String draft_people_id);
+                                                                      @Query("draft_people_id")String draft_people_id,
+                                                                      @Query("alive")int alive,@Query("event_ids")String event_ids,
+                                                                      @Query("description_id")String description_id);
     }
 }
 

@@ -112,16 +112,18 @@ public class CreationPeopleFragment extends BaseFragment{
                     public void onNext(GsonGetCreationPeopleSampleResultBean gsonGetCreationPeopleSampleResultBean) {
                         switch (gsonGetCreationPeopleSampleResultBean.getCode()){
                             case 0:
-                                itemCreationPeoples.clear();
-                                for(GsonGetCreationPeopleSampleResultBean.Info info :gsonGetCreationPeopleSampleResultBean.getInfos()){
-                                    ItemPeopleSample itemCreationPeople = new ItemPeopleSample();
-                                    itemCreationPeople.setTitle(info.getName());
-                                    itemCreationPeople.setContent(info.getDescriptionText());
-                                    itemCreationPeople.setCover_url(info.getCoverUrl());
-                                    itemCreationPeople.setPeople_id(info.getPeople_id());
-                                    itemCreationPeoples.add(itemCreationPeople);
+                                if(gsonGetCreationPeopleSampleResultBean.getInfos()!=null&&gsonGetCreationPeopleSampleResultBean.getInfos().size()>0) {
+                                    itemCreationPeoples.clear();
+                                    for (GsonGetCreationPeopleSampleResultBean.Info info : gsonGetCreationPeopleSampleResultBean.getInfos()) {
+                                        ItemPeopleSample itemCreationPeople = new ItemPeopleSample();
+                                        itemCreationPeople.setTitle(info.getName());
+                                        itemCreationPeople.setContent(info.getDescriptionText());
+                                        itemCreationPeople.setCover_url(info.getCoverUrl());
+                                        itemCreationPeople.setPeople_id(info.getPeople_id());
+                                        itemCreationPeoples.add(itemCreationPeople);
+                                    }
+                                    adapter.notifyDataSetChanged();
                                 }
-                                adapter.notifyDataSetChanged();
                                 break;
                             default:
                                 Toast.makeText(getContext(),"获取数据失败",Toast.LENGTH_SHORT).show();

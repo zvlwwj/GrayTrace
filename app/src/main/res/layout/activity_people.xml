@@ -35,6 +35,7 @@
             app:layout_constraintTop_toBottomOf="@id/tv_people_name"/>
         <com.zou.graytrace.view.TextViewPeopleContainer android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/textViewPeopleContainer"/>
+            android:id="@+id/textViewPeopleContainer"
+            app:layout_constraintTop_toBottomOf="@id/tv_people_description"/>
     </android.support.constraint.ConstraintLayout>
 </ScrollView>

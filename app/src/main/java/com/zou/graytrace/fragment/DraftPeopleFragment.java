@@ -110,16 +110,18 @@ public class DraftPeopleFragment extends BaseFragment {
                     public void onNext(GsonGetDraftPeopleSampleResultBean gsonGetDraftPeopleSampleResultBean) {
                         switch (gsonGetDraftPeopleSampleResultBean.getCode()){
                             case 0:
-                                itemDraftPeoples.clear();
-                                for(GsonGetDraftPeopleSampleResultBean.Info info :gsonGetDraftPeopleSampleResultBean.getInfos()){
-                                    ItemPeopleDraftSample itemPeopleDraftSample = new ItemPeopleDraftSample();
-                                    itemPeopleDraftSample.setTitle(info.getName());
-                                    itemPeopleDraftSample.setContent(info.getDescriptionText());
-                                    itemPeopleDraftSample.setCover_url(info.getCoverUrl());
-                                    itemPeopleDraftSample.setDraft_people_id(info.getDraft_people_id());
-                                    itemDraftPeoples.add(itemPeopleDraftSample);
+                                if(gsonGetDraftPeopleSampleResultBean.getInfos()!=null&&gsonGetDraftPeopleSampleResultBean.getInfos().size()>0) {
+                                    itemDraftPeoples.clear();
+                                    for (GsonGetDraftPeopleSampleResultBean.Info info : gsonGetDraftPeopleSampleResultBean.getInfos()) {
+                                        ItemPeopleDraftSample itemPeopleDraftSample = new ItemPeopleDraftSample();
+                                        itemPeopleDraftSample.setTitle(info.getName());
+                                        itemPeopleDraftSample.setContent(info.getDescriptionText());
+                                        itemPeopleDraftSample.setCover_url(info.getCoverUrl());
+                                        itemPeopleDraftSample.setDraft_people_id(info.getDraft_people_id());
+                                        itemDraftPeoples.add(itemPeopleDraftSample);
+                                    }
+                                    adapter.notifyDataSetChanged();
                                 }
-                                adapter.notifyDataSetChanged();
                                 break;
                             default:
                                 Toast.makeText(getContext(),"获取草稿失败",Toast.LENGTH_SHORT).show();
