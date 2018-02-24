@@ -65,6 +65,7 @@
             android:layout_marginStart="8dp"
             android:layout_marginEnd="8dp"
             android:layout_marginTop="16dp"
+            android:hint="@string/name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@+id/ic_name"
             app:layout_constraintTop_toBottomOf="@+id/fl_celebrity_bg">
@@ -73,7 +74,6 @@
                 android:id="@+id/et_celebrity_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/name"
                 android:inputType="text"
                 android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_birthday" />
@@ -135,13 +135,14 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_birthday"
-            app:layout_constraintTop_toBottomOf="@+id/rg_alive">
+            app:layout_constraintTop_toBottomOf="@+id/rg_alive"
+            android:hint="@string/hint_birth_day">
 
             <EditText
                 android:id="@+id/et_birthday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_birth_day"
+
                 android:inputType="date"
                 android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_death_day" />
@@ -170,13 +171,14 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_birthday"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birthday"
+            android:hint="@string/hint_death_day"
             android:visibility="gone">
 
             <EditText
                 android:id="@+id/et_death_day"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/hint_death_day"
+
                 android:inputType="date"
                 android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_celebrity_nationality" />
@@ -204,13 +206,14 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_nationality"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_death_day">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_death_day"
+            android:hint="@string/nationality">
 
             <EditText
                 android:id="@+id/et_celebrity_nationality"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/nationality"
+
                 android:inputType="text"
                 android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_birth_place"/>
@@ -237,13 +240,13 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_birth_place"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_nationality">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_celebrity_nationality"
+            android:hint="@string/birth_place">
 
             <EditText
                 android:id="@+id/et_birth_place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/birth_place"
                 android:inputType="text"
                 android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_long_sleep_place"/>
@@ -272,13 +275,13 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_long_sleep"
             app:layout_constraintTop_toBottomOf="@+id/textInputLayout_birth_place"
-            android:visibility="gone">
+            android:visibility="gone"
+            android:hint="@string/long_sleep_place">
 
             <EditText
                 android:id="@+id/et_long_sleep_place"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/long_sleep_place"
                 android:inputType="text"
                 android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_residence"/>
@@ -305,13 +308,13 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_residence"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_long_sleep_place">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_long_sleep_place"
+            android:hint="@string/residence">
 
             <EditText
                 android:id="@+id/et_residence"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/residence"
                 android:inputType="text"
                 android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_industry"/>
@@ -338,13 +341,13 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_industry"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_residence">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_residence"
+            android:hint="@string/industry">
 
             <EditText
                 android:id="@+id/et_industry"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/industry"
                 android:inputType="text"
                 android:imeOptions="actionNext"
                 android:nextFocusDown="@+id/et_motto"/>
@@ -372,13 +375,13 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/ic_motto"
-            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_industry">
+            app:layout_constraintTop_toBottomOf="@+id/textInputLayout_industry"
+            android:hint="@string/motto">
 
             <EditText
                 android:id="@+id/et_motto"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="@string/motto"
                 android:lines="1"
                 android:imeOptions="actionDone"/>
         </android.support.design.widget.TextInputLayout>

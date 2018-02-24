@@ -21,7 +21,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -51,25 +50,14 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import butterknife.OnFocusChange;
-import okhttp3.MediaType;
 import okhttp3.MultipartBody;
-import okhttp3.RequestBody;
 import retrofit2.Retrofit;
-import retrofit2.http.Multipart;
 import retrofit2.http.POST;
-import retrofit2.http.Part;
 import retrofit2.http.Query;
 import rx.Observable;
 import rx.Observer;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-/**
- * 草稿箱进入------提交人物
- * 我的创作进入----更新人物--（不能进入草稿箱了）
- * 添加新的人物进入-提交人物
- */
-
-
 //
 //                       _oo0oo_
 //                      o8888888o
@@ -114,6 +102,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     Button btn_select_cover;
     @BindView(R.id.iv_cover)
     ImageView iv_cover;
+    @BindView(R.id.textInputLayout_celebrity_name)
+    TextInputLayout textInputLayout_celebrity_name;
     @BindView(R.id.et_celebrity_name)
     EditText et_celebrity_name;
     @BindView(R.id.et_birthday)
@@ -165,11 +155,6 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     //人物描述草稿ID
     private String draft_people_description_id;
 
-    //人物事件ID
-    private String people_event_id;
-    //人物事件草稿ID
-    private String draft_people_event_id;
-
     private ArrayList<PeopleEventText> peopleEventTexts;
 
     private String cover_url;
@@ -218,8 +203,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             @Override
             public void onMoreTextClicked() {
                 if (!isCreatedDraft&&Tools.isEditTextEmpty(et_celebrity_name)) {
-                    //TODO 设置EditText error
-                    Toast.makeText(getApplicationContext(), "姓名不能为空", Toast.LENGTH_SHORT).show();
+                    textInputLayout_celebrity_name.setError(getResources().getString(R.string.name_empty_error));
                     return;
                 }
                 String[] singleChoiceItems = new String[peopleEventTexts.size()];
@@ -362,9 +346,6 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     String title = data.getStringExtra(Constant.INTENT_PEOPLE_EVENT_TITLE);
                     String id = data.getStringExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID);
                     addEventsInContainer(title,Constant.TAG_EVENT_EDIT_DRAFT,id);
-                }else if(resultCode == Constant.RESULT_EVENTS_SAVE_DRAFT_FAIL){
-                    //TODO 保存事件草稿失败
-
                 }
 
                 break;
@@ -378,6 +359,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     tv_add_description.setCompoundDrawablePadding(Tools.dip2px(this,2));
                     tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT);
                     people_description_id = data.getStringExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID);
+                    draft_people_description_id = null;
                 } else if(resultCode == Constant.RESULT_DESCRIPTION_SAVE_DRAFT_OK){
                     //保存描述草稿成功
                     tv_add_description.setText(R.string.edit_description);
@@ -387,8 +369,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     tv_add_description.setCompoundDrawablePadding(Tools.dip2px(this,2));
                     tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT_DRAFT);
                     draft_people_description_id = data.getStringExtra(Constant.INTENT_DRAFT_PEOPLE_DESCRIPTION_ID);
-                }else if(resultCode == Constant.RESULT_DESCRIPTION_SAVE_DRAFT_FAIL){
-                    //TODO 保存描述草稿失败
+                    people_description_id = null;
                 }
 
                 break;
@@ -398,7 +379,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     /**
      * 将事件添加到TextViewContainer中
      */
-    private void addEventsInContainer(String title,String tag,String id){
+    private void addEventsInContainer(String title, String tag, String id){
         //添加事件数据到内存中
         if(peopleEventTexts == null){
             peopleEventTexts = new ArrayList<>();
@@ -430,8 +411,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             public void onClick(View v) {
                 Intent intent = new Intent(UploadCelebrityActivity.this,EditEventsActivity.class);
                 if (!isCreatedDraft&&Tools.isEditTextEmpty(et_celebrity_name)) {
-                    //TODO 设置EditText error
-                    Toast.makeText(getApplicationContext(), "姓名不能为空", Toast.LENGTH_SHORT).show();
+                    textInputLayout_celebrity_name.setError(getResources().getString(R.string.name_empty_error));
                     return;
                 }
                 intent.putExtra(Constant.INTENT_EVENTS_TYPE, Constant.EVENTS_TYPE_PEOPLE);
@@ -685,8 +665,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     public void addEvents(){
         Intent intent = new Intent(this,EditEventsActivity.class);
         if (!isCreatedDraft&&Tools.isEditTextEmpty(et_celebrity_name)) {
-            //TODO 设置EditText error
-            Toast.makeText(getApplicationContext(), "姓名不能为空", Toast.LENGTH_SHORT).show();
+            textInputLayout_celebrity_name.setError(getResources().getString(R.string.name_empty_error));
             return;
         }
         intent.putExtra(Constant.INTENT_EVENTS_TYPE, Constant.EVENTS_TYPE_PEOPLE);
@@ -712,8 +691,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     public void addDescription(){
         Intent intent = new Intent(this, EditDescriptionActivity.class);
         if (!isCreatedDraft&&Tools.isEditTextEmpty(et_celebrity_name)) {
-            //TODO 设置EditText error
-            Toast.makeText(getApplicationContext(), "姓名不能为空", Toast.LENGTH_SHORT).show();
+            textInputLayout_celebrity_name.setError(getResources().getString(R.string.name_empty_error));
             return;
         }
         intent.putExtra(Constant.INTENT_DESCRIPTION_TYPE, Constant.DESCRIPTION_TYPE_PEOPLE);
@@ -738,10 +716,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
             intent.putExtra(Constant.INTENT_PEOPLE_ID,people_id);
             startActivityForResult(intent,ADD_DESCRIPTION);
         }
-
     }
-
-
 
     /**
      * 选择封面
@@ -780,14 +755,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                //TODO 给个dialog提示 返回主界面
-                if(Constant.PEOPLE_STATUS_EDIT.equals(stauts)) {
-                    //编辑提交的人物状态，点close，直接退出
-                    finish();
-                }else{
-                    //编辑人物草稿状态或者是添加新人物状态，点close，弹出保存草稿的弹出框
-                    showSaveDraftDialog();
-                }
+                onBackPressed();
+
                 break;
             case R.id.action_menu_commit:
                 if(stauts.equals(Constant.PEOPLE_STATUS_EDIT)){
@@ -1008,7 +977,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         String cover_url = this.cover_url;
         String time_stamp = Tools.getTimeStamp();
         int alive = this.alive?0:1;
-        aboutPeopleService.updatePeople(people_id,username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,draft_people_id,alive)
+        aboutPeopleService.updatePeople(people_id,username,name,nationality,birthplace,residence,grave_place,birth_day,death_day,motto,industry,cover_url,time_stamp,alive)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonUploadPeopleResultBean>() {
                     @Override
@@ -1090,7 +1059,13 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
     @Override
     public void onBackPressed() {
-        showSaveDraftDialog();
+        if(Constant.PEOPLE_STATUS_EDIT.equals(stauts)) {
+            //编辑提交的人物状态，点close，直接退出
+            finish();
+        }else{
+            //编辑人物草稿状态或者是添加新人物状态，点close，弹出保存草稿的弹出框
+            showSaveDraftDialog();
+        }
     }
 
     interface AboutPeopleService{
@@ -1111,7 +1086,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                             @Query("birth_day")String birth_day,@Query("death_day")String death_day,
                                                             @Query("motto")String motto,@Query("industry")String industry,
                                                             @Query("cover_url")String cover_url,@Query("time_stamp")String time_stamp,
-                                                            @Query("draft_people_id")String draft_people_id,@Query("alive")int alive);
+                                                            @Query("alive")int alive);
 
         @POST("people/get")
         Observable<GsonGetPeopleResultBean> getPeopleInfo(@Query("people_id")String people_id);

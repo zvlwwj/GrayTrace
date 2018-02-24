@@ -225,11 +225,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
         switch (item.getItemId()){
             case android.R.id.home:
                 //TODO 保存到草稿 返回主界面
-                if(Constant.DESCRIPTION_STATUS_EDIT.equals(stauts)) {
-                    finish();
-                }else{
-                    showSaveDraftDialog();
-                }
+                showSaveDraftDialog();
                 break;
             case R.id.action_menu_commit:
                 String type = getIntent().getStringExtra(Constant.INTENT_DESCRIPTION_TYPE);
@@ -444,7 +440,8 @@ public class EditDescriptionActivity extends AppCompatActivity {
         String draft_people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DRAFT_ID);
         String description_text = et_description_content.getText().toString();
         String time_stamp = Tools.getTimeStamp();
-        descriptionService.saveDraftPeopleDescription(username,draft_people_id,description_text,time_stamp)
+        String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+        descriptionService.saveDraftPeopleDescription(username,draft_people_id,description_text,time_stamp,people_id)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonSaveDraftPeopleDescriptionResultBean>() {
@@ -455,14 +452,14 @@ public class EditDescriptionActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(app,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onNext(GsonSaveDraftPeopleDescriptionResultBean gsonSaveDraftPeopleDescriptionResultBean) {
                         switch (gsonSaveDraftPeopleDescriptionResultBean.getCode()){
                             case 0:
-                                Toast.makeText(app,"已保存到草稿",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,R.string.save_draft_success,Toast.LENGTH_SHORT).show();
                                 String draft_people_description_id = gsonSaveDraftPeopleDescriptionResultBean.getDraft_people_description_id();
                                 Intent intent = new Intent();
                                 intent.putExtra(Constant.INTENT_DRAFT_PEOPLE_DESCRIPTION_ID,draft_people_description_id);
@@ -470,9 +467,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             default:
-                                Toast.makeText(app,"保存草稿失败",Toast.LENGTH_SHORT).show();
-                                setResult(Constant.RESULT_DESCRIPTION_SAVE_DRAFT_FAIL);
-                                finish();
+                                Toast.makeText(app,R.string.save_draft_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -505,7 +500,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
         @POST("people/update/description")
         Observable<GsonUpdateDescriptionResultBean> updatePeopleDescription(@Query("username")String username, @Query("people_description_id")String people_description_id, @Query("description_text")String description_text, @Query("time_stamp")String time_stamp);
         @POST("draft/people/description")
-        Observable<GsonSaveDraftPeopleDescriptionResultBean> saveDraftPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp);
+        Observable<GsonSaveDraftPeopleDescriptionResultBean> saveDraftPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp,@Query("people_id")String people_id);
         @POST("people/get/description")
         Observable<GsonPeopleDescription> getPeopleDescription(@Query("people_description_id")String people_description_id);
         @POST("people/get/description_from_draft")

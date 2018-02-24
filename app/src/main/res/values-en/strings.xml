@@ -61,4 +61,15 @@
     <string name="draft_box">草稿箱</string>
     <string name="nav_people">人物</string>
     <string name="nav_edit">编辑</string>
+    <string name="name_empty_error">姓名不能为空</string>
+    <string name="save_draft_error">保存草稿失败，请重试</string>
+    <string name="save_draft_success">已保存到草稿</string>
+    <string name="serve_error">服务器错误</string>
+    <string name="get_data_error">获取数据失败</string>
+    <string name="title_empty_error">标题为空</string>
+    <string name="content_empty_error">内容为空</string>
+    <string name="commit_success">提交成功</string>
+    <string name="commit_error">提交失败,请重试</string>
+    <string name="upload_success">上传成功</string>
+    <string name="upload_fail">上传失败</string>
 </resources>

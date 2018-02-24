@@ -175,17 +175,9 @@ public class EditEventsActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                //TODO 保存到草稿 返回主界面
-                if(Constant.EVENTS_STATUS_EDIT.equals(stauts)) {
-                    //编辑提交的文本状态，点close，直接退出
-                    finish();
-                }else{
-                    //编辑草稿的文本状态或者是添加状态，点close，弹出保存草稿的弹出框
-                    showSaveDraftDialog();
-                }
+                onBackPressed();
                 break;
             case R.id.action_menu_commit:
-                //TODO 提交
                 String type = getIntent().getStringExtra(Constant.INTENT_EVENTS_TYPE);
                 switch (type){
                     case Constant.EVENTS_TYPE_PEOPLE:
@@ -208,7 +200,11 @@ public class EditEventsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        showSaveDraftDialog();
+        if(Constant.EVENTS_STATUS_EDIT.equals(stauts)) {
+            finish();
+        }else{
+            showSaveDraftDialog();
+        }
     }
 
     /**
@@ -225,7 +221,7 @@ public class EditEventsActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(app,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -239,7 +235,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 et_event_content.requestFocus(event_text.length());
                                 break;
                             default:
-                                Toast.makeText(app,"读取数据失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,R.string.get_data_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -260,7 +256,7 @@ public class EditEventsActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(app,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -274,7 +270,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 et_event_content.requestFocus(event_text.length());
                                 break;
                             default:
-                                Toast.makeText(app,"读取数据失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,R.string.get_data_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -285,11 +281,11 @@ public class EditEventsActivity extends AppCompatActivity {
      */
     private void commitPeopleEventDraft() {
         if(Tools.isEditTextEmpty(et_event_title)){
-            Toast.makeText(app,"标题为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(app,R.string.title_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
         if(Tools.isEditTextEmpty(et_event_content)){
-            Toast.makeText(app,"内容为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(app,R.string.content_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
         String username = "13167231015";
@@ -308,14 +304,14 @@ public class EditEventsActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(app,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onNext(GsonCommitEventDraftResultBean gsonSaveDraftPeopleDescriptionResultBean) {
                         switch (gsonSaveDraftPeopleDescriptionResultBean.getCode()){
                             case 0:
-                                Toast.makeText(app,"已保存到草稿",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,R.string.save_draft_success,Toast.LENGTH_SHORT).show();
                                 String draft_people_event_id = gsonSaveDraftPeopleDescriptionResultBean.getDraft_people_event_id();
                                 Intent intent = new Intent();
                                 String title = et_event_title.getText().toString();
@@ -325,9 +321,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             default:
-                                Toast.makeText(app,"保存草稿失败",Toast.LENGTH_SHORT).show();
-                                setResult(Constant.RESULT_DESCRIPTION_SAVE_DRAFT_FAIL);
-                                finish();
+                                Toast.makeText(app,R.string.save_draft_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -339,11 +333,11 @@ public class EditEventsActivity extends AppCompatActivity {
      */
     private void updatePeopleEventDraft(){
         if(Tools.isEditTextEmpty(et_event_title)){
-            Toast.makeText(app,"标题为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(app,R.string.title_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
         if(Tools.isEditTextEmpty(et_event_content)){
-            Toast.makeText(app,"内容为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(app,R.string.content_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
         String username = "13167231015";
@@ -362,14 +356,14 @@ public class EditEventsActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(app,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onNext(GsonUpdateEventDraftResultBean gsonUpdateEventDraftResultBean) {
                         switch (gsonUpdateEventDraftResultBean.getCode()){
                             case 0:
-                                Toast.makeText(app,"已更新到草稿",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,R.string.save_draft_success,Toast.LENGTH_SHORT).show();
                                 Intent intent = new Intent();
                                 String title = et_event_title.getText().toString();
                                 intent.putExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID,draft_people_event_id);
@@ -378,7 +372,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             default:
-                                Toast.makeText(app,"更新草稿失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,R.string.save_draft_error,Toast.LENGTH_SHORT).show();
                                 setResult(Constant.RESULT_DESCRIPTION_SAVE_DRAFT_FAIL);
                                 finish();
                                 break;
@@ -392,11 +386,11 @@ public class EditEventsActivity extends AppCompatActivity {
      */
     private void uploadPeopleEvent() {
         if(Tools.isEditTextEmpty(et_event_title)){
-            Toast.makeText(app,"标题为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(app,R.string.title_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
         if(Tools.isEditTextEmpty(et_event_content)){
-            Toast.makeText(app,"内容为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(app,R.string.content_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
         //TODO
@@ -417,7 +411,7 @@ public class EditEventsActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(app,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -425,7 +419,7 @@ public class EditEventsActivity extends AppCompatActivity {
                         switch (gsonUploadEventResultBean.getCode()){
                             case 0:
                                 //提交成功，返回标题和ID到前一个界面
-                                Toast.makeText(EditEventsActivity.this,"提交成功",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditEventsActivity.this,R.string.commit_success,Toast.LENGTH_SHORT).show();
                                 Intent data = new Intent();
                                 String title = et_event_title.getText().toString();
                                 data.putExtra(Constant.INTENT_PEOPLE_EVENT_TITLE,title);
@@ -439,7 +433,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             default:
-                                Toast.makeText(EditEventsActivity.this,"提交失败，请重试",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditEventsActivity.this,R.string.commit_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -450,11 +444,11 @@ public class EditEventsActivity extends AppCompatActivity {
      */
     private void updatePeopleEvent() {
         if(Tools.isEditTextEmpty(et_event_title)){
-            Toast.makeText(app,"标题为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(app,R.string.title_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
         if(Tools.isEditTextEmpty(et_event_content)){
-            Toast.makeText(app,"内容为空",Toast.LENGTH_SHORT).show();
+            Toast.makeText(app,R.string.content_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
         //TODO
@@ -474,7 +468,7 @@ public class EditEventsActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(app,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -482,7 +476,7 @@ public class EditEventsActivity extends AppCompatActivity {
                         switch (gsonUpdateEventResultBean.getCode()){
                             case 0:
                                 //提交成功，返回标题和ID到前一个界面
-                                Toast.makeText(app,"提交成功",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,R.string.commit_success,Toast.LENGTH_SHORT).show();
                                 Intent data = new Intent();
                                 String title = et_event_title.getText().toString();
                                 String id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
@@ -497,7 +491,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             default:
-                                Toast.makeText(app,"提交失败，请重试",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(app,R.string.commit_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -583,17 +577,17 @@ public class EditEventsActivity extends AppCompatActivity {
 
                                     @Override
                                     public void onError(Throwable e) {
-                                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                                        Toast.makeText(EditEventsActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
                                     }
 
                                     @Override
                                     public void onNext(GsonUploadFileResultBean gsonUploadFileResultBean) {
                                         switch (gsonUploadFileResultBean.getCode()){
                                             case 0:
-                                                Toast.makeText(app,"上传文件成功",Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(EditEventsActivity.this,R.string.upload_success,Toast.LENGTH_SHORT).show();
                                                 break;
                                             default:
-                                                Toast.makeText(app,"上传文件失败",Toast.LENGTH_SHORT).show();
+                                                Toast.makeText(EditEventsActivity.this,R.string.upload_fail,Toast.LENGTH_SHORT).show();
                                                 break;
                                         }
                                     }
@@ -621,17 +615,17 @@ public class EditEventsActivity extends AppCompatActivity {
 
                                 @Override
                                 public void onError(Throwable e) {
-                                    Toast.makeText(EditEventsActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(EditEventsActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
                                 }
 
                                 @Override
                                 public void onNext(GsonUploadFileResultBean gsonUploadFileResultBean) {
                                     switch (gsonUploadFileResultBean.getCode()){
                                         case 0:
-                                            Toast.makeText(EditEventsActivity.this,"上传文件成功",Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(EditEventsActivity.this,R.string.upload_success,Toast.LENGTH_SHORT).show();
                                             break;
                                         default:
-                                            Toast.makeText(EditEventsActivity.this,"上传文件失败",Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(EditEventsActivity.this,R.string.upload_fail,Toast.LENGTH_SHORT).show();
                                             break;
                                     }
                                 }
