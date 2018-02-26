@@ -8,5 +8,12 @@
         android:orderInCategory="1"
         app:showAsAction="always"
         />
+
+    <item android:id="@+id/action_menu_delete"
+        android:title="@string/delete"
+        android:icon="@drawable/ic_action_delete"
+        android:orderInCategory="1"
+        app:showAsAction="always"
+        />
     <!--android:icon="@drawable/ic_action_search"-->
 </menu>

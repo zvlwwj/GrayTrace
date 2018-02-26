@@ -41,7 +41,8 @@ public class Constant {
 
     public static final int RESULT_EVENTS_COMMIT_OK = 1000;
     public static final int RESULT_EVENTS_SAVE_DRAFT_OK = 1001;
-    public static final int RESULT_EVENTS_SAVE_DRAFT_FAIL = 1002;
+    public static final int RESULT_EVENTS_COMMIT_DRAFT_OK = 1002;
+
 
     public static final String TAG_EVENT_EDIT = "tag_event_edit";
     public static final String TAG_EVENT_EDIT_DRAFT = "tag_event_edit_draft";

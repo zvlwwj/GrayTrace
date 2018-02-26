@@ -26,6 +26,7 @@ import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
 import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
+import com.zou.graytrace.bean.GsonDeleteResultBean;
 import com.zou.graytrace.bean.GsonPeopleDescription;
 import com.zou.graytrace.bean.GsonPeopleDescriptionFromDraft;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleDescriptionResultBean;
@@ -141,6 +142,39 @@ public class EditDescriptionActivity extends AppCompatActivity {
     }
 
     /**
+     * 删除提交的描述
+     */
+    private void deleteDescription(){
+        String people_description_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_DESCRIPTION_ID);
+        descriptionService.deletePeopleDescription(people_description_id)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonDeleteResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonDeleteResultBean gsonDeleteResultBean) {
+                        switch (gsonDeleteResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(app,"人物描述已删除",Toast.LENGTH_SHORT).show();
+                                break;
+                            default:
+                                Toast.makeText(app,"获取数据失败",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    /**
      * 编辑状态，获取草稿中的文本
      */
     private void getDescriptionFromDraft(){
@@ -169,6 +203,36 @@ public class EditDescriptionActivity extends AppCompatActivity {
                                 break;
                             default:
                                 Toast.makeText(app,"获取描述失败",Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    private void deleteDescriptionFromDraft(){
+        String draft_people_description_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_DESCRIPTION_ID);
+        descriptionService.deletePeopleDescriptionFromDraft(draft_people_description_id)
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonDeleteResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonDeleteResultBean gsonDeleteResultBean) {
+                        switch (gsonDeleteResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(app,"人物描述已删除",Toast.LENGTH_SHORT).show();
+                                break;
+                            default:
+                                Toast.makeText(app,"获取数据失败",Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -217,6 +281,10 @@ public class EditDescriptionActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_commit,menu);
+        if(Constant.DESCRIPTION_STATUS_ADD_NEW.equals(stauts)){
+            MenuItem menuItem = menu.findItem(R.id.action_menu_delete);
+            menuItem.setVisible(false);
+        }
         return true;
     }
 
@@ -224,8 +292,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
             case android.R.id.home:
-                //TODO 保存到草稿 返回主界面
-                showSaveDraftDialog();
+                onBackPressed();
                 break;
             case R.id.action_menu_commit:
                 String type = getIntent().getStringExtra(Constant.INTENT_DESCRIPTION_TYPE);
@@ -242,8 +309,21 @@ public class EditDescriptionActivity extends AppCompatActivity {
                     case Constant.DESCRIPTION_TYPE_EVENTS:
                         break;
                 }
+                break;
+            case R.id.action_menu_delete:
+                switch (stauts){
+                    case Constant.DESCRIPTION_STATUS_ADD_NEW:
 
-                Toast.makeText(getApplicationContext(),"提交",Toast.LENGTH_SHORT).show();
+                        break;
+                    case Constant.DESCRIPTION_STATUS_EDIT:
+                        //删除提交的描述
+                        deleteDescription();
+                        break;
+                    case Constant.DESCRIPTION_STATUS_EDIT_DRAFT:
+                        //删除描述草稿
+                        deleteDescriptionFromDraft();
+                        break;
+                }
                 break;
         }
         return super.onOptionsItemSelected(item);
@@ -339,7 +419,11 @@ public class EditDescriptionActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        showSaveDraftDialog();
+        if(Constant.DESCRIPTION_STATUS_EDIT.equals(stauts)){
+            finish();
+        }else {
+            showSaveDraftDialog();
+        }
     }
 
     /**
@@ -474,6 +558,8 @@ public class EditDescriptionActivity extends AppCompatActivity {
                 });
     }
 
+
+
     private void showSaveDraftDialog(){
         if(saveDraftDialog == null){
             saveDraftDialog =  new AlertDialog.Builder(this)
@@ -503,7 +589,11 @@ public class EditDescriptionActivity extends AppCompatActivity {
         Observable<GsonSaveDraftPeopleDescriptionResultBean> saveDraftPeopleDescription(@Query("username")String username,@Query("draft_people_id")String draft_people_id,@Query("description_text")String description_text,@Query("time_stamp")String time_stamp,@Query("people_id")String people_id);
         @POST("people/get/description")
         Observable<GsonPeopleDescription> getPeopleDescription(@Query("people_description_id")String people_description_id);
+        @POST("people/delete/description")
+        Observable<GsonDeleteResultBean> deletePeopleDescription(@Query("people_description_id")String people_description_id);
         @POST("people/get/description_from_draft")
         Observable<GsonPeopleDescriptionFromDraft> getPeopleDescriptionFromDraft(@Query("draft_people_description_id")String draft_people_description_id);
+        @POST("people/delete/description_from_draft")
+        Observable<GsonDeleteResultBean>deletePeopleDescriptionFromDraft(@Query("draft_people_description_id")String draft_people_description_id);
     }
 }

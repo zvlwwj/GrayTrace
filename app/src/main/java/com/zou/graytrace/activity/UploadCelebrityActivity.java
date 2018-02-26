@@ -444,6 +444,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     }
 
     private void removeDeletedDraftIdInContains(String deleted_people_event_draft_id){
+        for(int i=0;i<peopleEventTexts.size();i++){
+            if(deleted_people_event_draft_id.equals(peopleEventTexts.get(i).getId())&&Constant.TAG_EVENT_EDIT_DRAFT.equals(peopleEventTexts.get(i).getTag())){
+                peopleEventTexts.remove(i);
+            }
+        }
         for(int i=0;i<ll_tv_events.getChildCount();i++){
             View child = ll_tv_events.getChildAt(i);
             if(Constant.TAG_EVENT_EDIT_DRAFT.equals(child.getTag(R.string.tag_event_status))
