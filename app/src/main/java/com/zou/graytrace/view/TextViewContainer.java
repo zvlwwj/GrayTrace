@@ -12,6 +12,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.zou.graytrace.R;
+import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
 
 import java.util.List;
@@ -59,7 +60,13 @@ public class TextViewContainer extends LinearLayout {
     }
 
     public void addTextView(TextView child){
-        Drawable drawable = getResources().getDrawable(R.drawable.ic_edit);
+        Drawable drawable  = null;
+        if(Constant.TAG_EVENT_EDIT.equals(child.getTag(R.string.tag_event_status))){
+            drawable = getResources().getDrawable(R.drawable.ic_edit);
+        }else if(Constant.TAG_EVENT_EDIT_DRAFT.equals(child.getTag(R.string.tag_event_status))){
+            drawable = getResources().getDrawable(R.drawable.ic_draft);
+        }
+
         drawable.setBounds(0,0,Tools.dip2px(getContext(),16),Tools.dip2px(getContext(),16));
         child.setCompoundDrawables(drawable,null,null,null);
         child.setCompoundDrawablePadding(Tools.dip2px(getContext(),2));

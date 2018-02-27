@@ -362,8 +362,8 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                     draft_people_description_id = null;
                 } else if(resultCode == Constant.RESULT_DESCRIPTION_SAVE_DRAFT_OK){
                     //保存描述草稿成功
-                    tv_add_description.setText(R.string.edit_description);
-                    Drawable drawable = getResources().getDrawable(R.drawable.ic_edit);
+                    tv_add_description.setText(R.string.edit_draft_description);
+                    Drawable drawable = getResources().getDrawable(R.drawable.ic_draft);
                     drawable.setBounds(0,0,Tools.dip2px(this,16),Tools.dip2px(this,16));
                     tv_add_description.setCompoundDrawables(drawable,null,null,null);
                     tv_add_description.setCompoundDrawablePadding(Tools.dip2px(this,2));
@@ -544,11 +544,32 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                             tv_add_description.setCompoundDrawablePadding(Tools.dip2px(UploadCelebrityActivity.this,2));
                             tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT);
                         }
+
+                        //描述草稿
+                        String draft_people_description_id = gsonGetPeopleResultBean.getInfo().getDraft_people_description_id();
+                        if(draft_people_description_id!=null){
+                            UploadCelebrityActivity.this.draft_people_description_id = draft_people_description_id;
+                            tv_add_description.setText(R.string.edit_draft_description);
+                            Drawable drawable = getResources().getDrawable(R.drawable.ic_draft);
+                            drawable.setBounds(0,0,Tools.dip2px(UploadCelebrityActivity.this,16),Tools.dip2px(UploadCelebrityActivity.this,16));
+                            tv_add_description.setCompoundDrawables(drawable,null,null,null);
+                            tv_add_description.setCompoundDrawablePadding(Tools.dip2px(UploadCelebrityActivity.this,2));
+                            tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT_DRAFT);
+                        }
+
                         //事件
                         ArrayList<GsonGetPeopleResultBean.Info.Event> events = gsonGetPeopleResultBean.getInfo().getEvents();
                         if(events!=null&&events.size()>0){
                             for(GsonGetPeopleResultBean.Info.Event event : events){
                                 addEventsInContainer(event.getEvent_title(),Constant.TAG_EVENT_EDIT,event.getEvent_id());
+                            }
+                        }
+
+                        //事件草稿
+                        ArrayList<GsonGetPeopleResultBean.Info.DraftEvent> draftEvents = gsonGetPeopleResultBean.getInfo().getDraftEvents();
+                        if(draftEvents!=null&&draftEvents.size()>0){
+                            for(GsonGetPeopleResultBean.Info.DraftEvent draftEvent : draftEvents){
+                                addEventsInContainer(draftEvent.getDraft_event_title(),Constant.TAG_EVENT_EDIT_DRAFT,draftEvent.getDraft_event_id());
                             }
                         }
                         break;
@@ -647,11 +668,32 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                             tv_add_description.setCompoundDrawablePadding(Tools.dip2px(UploadCelebrityActivity.this,2));
                             tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT);
                         }
+
+                        //描述草稿
+                        String draft_people_description_id = gsonGetDraftPeopleResultBean.getInfo().getDraft_people_description_id();
+                        if(draft_people_description_id!=null){
+                            UploadCelebrityActivity.this.draft_people_description_id = draft_people_description_id;
+                            tv_add_description.setText(R.string.edit_draft_description);
+                            Drawable drawable = getResources().getDrawable(R.drawable.ic_draft);
+                            drawable.setBounds(0,0,Tools.dip2px(UploadCelebrityActivity.this,16),Tools.dip2px(UploadCelebrityActivity.this,16));
+                            tv_add_description.setCompoundDrawables(drawable,null,null,null);
+                            tv_add_description.setCompoundDrawablePadding(Tools.dip2px(UploadCelebrityActivity.this,2));
+                            tv_add_description.setTag(Constant.TAG_DESCRIPTION_EDIT_DRAFT);
+                        }
+
                         //事件
                         ArrayList<GsonGetDraftPeopleResultBean.Info.Event> events = gsonGetDraftPeopleResultBean.getInfo().getEvents();
                         if(events!=null&&events.size()>0){
                             for(GsonGetDraftPeopleResultBean.Info.Event event : events){
                                 addEventsInContainer(event.getEvent_title(),Constant.TAG_EVENT_EDIT,event.getEvent_id());
+                            }
+                        }
+
+                        //事件草稿
+                        ArrayList<GsonGetDraftPeopleResultBean.Info.DraftEvent> draftEvents = gsonGetDraftPeopleResultBean.getInfo().getDraftEvents();
+                        if(draftEvents!=null&&draftEvents.size()>0){
+                            for(GsonGetDraftPeopleResultBean.Info.DraftEvent draftEvent : draftEvents){
+                                addEventsInContainer(draftEvent.getDraft_event_title(),Constant.TAG_EVENT_EDIT_DRAFT,draftEvent.getDraft_event_id());
                             }
                         }
                         break;

@@ -293,7 +293,8 @@ public class EditEventsActivity extends AppCompatActivity {
         String event_text = et_event_content.getText().toString();
         String event_title = et_event_title.getText().toString();
         String time_stamp = Tools.getTimeStamp();
-        eventService.commitEventDraft(username,time_stamp,draft_people_id,event_title,event_text)
+        String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+        eventService.commitEventDraft(username,time_stamp,draft_people_id,event_title,event_text,people_id)
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonCommitEventDraftResultBean>() {
@@ -674,7 +675,7 @@ public class EditEventsActivity extends AppCompatActivity {
         @POST("people/update/event")
         Observable<GsonUpdateEventResultBean> updatePeopleEvent(@Query("username")String username, @Query("draft_people_id")String draft_people_id, @Query("people_event_id")String people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text, @Query("time_stamp")String time_stamp);
         @POST("draft/people/commit/event")
-        Observable<GsonCommitEventDraftResultBean> commitEventDraft(@Query("username")String username, @Query("time_stamp")String time_stamp,@Query("draft_people_id") String draft_people_id,@Query("event_title") String event_title,@Query("event_text")String event_text);
+        Observable<GsonCommitEventDraftResultBean> commitEventDraft(@Query("username")String username, @Query("time_stamp")String time_stamp,@Query("draft_people_id") String draft_people_id,@Query("event_title") String event_title,@Query("event_text")String event_text,@Query("people_id")String people_id);
         @POST("draft/people/update/event")
         Observable<GsonUpdateEventDraftResultBean> updateEventDraft(@Query("username")String username, @Query("time_stamp")String time_stamp, @Query("draft_people_event_id")String draft_people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text);
         @POST("people/get/event")

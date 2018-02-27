@@ -25,6 +25,8 @@ public class GsonGetDraftPeopleResultBean {
         private String industry;
         private ArrayList<Event> events;
         private String uploader;
+        private String draft_people_description_id;
+        private ArrayList<DraftEvent> draftEvents;
 
         public class Description{
             private String description_id;
@@ -74,6 +76,52 @@ public class GsonGetDraftPeopleResultBean {
 
             public void setEvent_text(String event_text) {
                 this.event_text = event_text;
+            }
+        }
+
+        public String getDraft_people_description_id() {
+            return draft_people_description_id;
+        }
+
+        public void setDraft_people_description_id(String draft_people_description_id) {
+            this.draft_people_description_id = draft_people_description_id;
+        }
+
+        public ArrayList<DraftEvent> getDraftEvents() {
+            return draftEvents;
+        }
+
+        public void setDraftEvents(ArrayList<DraftEvent> draftEvents) {
+            this.draftEvents = draftEvents;
+        }
+
+        public class DraftEvent{
+            private String draft_event_id;
+            private String draft_event_title;
+            private String draft_event_text;
+
+            public String getDraft_event_id() {
+                return draft_event_id;
+            }
+
+            public void setDraft_event_id(String draft_event_id) {
+                this.draft_event_id = draft_event_id;
+            }
+
+            public String getDraft_event_title() {
+                return draft_event_title;
+            }
+
+            public void setDraft_event_title(String draft_event_title) {
+                this.draft_event_title = draft_event_title;
+            }
+
+            public String getDraft_event_text() {
+                return draft_event_text;
+            }
+
+            public void setDraft_event_text(String draft_event_text) {
+                this.draft_event_text = draft_event_text;
             }
         }
 
