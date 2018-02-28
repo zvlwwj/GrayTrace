@@ -30,6 +30,7 @@ import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
 import com.zou.graytrace.bean.GsonCommitEventDraftResultBean;
 import com.zou.graytrace.bean.GsonDeleteFileResultBean;
+import com.zou.graytrace.bean.GsonDeleteResultBean;
 import com.zou.graytrace.bean.GsonPeopleEvent;
 import com.zou.graytrace.bean.GsonPeopleEventFromDraft;
 import com.zou.graytrace.bean.GsonUpdateEventDraftResultBean;
@@ -192,10 +193,15 @@ public class EditEventsActivity extends AppCompatActivity {
                         break;
                 }
                 break;
+            case R.id.action_menu_delete:
+                if(Constant.EVENTS_STATUS_EDIT.equals(stauts)){
+                    deletePeopleEvent();
+                }else if(Constant.EVENTS_STATUS_EDIT_DRAFT.equals(stauts)){
+                    deleteDraftPeopleEvent();
+                }
         }
         return super.onOptionsItemSelected(item);
     }
-
 
 
     @Override
@@ -469,7 +475,7 @@ public class EditEventsActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,R.string.serve_error,Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditEventsActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -477,7 +483,7 @@ public class EditEventsActivity extends AppCompatActivity {
                         switch (gsonUpdateEventResultBean.getCode()){
                             case 0:
                                 //提交成功，返回标题和ID到前一个界面
-                                Toast.makeText(app,R.string.commit_success,Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditEventsActivity.this,R.string.commit_success,Toast.LENGTH_SHORT).show();
                                 Intent data = new Intent();
                                 String title = et_event_title.getText().toString();
                                 String id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
@@ -492,12 +498,83 @@ public class EditEventsActivity extends AppCompatActivity {
                                 finish();
                                 break;
                             default:
-                                Toast.makeText(app,R.string.commit_error,Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditEventsActivity.this,R.string.commit_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
                 });
     }
+
+    /**
+     * 删除人物事件
+     */
+    private void deletePeopleEvent() {
+        String people_event_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_EVENT_ID);
+        String time_stamp = Tools.getTimeStamp();
+        eventService.deletePeopleEvent(people_event_id,time_stamp)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonDeleteResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(EditEventsActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonDeleteResultBean gsonDeleteResultBean) {
+                        switch (gsonDeleteResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(EditEventsActivity.this,R.string.delete_success,Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+                            default:
+                                Toast.makeText(EditEventsActivity.this,R.string.delete_error,Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 删除人物事件草稿
+     */
+    private void deleteDraftPeopleEvent() {
+        String draft_people_event_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_EVENT_ID);
+        String time_stamp = Tools.getTimeStamp();
+        eventService.deleteDraftPeopleEvent(draft_people_event_id,time_stamp)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonDeleteResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(EditEventsActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonDeleteResultBean gsonDeleteResultBean) {
+                        switch (gsonDeleteResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(EditEventsActivity.this,R.string.delete_success,Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+                            default:
+                                Toast.makeText(EditEventsActivity.this,R.string.delete_error,Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+
+
 
     /**
      * 权限请求成功
@@ -680,7 +757,12 @@ public class EditEventsActivity extends AppCompatActivity {
         Observable<GsonUpdateEventDraftResultBean> updateEventDraft(@Query("username")String username, @Query("time_stamp")String time_stamp, @Query("draft_people_event_id")String draft_people_event_id, @Query("event_title")String event_title, @Query("event_text")String event_text);
         @POST("people/get/event")
         Observable<GsonPeopleEvent> getPeopleEvent(@Query("people_event_id")String people_event_id);
-        @POST("people/get/event_from_draft")
+        @POST("draft/people_event/get")
         Observable<GsonPeopleEventFromDraft> getPeopleEventFromDraft(@Query("draft_people_event_id")String draft_people_event_id);
+        @POST("people/event/delete")
+        Observable<GsonDeleteResultBean> deletePeopleEvent(@Query("people_event_id")String people_event_id, @Query("time_stamp")String time_stamp);
+        @POST("draft/people_events/delete")
+        Observable<GsonDeleteResultBean> deleteDraftPeopleEvent(@Query("draft_people_event_id")String draft_people_event_id, @Query("time_stamp")String time_stamp);
+
     }
 }

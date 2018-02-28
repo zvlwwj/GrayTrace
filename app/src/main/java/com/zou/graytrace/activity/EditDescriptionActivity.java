@@ -157,17 +157,18 @@ public class EditDescriptionActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditDescriptionActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onNext(GsonDeleteResultBean gsonDeleteResultBean) {
                         switch (gsonDeleteResultBean.getCode()){
                             case 0:
-                                Toast.makeText(app,"人物描述已删除",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditDescriptionActivity.this,R.string.delete_success,Toast.LENGTH_SHORT).show();
+                                finish();
                                 break;
                             default:
-                                Toast.makeText(app,"获取数据失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditDescriptionActivity.this,R.string.delete_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -190,7 +191,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditDescriptionActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -202,7 +203,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
                                 et_description_content.requestFocus(description.length());
                                 break;
                             default:
-                                Toast.makeText(app,"获取描述失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditDescriptionActivity.this,"获取描述失败",Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -222,17 +223,18 @@ public class EditDescriptionActivity extends AppCompatActivity {
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(app,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(EditDescriptionActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
                     public void onNext(GsonDeleteResultBean gsonDeleteResultBean) {
                         switch (gsonDeleteResultBean.getCode()){
                             case 0:
-                                Toast.makeText(app,"人物描述已删除",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditDescriptionActivity.this,R.string.delete_success,Toast.LENGTH_SHORT).show();
+                                finish();
                                 break;
                             default:
-                                Toast.makeText(app,"获取数据失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(EditDescriptionActivity.this,R.string.delete_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
@@ -591,9 +593,9 @@ public class EditDescriptionActivity extends AppCompatActivity {
         Observable<GsonPeopleDescription> getPeopleDescription(@Query("people_description_id")String people_description_id);
         @POST("people/delete/description")
         Observable<GsonDeleteResultBean> deletePeopleDescription(@Query("people_description_id")String people_description_id);
-        @POST("people/get/description_from_draft")
+        @POST("draft/people_description/get")
         Observable<GsonPeopleDescriptionFromDraft> getPeopleDescriptionFromDraft(@Query("draft_people_description_id")String draft_people_description_id);
-        @POST("people/delete/description_from_draft")
+        @POST("draft/people_description/delete")
         Observable<GsonDeleteResultBean>deletePeopleDescriptionFromDraft(@Query("draft_people_description_id")String draft_people_description_id);
     }
 }

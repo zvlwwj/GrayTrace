@@ -33,6 +33,7 @@ import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
 import com.zou.graytrace.Utils.URL;
 import com.zou.graytrace.application.GrayTraceApplication;
+import com.zou.graytrace.bean.GsonDeleteResultBean;
 import com.zou.graytrace.bean.GsonGetDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonGetPeopleResultBean;
 import com.zou.graytrace.bean.GsonSaveDraftPeopleResultBean;
@@ -795,6 +796,10 @@ public class UploadCelebrityActivity extends AppCompatActivity{
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_commit,menu);
+        MenuItem delete = menu.findItem(R.id.action_menu_delete);
+        if(Constant.PEOPLE_STATUS_ADD_NEW.equals(stauts)){
+            delete.setVisible(false);
+        }
         return true;
     }
 
@@ -803,13 +808,19 @@ public class UploadCelebrityActivity extends AppCompatActivity{
         switch (item.getItemId()){
             case android.R.id.home:
                 onBackPressed();
-
                 break;
             case R.id.action_menu_commit:
                 if(stauts.equals(Constant.PEOPLE_STATUS_EDIT)){
                     updatePeople();
                 }else {
                     upLoadPeople();
+                }
+                break;
+            case R.id.action_menu_delete:
+                if(Constant.PEOPLE_STATUS_EDIT.equals(stauts)){
+                    deletePeople();
+                }else if(Constant.PEOPLE_STATUS_EDIT_DRAFT.equals(stauts)){
+                    deleteDraftPeople();
                 }
                 break;
         }
@@ -1034,7 +1045,7 @@ public class UploadCelebrityActivity extends AppCompatActivity{
 
                     @Override
                     public void onError(Throwable e) {
-                        Toast.makeText(UploadCelebrityActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(UploadCelebrityActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
                         hideLoadingDialog();
                     }
 
@@ -1043,16 +1054,84 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                         hideLoadingDialog();
                         switch (gsonUploadPeopleResultBean.getCode()){
                             case 0:
-                                Toast.makeText(UploadCelebrityActivity.this,"更新成功",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UploadCelebrityActivity.this,R.string.update_success,Toast.LENGTH_SHORT).show();
                                 finish();
                                 break;
                             default:
-                                Toast.makeText(UploadCelebrityActivity.this,"更新失败",Toast.LENGTH_SHORT).show();
+                                Toast.makeText(UploadCelebrityActivity.this,R.string.update_error,Toast.LENGTH_SHORT).show();
                                 break;
                         }
                     }
                 });
     }
+
+    /**
+     * 删除人物
+     */
+    private void deletePeople() {
+        String people_id = getIntent().getStringExtra(Constant.INTENT_PEOPLE_ID);
+        aboutPeopleService.deletePeople(people_id).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonDeleteResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(UploadCelebrityActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonDeleteResultBean gsonDeleteResultBean) {
+                        switch (gsonDeleteResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(UploadCelebrityActivity.this,R.string.delete_success,Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+                            default:
+                                Toast.makeText(UploadCelebrityActivity.this,R.string.delete_error,Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+    /**
+     * 删除人物草稿
+     */
+    private void deleteDraftPeople() {
+        String draft_people_id = getIntent().getStringExtra(Constant.INTENT_DRAFT_PEOPLE_ID);
+        aboutPeopleService.deleteDraftPeople(draft_people_id).subscribeOn(Schedulers.newThread())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonDeleteResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(UploadCelebrityActivity.this,R.string.serve_error,Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonDeleteResultBean gsonDeleteResultBean) {
+                        switch (gsonDeleteResultBean.getCode()){
+                            case 0:
+                                Toast.makeText(UploadCelebrityActivity.this,R.string.delete_success,Toast.LENGTH_SHORT).show();
+                                finish();
+                                break;
+                            default:
+                                Toast.makeText(UploadCelebrityActivity.this,R.string.delete_error,Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
+    }
+
+
 
     private void showSaveDraftDialog(){
         if(saveDraftDialog == null){
@@ -1160,6 +1239,11 @@ public class UploadCelebrityActivity extends AppCompatActivity{
                                                                       @Query("draft_people_id")String draft_people_id,
                                                                       @Query("alive")int alive,@Query("event_ids")String event_ids,
                                                                       @Query("description_id")String description_id);
+        @POST("people/delete")
+        Observable<GsonDeleteResultBean> deletePeople(@Query("people_id")String people_id);
+
+        @POST("draft/people/delete")
+        Observable<GsonDeleteResultBean> deleteDraftPeople(@Query("draft_people_id")String draft_people_id);
     }
 }
 
