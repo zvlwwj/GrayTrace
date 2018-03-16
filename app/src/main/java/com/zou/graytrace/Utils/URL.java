@@ -5,6 +5,7 @@ package com.zou.graytrace.Utils;
  */
 
 public class URL {
+//    public static final String BASE_URL = "http://35.229.220.81:8000/";
     public static final String BASE_URL = "http://172.16.4.32:8000/";
     public static final String BASE_PIC_EVENT = BASE_URL+"static/pic/event/";
     public static final String BASE_VIDEO_EVENT = BASE_URL+"static/video/event/";

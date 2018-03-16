@@ -164,6 +164,9 @@ public class PeopleActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()){
+            case android.R.id.home:
+                onBackPressed();
+                break;
             case R.id.action_menu_people_edit:
                 if(from.equals(Constant.PEOPLE_FROM_CREATION)){
                     Intent intent = new Intent(PeopleActivity.this, UploadCelebrityActivity.class);

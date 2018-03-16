@@ -79,4 +79,6 @@
     <string name="update_error">更新失败</string>
     <string name="delete_success">删除成功</string>
     <string name="delete_error">删除失败</string>
+    <string name="behavior_footer">com.zou.graytrace.Utils.FooterBehaviorDependAppBar</string>
+    <string name="collection">收藏</string>
 </resources>
