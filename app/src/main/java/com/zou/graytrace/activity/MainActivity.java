@@ -114,6 +114,7 @@ public class MainActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         Toast.makeText(MainActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                        sp_account.edit().putBoolean(Constant.SP_IS_LOGIN,false).apply();
                     }
 
                     @Override

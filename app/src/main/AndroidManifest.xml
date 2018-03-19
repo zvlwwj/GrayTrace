@@ -31,6 +31,7 @@
         <activity android:name=".activity.MyCreationActivity"/>
         <activity android:name=".activity.DraftBoxActivity"/>
         <activity android:name=".activity.PeopleActivity"/>
+        <activity android:name=".activity.CommentActivity"/>
     </application>
 
 </manifest>

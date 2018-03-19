@@ -79,4 +79,6 @@
     <string name="delete_success">删除成功</string>
     <string name="delete_error">删除失败</string>
     <string name="collection">收藏</string>
+    <string name="comment">评论</string>
+    <string name="add_comment">添加评论</string>
 </resources>

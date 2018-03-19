@@ -74,4 +74,16 @@ public class Constant {
     public static final String PEOPLE_FROM_MAIN = "people_from_main";
 //    public static final int TAG_EVENT_STATUS = 100;
 //    public static final int TAG_EVENT_STATUS_ID = 101;
+
+    /**
+     * 关于评论
+     */
+    public static final String INTENT_COMMENT_TYPE = "intent_comment_type";
+    public static final String INTENT_COMMENT_TYPE_ID = "intent_comment_type_id";
+    public static final String COMMENT_TYPE_PEOPLE = "people";
+    public static final String COMMENT_TYPE_THING = "thing";
+    public static final String COMMENT_TYPE_EVENT = "event";
+    public static final String COMMENT_TYPE_ARTICLE = "article";
+
+
 }

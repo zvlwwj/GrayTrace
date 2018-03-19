@@ -68,7 +68,7 @@
     <string name="serve_error">服务器错误</string>
     <string name="get_data_error">获取数据失败</string>
     <string name="title_empty_error">标题为空</string>
-    <string name="content_empty_error">内容为空</string>
+    <string name="content_empty_error">内容不能为空</string>
     <string name="commit_success">提交成功</string>
     <string name="commit_error">提交失败,请重试</string>
     <string name="upload_success">上传成功</string>
@@ -81,4 +81,6 @@
     <string name="delete_error">删除失败</string>
     <string name="behavior_footer">com.zou.graytrace.Utils.FooterBehaviorDependAppBar</string>
     <string name="collection">收藏</string>
+    <string name="comment">评论</string>
+    <string name="add_comment">添加评论</string>
 </resources>

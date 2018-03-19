@@ -9,6 +9,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -24,6 +25,7 @@ import java.util.ArrayList;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 import retrofit2.Retrofit;
 import retrofit2.http.POST;
 import retrofit2.http.Query;
@@ -35,7 +37,7 @@ import rx.schedulers.Schedulers;
 /**
  * Created by zou on 2018/2/22.
  */
-
+//TODO 底部cardView显示的时候会遮住显示部分
 public class PeopleActivity extends AppCompatActivity {
     @BindView(R.id.toolbar_people)
     Toolbar toolbar_people;
@@ -47,6 +49,12 @@ public class PeopleActivity extends AppCompatActivity {
     TextView tv_people_description;
     @BindView(R.id.textViewPeopleContainer)
     TextViewPeopleContainer textViewPeopleContainer;
+    @BindView(R.id.ll_reputation)
+    LinearLayout ll_reputation;
+    @BindView(R.id.ll_chat)
+    LinearLayout ll_chat;
+    @BindView(R.id.ll_collection)
+    LinearLayout ll_collection;
     private String from;
     private String people_id;
     private GetPeopleInfoService getPeopleInfoService;
@@ -77,6 +85,26 @@ public class PeopleActivity extends AppCompatActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
         }
+    }
+
+    //点赞
+    @OnClick(R.id.ll_reputation)
+    public void reputation(){
+
+    }
+
+    //跳转到留言板
+    @OnClick(R.id.ll_chat)
+    public void chat(){
+        Intent intent = new Intent(this,CommentActivity.class);
+        intent.putExtra(Constant.INTENT_COMMENT_TYPE,Constant.COMMENT_TYPE_PEOPLE);
+        intent.putExtra(Constant.INTENT_COMMENT_TYPE_ID,Integer.valueOf(people_id));
+        startActivity(intent);
+    }
+
+    @OnClick(R.id.ll_collection)
+    public void collection(){
+
     }
 
     private void getPeopleInfo() {

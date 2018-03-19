@@ -67,11 +67,11 @@ public class DraftPeopleRecyclerAdapter extends RecyclerView.Adapter<DraftPeople
         }
     }
 
-    public static class ViewHolder extends RecyclerView.ViewHolder {
+    static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tv_item_creation_people_title;
         TextView tv_item_creation_people_content;
         ImageView iv_item_creation_people_cover;
-        public ViewHolder(View itemView) {
+        ViewHolder(View itemView) {
             super(itemView);
             tv_item_creation_people_title = itemView.findViewById(R.id.tv_item_creation_people_title);
             tv_item_creation_people_content = itemView.findViewById(R.id.tv_item_creation_people_content);

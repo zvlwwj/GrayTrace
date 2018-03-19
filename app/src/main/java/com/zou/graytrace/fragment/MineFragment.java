@@ -46,10 +46,7 @@ public class MineFragment extends BaseFragment {
     @BindView(R.id.tv_draft_count)
     TextView tv_draft_count;
     private static MineFragment instance;
-    private boolean isLogin;
     private int user_id;
-    private GetAccountInfoService getAccountInfoService;
-    private GrayTraceApplication application;
     private SharedPreferences sharedPreferences;
     private AlertDialog exitLoginDialog;
     private static final int REQUEST_LOGIN = 100;
@@ -79,9 +76,9 @@ public class MineFragment extends BaseFragment {
     }
 
     private void initData() {
-        application = (GrayTraceApplication) getActivity().getApplication();
+        GrayTraceApplication application = (GrayTraceApplication) getActivity().getApplication();
         sharedPreferences = application.getAccountSharedPreferences();
-        isLogin = sharedPreferences.getBoolean(Constant.SP_IS_LOGIN,false);
+        boolean isLogin = sharedPreferences.getBoolean(Constant.SP_IS_LOGIN, false);
         if(isLogin){
             //显示已登录的界面
             user_id = sharedPreferences.getInt(Constant.SP_USER_ID,0);
@@ -107,7 +104,7 @@ public class MineFragment extends BaseFragment {
      */
     private void getAccountInfo(){
         GrayTraceApplication application = (GrayTraceApplication) getActivity().getApplication();
-        getAccountInfoService = application.getRetrofit().create(GetAccountInfoService.class);
+        GetAccountInfoService getAccountInfoService = application.getRetrofit().create(GetAccountInfoService.class);
         getAccountInfoService.getAccountInfoService(user_id)
                 .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<GsonGetAccountInfoResult>() {
