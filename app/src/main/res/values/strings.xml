@@ -83,4 +83,9 @@
     <string name="collection">收藏</string>
     <string name="comment">评论</string>
     <string name="add_comment">添加评论</string>
+    <string name="nickname_empty_error">昵称不能为空</string>
+    <string name="copy">拷贝</string>
+    <string name="reply_comment">回复评论</string>
+    <string name="reply_to">回复给：</string>
+    <string name="copy_success">内容已复制到剪切板</string>
 </resources>

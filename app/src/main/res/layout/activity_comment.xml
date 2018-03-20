@@ -16,25 +16,37 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:navigationIcon="@drawable/ic_action_close"/>
-    <android.support.v7.widget.RecyclerView android:layout_width="match_parent"
-        app:layout_constraintVertical_weight="1"
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/recyclerView_comment"
+        android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar_comment"
-        android:id="@+id/recyclerView_comment"/>
-    <LinearLayout android:layout_width="match_parent"
+        android:layout_marginBottom="8dp"
+        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar_comment" />
+
+    <LinearLayout
+        android:id="@+id/linearLayout"
+        android:layout_width="match_parent"
         android:layout_height="48dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         android:orientation="horizontal"
-        android:weightSum="1">
-        <EditText android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="match_parent"
+        android:weightSum="1"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <EditText
             android:id="@+id/et_comment"
-            android:hint="@string/add_comment"/>
-        <ImageView android:layout_width="36dp"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:hint="@string/add_comment" />
+
+        <ImageView
+            android:id="@+id/iv_commit_comment"
+            android:layout_width="36dp"
             android:layout_height="36dp"
             android:layout_gravity="center_vertical"
-            android:id="@+id/iv_commit_comment"
-            android:src="@drawable/ic_action_commit"/>
+            android:src="@drawable/ic_action_commit" />
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>
