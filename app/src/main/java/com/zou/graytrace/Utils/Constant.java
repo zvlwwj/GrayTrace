@@ -85,5 +85,5 @@ public class Constant {
     public static final String COMMENT_TYPE_EVENT = "event";
     public static final String COMMENT_TYPE_ARTICLE = "article";
 
-
+    public static final String INTENT_COMMENTS ="intent_comments" ;
 }

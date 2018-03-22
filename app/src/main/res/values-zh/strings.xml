@@ -86,4 +86,8 @@
     <string name="reply_comment">回复评论</string>
     <string name="reply_to">回复给：</string>
     <string name="copy_success">内容已复制到剪切板</string>
+    <string name="reply">回复</string>
+    <string name="look_conversation">查看对话</string>
+    <string name="delete_comment">删除评论</string>
+    <string name="upvote_error">点赞遇到问题...</string>
 </resources>

@@ -1,19 +1,39 @@
 package com.zou.graytrace.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by zou on 2018/3/20.
  */
 
-public class CommentBean {
+public class CommentBean implements Serializable{
     private int comment_id;
     private String text;
+    private int uploader_id;
     private String nick_name;
     private String avatar_url;
-    private int upvote;
+    private int upvote_count;
+    private boolean is_upvote;
     private int reply_id;
     private String type;
-    private int type_id;
+    private int type_id = -1;
     private String time_stamp;
+
+    public boolean is_upvote() {
+        return is_upvote;
+    }
+
+    public void setIs_upvote(boolean is_upvote) {
+        this.is_upvote = is_upvote;
+    }
+
+    public int getUploader_id() {
+        return uploader_id;
+    }
+
+    public void setUploader_id(int uploader_id) {
+        this.uploader_id = uploader_id;
+    }
 
     public int getComment_id() {
         return comment_id;
@@ -47,12 +67,12 @@ public class CommentBean {
         this.avatar_url = avatar_url;
     }
 
-    public int getUpvote() {
-        return upvote;
+    public int getUpvote_count() {
+        return upvote_count;
     }
 
-    public void setUpvote(int upvote) {
-        this.upvote = upvote;
+    public void setUpvote_count(int upvote_count) {
+        this.upvote_count = upvote_count;
     }
 
     public int getReply_id() {

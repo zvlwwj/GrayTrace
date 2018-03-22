@@ -13,13 +13,31 @@ public class GsonGetCommentResultBean {
     public class Info {
         private int comment_id;
         private String text;
+        private int uploader_id;
         private String nick_name;
         private String avatar_url;
-        private int upvote;
+        private int upvote_count;
+        private boolean is_upvote;
         private int reply_id;
         private String type;
         private int type_id;
         private String time_stamp;
+
+        public boolean isIs_upvote() {
+            return is_upvote;
+        }
+
+        public void setIs_upvote(boolean is_upvote) {
+            this.is_upvote = is_upvote;
+        }
+
+        public int getUploader_id() {
+            return uploader_id;
+        }
+
+        public void setUploader_id(int uploader_id) {
+            this.uploader_id = uploader_id;
+        }
 
         public int getComment_id() {
             return comment_id;
@@ -53,12 +71,12 @@ public class GsonGetCommentResultBean {
             this.avatar_url = avatar_url;
         }
 
-        public int getUpvote() {
-            return upvote;
+        public int getUpvote_count() {
+            return upvote_count;
         }
 
-        public void setUpvote(int upvote) {
-            this.upvote = upvote;
+        public void setUpvote_count(int upvote_count) {
+            this.upvote_count = upvote_count;
         }
 
         public int getReply_id() {

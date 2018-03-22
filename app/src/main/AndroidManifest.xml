@@ -32,6 +32,7 @@
         <activity android:name=".activity.DraftBoxActivity"/>
         <activity android:name=".activity.PeopleActivity"/>
         <activity android:name=".activity.CommentActivity"/>
+        <activity android:name=".activity.ConversationActivity"/>
     </application>
 
 </manifest>
