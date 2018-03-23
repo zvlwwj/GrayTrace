@@ -63,6 +63,8 @@ public class CommentActivity extends AppCompatActivity {
     private BottomSheetDialog mBottomSheetDialog;
     private String reply_nickname;
     private int user_id;
+    private String type;
+    private int type_id;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -76,8 +78,10 @@ public class CommentActivity extends AppCompatActivity {
     private void initData() {
         GrayTraceApplication application = (GrayTraceApplication) getApplication();
         sharedPreferences = application.getAccountSharedPreferences();
-        commentService = application.getRetrofit().create(CommentService.class);
         user_id = sharedPreferences.getInt(Constant.SP_USER_ID,0);
+        commentService = application.getRetrofit().create(CommentService.class);
+        type = getIntent().getStringExtra(Constant.INTENT_COMMENT_TYPE);
+        type_id = getIntent().getIntExtra(Constant.INTENT_COMMENT_TYPE_ID,-1);
         getCommentList();
     }
 
@@ -91,6 +95,7 @@ public class CommentActivity extends AppCompatActivity {
         }
     }
 
+    //TODO 获取评论的时间太长，待优化
     private void getCommentList() {
         String type = getIntent().getStringExtra(Constant.INTENT_COMMENT_TYPE);
         int type_id = getIntent().getIntExtra(Constant.INTENT_COMMENT_TYPE_ID,-1);
@@ -207,6 +212,8 @@ public class CommentActivity extends AppCompatActivity {
                 }
                 Intent intent = new Intent(CommentActivity.this,ConversationActivity.class);
                 intent.putExtra(Constant.INTENT_COMMENTS,conversationComments);
+                intent.putExtra(Constant.INTENT_COMMENT_TYPE,type);
+                intent.putExtra(Constant.INTENT_COMMENT_TYPE_ID,type_id);
                 startActivity(intent);
             }
         });
@@ -373,8 +380,7 @@ public class CommentActivity extends AppCompatActivity {
             Toast.makeText(CommentActivity.this,R.string.content_empty_error,Toast.LENGTH_SHORT).show();
             return;
         }
-        String type = getIntent().getStringExtra(Constant.INTENT_COMMENT_TYPE);
-        int type_id = getIntent().getIntExtra(Constant.INTENT_COMMENT_TYPE_ID,-1);
+
         String time_stamp = Tools.getTimeStamp();
         if(type_id!=-1) {
             commentService.commitComment(text, user_id, reply_id, type, type_id,time_stamp)
@@ -397,6 +403,7 @@ public class CommentActivity extends AppCompatActivity {
                                     Toast.makeText(CommentActivity.this,R.string.commit_success,Toast.LENGTH_SHORT).show();
                                     et_comment.setText("");
                                     closeInputMethod();
+                                    onBackPressed();
                                     break;
                                 default:
                                     Toast.makeText(CommentActivity.this,R.string.commit_error,Toast.LENGTH_SHORT).show();

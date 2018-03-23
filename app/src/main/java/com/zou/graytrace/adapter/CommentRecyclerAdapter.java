@@ -98,6 +98,9 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         if(commentBean.is_upvote()){
             holder.iv_upvote.setSelected(true);
             holder.tv_upvote_count.setSelected(true);
+        }else{
+            holder.iv_upvote.setSelected(false);
+            holder.tv_upvote_count.setSelected(false);
         }
         holder.ll_upvote.setOnClickListener(new View.OnClickListener() {
             @Override
