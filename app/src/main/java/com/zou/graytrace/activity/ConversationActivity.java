@@ -27,6 +27,7 @@ import com.zou.graytrace.bean.CommentBean;
 import com.zou.graytrace.bean.GsonCommitCommentResultBean;
 import com.zou.graytrace.bean.GsonCommonResultBean;
 import com.zou.graytrace.bean.GsonDeleteResultBean;
+import com.zou.graytrace.bean.GsonGetCommentResultBean;
 
 import java.util.ArrayList;
 
@@ -56,14 +57,15 @@ public class ConversationActivity extends AppCompatActivity {
     private ArrayList<CommentBean> conversationComments;
     private CommentRecyclerAdapter adapter;
     private BottomSheetDialog mBottomSheetDialog;
-    private int reply_id = -1;
     private String reply_nickname;
     private SharedPreferences sharedPreferences;
     private int user_id;
     private CommentService commentService;
     private String type;
     private int type_id;
-
+    private int previous_id=-1;
+    private int comment_id = -1;
+    private String next_ids;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -75,21 +77,63 @@ public class ConversationActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        conversationComments = (ArrayList<CommentBean>) getIntent().getSerializableExtra(Constant.INTENT_COMMENTS);
+
         GrayTraceApplication application = (GrayTraceApplication) getApplication();
         sharedPreferences = application.getAccountSharedPreferences();
         user_id = sharedPreferences.getInt(Constant.SP_USER_ID,0);
         commentService = application.getRetrofit().create(CommentService.class);
+        previous_id =getIntent().getIntExtra(Constant.INTENT_COMMENT_PREVIOUS_ID,-1);
+        comment_id = getIntent().getIntExtra(Constant.INTENT_COMMENT_COMMENT_ID,-1);
+        next_ids = getIntent().getStringExtra(Constant.INTENT_COMMENT_NEXT_IDS);
         type = getIntent().getStringExtra(Constant.INTENT_COMMENT_TYPE);
         type_id = getIntent().getIntExtra(Constant.INTENT_COMMENT_TYPE_ID,-1);
+        commentService.getConversationList(previous_id,comment_id,next_ids,user_id)
+                .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Observer<GsonGetCommentResultBean>() {
+                    @Override
+                    public void onCompleted() {
+
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        Toast.makeText(ConversationActivity.this,R.string.get_data_error,Toast.LENGTH_SHORT).show();
+                    }
+
+                    @Override
+                    public void onNext(GsonGetCommentResultBean gsonGetCommentResultBean) {
+                        switch (gsonGetCommentResultBean.getCode()){
+                            case 0:
+                                for (GsonGetCommentResultBean.Info info:gsonGetCommentResultBean.getInfos()) {
+                                    CommentBean commentBean = new CommentBean();
+                                    commentBean.setText(info.getText());
+                                    commentBean.setAvatar_url(info.getAvatar_url());
+                                    commentBean.setComment_id(info.getComment_id());
+                                    commentBean.setUploader_id(info.getUploader_id());
+                                    commentBean.setNick_name(info.getNick_name());
+                                    commentBean.setPrevious_id(info.getPrevious_id());
+                                    commentBean.setNext_ids(info.getNext_ids());
+                                    commentBean.setTime_stamp(info.getTime_stamp());
+                                    commentBean.setType(info.getType());
+                                    commentBean.setType_id(info.getType_id());
+                                    commentBean.setUpvote_count(info.getUpvote_count());
+                                    commentBean.setIs_upvote(info.isIs_upvote());
+                                    if(conversationComments == null){
+                                        conversationComments = new ArrayList<CommentBean>();
+                                    }
+                                    conversationComments.add(commentBean);
+                                }
+                                initRecyclerView();
+                                break;
+                            default:
+                                Toast.makeText(ConversationActivity.this,R.string.get_data_error,Toast.LENGTH_SHORT).show();
+                                break;
+                        }
+                    }
+                });
     }
 
-    private void initView() {
-        setSupportActionBar(toolbar_conversation);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
+    private void initRecyclerView() {
         recyclerView_conversation.setLayoutManager(new LinearLayoutManager(this));
         adapter = new CommentRecyclerAdapter(conversationComments,this,true);
         adapter.setOnItemClickListener(new CommentRecyclerAdapter.OnItemClickListener() {
@@ -114,7 +158,7 @@ public class ConversationActivity extends AppCompatActivity {
                     ll_reply.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            reply_id = conversationComments.get(position).getComment_id();
+                            previous_id = conversationComments.get(position).getComment_id();
                             reply_nickname = conversationComments.get(position).getNick_name();
                             et_conversation_comment.setText("");
                             et_conversation_comment.setHint(getString(R.string.reply_to)+reply_nickname);
@@ -140,7 +184,6 @@ public class ConversationActivity extends AppCompatActivity {
                 mBottomSheetDialog.show();
             }
         });
-
         adapter.setOnUpvoteListener(new CommentRecyclerAdapter.OnUpvoteListener() {
             @Override
             public void onUpvote(int position,boolean isChecked) {
@@ -154,6 +197,14 @@ public class ConversationActivity extends AppCompatActivity {
             }
         });
         recyclerView_conversation.setAdapter(adapter);
+    }
+
+    private void initView() {
+        setSupportActionBar(toolbar_conversation);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     @Override
@@ -177,7 +228,7 @@ public class ConversationActivity extends AppCompatActivity {
 
         String time_stamp = Tools.getTimeStamp();
         if(type_id!=-1) {
-            commentService.commitComment(text, user_id, reply_id, type, type_id,time_stamp)
+            commentService.commitComment(text, user_id, previous_id, type, type_id,time_stamp)
                     .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<GsonCommitCommentResultBean>() {
                         @Override
@@ -333,12 +384,14 @@ public class ConversationActivity extends AppCompatActivity {
 
     interface CommentService {
         @POST("comment/add")
-        Observable<GsonCommitCommentResultBean> commitComment(@Query("text")String text,@Query("uploader_id")int uploader_id,@Query("reply_id")int reply_id,@Query("type")String type,@Query("type_id")int type_id,@Query("time_stamp")String time_stamp);
+        Observable<GsonCommitCommentResultBean> commitComment(@Query("text")String text,@Query("uploader_id")int uploader_id,@Query("previous_id")int previous_id,@Query("type")String type,@Query("type_id")int type_id,@Query("time_stamp")String time_stamp);
         @POST("comment/delete")
         Observable<GsonDeleteResultBean> deleteComment(@Query("comment_id")int comment_id, @Query("user_id")int user_id);
         @POST("/comment/upvote")
         Observable<GsonCommonResultBean> upvote(@Query("comment_id")int comment_id, @Query("user_id")int user_id);
         @POST("/comment/cancel_upvote")
         Observable<GsonCommonResultBean> cancelUpvote(@Query("comment_id")int comment_id,@Query("user_id")int user_id);
+        @POST("/comment/get/conversation")
+        Observable<GsonGetCommentResultBean> getConversationList(@Query("previous_id")int previous_id,@Query("comment_id")int comment_id,@Query("next_ids")String next_ids,@Query("user_id")int user_id);
     }
 }

@@ -86,4 +86,7 @@ public class Constant {
     public static final String COMMENT_TYPE_ARTICLE = "article";
 
     public static final String INTENT_COMMENTS ="intent_comments" ;
+    public static final String INTENT_COMMENT_PREVIOUS_ID = "intent_comment_previous_id";
+    public static final String INTENT_COMMENT_COMMENT_ID = "intent_comment_comment_id";
+    public static final String INTENT_COMMENT_NEXT_IDS = "intent_comment_next_ids";
 }

@@ -46,7 +46,6 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, final int position) {
-        boolean hasconversation = false;
         CommentBean commentBean = commentBeans.get(position);
         String avatar_url = commentBean.getAvatar_url();
         int upvote = commentBean.getUpvote_count();
@@ -58,9 +57,9 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         }
         holder.tv_upvote_count.setText(String.valueOf(upvote));
         holder.tv_comment_nick.setText(nickName);
-        if(commentBean.getReply_id()!=-1){
+        if(commentBean.getPrevious_id()!=-1){
             for(CommentBean comment:commentBeans){
-                if(comment.getComment_id() == commentBean.getReply_id()){
+                if(comment.getComment_id() == commentBean.getPrevious_id()){
                     holder.tv_comment_content.setText(context.getString(R.string.reply)+" "+comment.getNick_name()+":"+text);
                 }
             }
@@ -70,15 +69,7 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
         holder.tv_comment_time.setText(time);
         if(!look_conversation) {
             //该item是否有对话
-            for (CommentBean comment : commentBeans) {
-                if (comment.getReply_id() == commentBean.getComment_id()) {
-                    hasconversation = true;
-                }
-            }
-            if (commentBean.getReply_id() != -1) {
-                hasconversation = true;
-            }
-            if (hasconversation) {
+            if (commentBean.getPrevious_id()!=-1||commentBean.getNext_ids()!=null) {
                 holder.tv_look_conversation.setVisibility(View.VISIBLE);
             } else {
                 holder.tv_look_conversation.setVisibility(View.GONE);
@@ -126,6 +117,9 @@ public class CommentRecyclerAdapter extends RecyclerView.Adapter<CommentRecycler
 
     @Override
     public int getItemCount() {
+        if(commentBeans==null){
+            return 0;
+        }
         return commentBeans.size();
     }
 

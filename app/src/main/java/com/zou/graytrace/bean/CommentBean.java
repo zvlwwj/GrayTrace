@@ -14,7 +14,8 @@ public class CommentBean implements Serializable{
     private String avatar_url;
     private int upvote_count;
     private boolean is_upvote;
-    private int reply_id;
+    private int previous_id;
+    private String next_ids;
     private String type;
     private int type_id = -1;
     private String time_stamp;
@@ -75,12 +76,24 @@ public class CommentBean implements Serializable{
         this.upvote_count = upvote_count;
     }
 
-    public int getReply_id() {
-        return reply_id;
+    public boolean isIs_upvote() {
+        return is_upvote;
     }
 
-    public void setReply_id(int reply_id) {
-        this.reply_id = reply_id;
+    public int getPrevious_id() {
+        return previous_id;
+    }
+
+    public void setPrevious_id(int previous_id) {
+        this.previous_id = previous_id;
+    }
+
+    public String getNext_ids() {
+        return next_ids;
+    }
+
+    public void setNext_ids(String next_ids) {
+        this.next_ids = next_ids;
     }
 
     public String getType() {

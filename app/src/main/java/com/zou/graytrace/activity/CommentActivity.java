@@ -56,7 +56,7 @@ public class CommentActivity extends AppCompatActivity {
     @BindView(R.id.toolbar_comment)
     Toolbar toolbar_comment;
     private SharedPreferences sharedPreferences;
-    private int reply_id = -1;
+    private int previous_id = -1;
     private CommentService commentService;
     private ArrayList<CommentBean> commentBeans;
     private CommentRecyclerAdapter adapter;
@@ -124,7 +124,8 @@ public class CommentActivity extends AppCompatActivity {
                                         commentBean.setComment_id(info.getComment_id());
                                         commentBean.setUploader_id(info.getUploader_id());
                                         commentBean.setNick_name(info.getNick_name());
-                                        commentBean.setReply_id(info.getReply_id());
+                                        commentBean.setPrevious_id(info.getPrevious_id());
+                                        commentBean.setNext_ids(info.getNext_ids());
                                         commentBean.setTime_stamp(info.getTime_stamp());
                                         commentBean.setType(info.getType());
                                         commentBean.setType_id(info.getType_id());
@@ -172,7 +173,7 @@ public class CommentActivity extends AppCompatActivity {
                     ll_reply.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
-                            reply_id = commentBeans.get(position).getComment_id();
+                            previous_id = commentBeans.get(position).getComment_id();
                             reply_nickname = commentBeans.get(position).getNick_name();
                             et_comment.setText("");
                             et_comment.setHint(getString(R.string.reply_to)+reply_nickname);
@@ -202,16 +203,10 @@ public class CommentActivity extends AppCompatActivity {
             public void onLookConversationClick(int position) {
                 //查看对话
                 CommentBean currentComment = commentBeans.get(position);
-                ArrayList<CommentBean> conversationComments = new ArrayList<CommentBean>();
-                for(CommentBean commentBean:commentBeans){
-                    if(currentComment.getComment_id()==commentBean.getReply_id()
-                            ||currentComment.getReply_id()==commentBean.getComment_id()
-                            ||currentComment.getComment_id()==commentBean.getComment_id()){
-                        conversationComments.add(commentBean);
-                    }
-                }
                 Intent intent = new Intent(CommentActivity.this,ConversationActivity.class);
-                intent.putExtra(Constant.INTENT_COMMENTS,conversationComments);
+                intent.putExtra(Constant.INTENT_COMMENT_PREVIOUS_ID,currentComment.getPrevious_id());
+                intent.putExtra(Constant.INTENT_COMMENT_COMMENT_ID,currentComment.getComment_id());
+                intent.putExtra(Constant.INTENT_COMMENT_NEXT_IDS,currentComment.getNext_ids());
                 intent.putExtra(Constant.INTENT_COMMENT_TYPE,type);
                 intent.putExtra(Constant.INTENT_COMMENT_TYPE_ID,type_id);
                 startActivity(intent);
@@ -383,7 +378,7 @@ public class CommentActivity extends AppCompatActivity {
 
         String time_stamp = Tools.getTimeStamp();
         if(type_id!=-1) {
-            commentService.commitComment(text, user_id, reply_id, type, type_id,time_stamp)
+            commentService.commitComment(text, user_id, previous_id, type, type_id,time_stamp)
                     .subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
                     .subscribe(new Observer<GsonCommitCommentResultBean>() {
                         @Override
@@ -428,7 +423,7 @@ public class CommentActivity extends AppCompatActivity {
 
     interface CommentService {
         @POST("comment/add")
-        Observable<GsonCommitCommentResultBean> commitComment(@Query("text")String text,@Query("uploader_id")int uploader_id,@Query("reply_id")int reply_id,@Query("type")String type,@Query("type_id")int type_id,@Query("time_stamp")String time_stamp);
+        Observable<GsonCommitCommentResultBean> commitComment(@Query("text")String text,@Query("uploader_id")int uploader_id,@Query("previous_id")int previous_id,@Query("type")String type,@Query("type_id")int type_id,@Query("time_stamp")String time_stamp);
         @POST("comment/get")
         Observable<GsonGetCommentResultBean> getComment(@Query("type")String type, @Query("type_id")int type_id, @Query("user_id")int user_id);
         @POST("comment/delete")

@@ -26,8 +26,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.mukesh.countrypicker.Country;
 import com.mukesh.countrypicker.CountryPicker;
-import com.mukesh.countrypicker.CountryPickerListener;
+import com.mukesh.countrypicker.OnCountryPickerListener;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.Utils.Tools;
@@ -1162,25 +1163,21 @@ public class UploadCelebrityActivity extends AppCompatActivity{
      */
     private void showCountryPicker() {
         if (picker == null) {
-            picker = CountryPicker.newInstance(getResources().getString(R.string.select_country));
-            picker.setListener(new CountryPickerListener() {
-                @Override
-                public void onSelectCountry(String name, String code, String dialCode, int flagDrawableResID) {
-                    // Implement your code here
-                    Drawable image = getResources().getDrawable(flagDrawableResID);
-                    int h = image.getIntrinsicHeight();
-                    int w = image.getIntrinsicWidth();
-                    image.setBounds(0, 0, w / 2, h / 2);
-                    et_celebrity_nationality.setCompoundDrawables(image, null, null, null);
-                    et_celebrity_nationality.setCompoundDrawablePadding(Tools.dip2px(UploadCelebrityActivity.this, 5));
-                    et_celebrity_nationality.setText(name);
-                    picker.dismiss();
-                }
-            });
+            picker = new CountryPicker.Builder().with(this)
+                    .listener(new OnCountryPickerListener() {
+                        @Override public void onSelectCountry(Country country) {
+                            //DO something here
+                            Drawable image = getResources().getDrawable(country.getFlag());
+                            int h = image.getIntrinsicHeight();
+                            int w = image.getIntrinsicWidth();
+                            image.setBounds(0, 0, w / 2, h / 2);
+                            et_celebrity_nationality.setCompoundDrawables(image, null, null, null);
+                            et_celebrity_nationality.setCompoundDrawablePadding(Tools.dip2px(UploadCelebrityActivity.this, 5));
+                            et_celebrity_nationality.setText(country.getName());
+                        }
+                    }).build();
         }
-        if (!picker.isVisible()) {
-            picker.show(getSupportFragmentManager(), "COUNTRY_PICKER");
-        }
+        picker.showDialog(getSupportFragmentManager());
     }
 
     @Override
