@@ -13,6 +13,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:maxLines="2"
             android:textSize="22dp"
             android:text="人物：测试标题"/>
         <TextView android:layout_width="match_parent"
@@ -21,6 +22,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tv_item_creation_people_title"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
+            android:maxLines="3"
             android:text="测试内容测试内容测试内容测试内容测试内容"/>
         <ImageView android:layout_width="match_parent"
             android:layout_height="wrap_content"

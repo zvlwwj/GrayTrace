@@ -1,11 +1,17 @@
 package com.zou.graytrace.activity;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.ImageSpan;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ImageView;
@@ -17,8 +23,8 @@ import com.bumptech.glide.Glide;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Constant;
 import com.zou.graytrace.application.GrayTraceApplication;
-import com.zou.graytrace.bean.GsonGetDraftPeopleResultBean;
 import com.zou.graytrace.bean.GsonGetPeopleResultBean;
+import com.zou.graytrace.view.RichTextViewContainer;
 import com.zou.graytrace.view.TextViewPeopleContainer;
 
 import java.util.ArrayList;
@@ -46,7 +52,7 @@ public class PeopleActivity extends AppCompatActivity {
     @BindView(R.id.tv_people_name)
     TextView tv_people_name;
     @BindView(R.id.tv_people_description)
-    TextView tv_people_description;
+    RichTextViewContainer tv_people_description;
     @BindView(R.id.textViewPeopleContainer)
     TextViewPeopleContainer textViewPeopleContainer;
     @BindView(R.id.ll_reputation)
@@ -117,6 +123,7 @@ public class PeopleActivity extends AppCompatActivity {
             @Override
             public void onError(Throwable e) {
                 Toast.makeText(PeopleActivity.this,"服务器错误",Toast.LENGTH_SHORT).show();
+                e.printStackTrace();
             }
 
             @Override
@@ -155,7 +162,14 @@ public class PeopleActivity extends AppCompatActivity {
                         String people_description_id = gsonGetPeopleResultBean.getInfo().getDescription().getDescription_id();
                         if(people_description_id != null){
                             String description_text = gsonGetPeopleResultBean.getInfo().getDescription().getDescription_text();
-                            tv_people_description.setText(description_text);
+//                            tv_people_description.setText(description_text);
+                            tv_people_description.setSpanString(description_text);
+                            tv_people_description.setOnSelectMediaListener(new RichTextViewContainer.OnSelectMediaListener() {
+                                @Override
+                                public void OnSelected(int type, String url) {
+                                    Toast.makeText(PeopleActivity.this,"type: "+type+" url: "+url,Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                         //事件
                         ArrayList<GsonGetPeopleResultBean.Info.Event> events = gsonGetPeopleResultBean.getInfo().getEvents();

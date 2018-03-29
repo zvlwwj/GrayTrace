@@ -28,6 +28,8 @@ import com.zou.graytrace.fragment.MineFragment;
 import com.zou.graytrace.fragment.NearFragment;
 import com.zou.graytrace.fragment.NotificationFragment;
 import java.util.List;
+import java.util.regex.Pattern;
+
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import retrofit2.Retrofit;
@@ -69,6 +71,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         initData();
         initView();
     }

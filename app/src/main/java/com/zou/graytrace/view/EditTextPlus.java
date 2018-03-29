@@ -26,6 +26,7 @@ import android.widget.Toast;
 
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Tools;
+import com.zou.graytrace.span.VerticalCenterImageSpan;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -247,35 +248,6 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
         return ss;
     }
 
-
-    /**
-     * 自定义ImageSpan 来调整图片的位置
-     */
-    public class VerticalCenterImageSpan extends ImageSpan {
-
-        public VerticalCenterImageSpan(Drawable d, int verticalAlignment) {
-            super(d, verticalAlignment);
-        }
-
-        @Override
-        public void draw(Canvas canvas, CharSequence text, int start, int end, float x, int top, int y, int bottom, Paint paint) {
-            Drawable b = getDrawable();
-            canvas.save();
-
-            int transY = bottom - b.getBounds().bottom;
-            if (mVerticalAlignment == ALIGN_BASELINE) {
-                transY -= paint.getFontMetricsInt().descent;
-            } else if (mVerticalAlignment == ALIGN_BOTTOM) {
-
-            } else {
-                transY += paint.getFontMetricsInt().descent * 2;
-            }
-
-            canvas.translate(x, transY);
-            b.draw(canvas);
-            canvas.restore();
-        }
-    }
 
 
     /**

@@ -44,4 +44,9 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    //获取网络视频缩略图
+    compile 'com.github.wseemann:FFmpegMediaMetadataRetriever:1.0.14'
+//    compile 'com.github.wseemann:FFmpegMediaMetadataRetriever-armeabi:1.0.14'
+//    compile 'com.github.wseemann:FFmpegMediaMetadataRetriever-armeabi-v7a:1.0.14'
 }

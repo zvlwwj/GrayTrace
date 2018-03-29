@@ -371,4 +371,11 @@ public class Tools {
         List<MultipartBody.Part> partList = builder.build().parts();
         return partList;
     }
+
+    public static byte[] bitmapToByte(Bitmap bitmap){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
+        return byteArray;
+    }
 }

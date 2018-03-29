@@ -8,6 +8,8 @@ buildscript {
         mavenCentral()
     }
     dependencies {
+        //获取网络视频缩略图
+
         classpath 'com.android.tools.build:gradle:3.0.1'
         //事件注入
         classpath 'com.jakewharton:butterknife-gradle-plugin:8.8.1'
