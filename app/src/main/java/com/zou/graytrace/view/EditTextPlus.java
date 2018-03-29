@@ -3,8 +3,6 @@ package com.zou.graytrace.view;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Canvas;
-import android.graphics.Paint;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.text.Editable;
@@ -19,17 +17,25 @@ import android.util.Log;
 import android.view.Gravity;
 import android.view.MotionEvent;
 import android.view.View;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.zou.graytrace.R;
 import com.zou.graytrace.Utils.Tools;
 import com.zou.graytrace.span.VerticalCenterImageSpan;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import rx.Observable;
+import rx.Observer;
+import rx.Subscriber;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
+import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
  * Created by zou on 2018/1/25.
@@ -39,6 +45,7 @@ import java.util.List;
 
 public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
     private static String TAG = "EditTextPlus";
+    private FFmpegMediaMetadataRetriever fmmr;
     /**
      * 最大输入字符
      */
@@ -68,6 +75,72 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
     public void init() {
         setGravity(Gravity.TOP);
         addTextChangedListener(watcher);
+        fmmr = new FFmpegMediaMetadataRetriever();
+    }
+
+    /**
+     * TODO 测试！！！
+     * 显示富文本中图片和视频
+     * @param text
+     */
+    public void setSpanString(CharSequence text){
+        final SpannableString ss = new SpannableString(text);
+        String regex = "(<img src=\".*\"/>)|(<video src=\".*\"/>)";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(text);
+        while (matcher.find()){
+            final int start = matcher.start();
+            final int end = matcher.end();
+            String media_str = matcher.group();
+            if(Pattern.matches("(<img src=\".*\"/>)",media_str)){
+                final String url = media_str.substring(10,media_str.length()-3);
+                Observable.create(new Observable.OnSubscribe<Object>() {
+                    @Override
+                    public void call(Subscriber<? super Object> subscriber) {
+                        try {
+                            Bitmap bitmap =Glide.with(mContext).load(url).asBitmap().centerCrop().into(800,400).get();
+                            subscriber.onNext(bitmap);
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }).subscribeOn(Schedulers.newThread()).observeOn(AndroidSchedulers.mainThread())
+                        .subscribe(new Observer<Object>() {
+                            @Override
+                            public void onCompleted() {
+
+                            }
+
+                            @Override
+                            public void onError(Throwable e) {
+
+                            }
+
+                            @Override
+                            public void onNext(Object o) {
+                                Bitmap bitmap = (Bitmap) o;
+                                if(bitmap!=null){
+                                    BitmapDrawable drawable = new BitmapDrawable(bitmap);
+                                    ImageSpan span = new ImageSpan(drawable);
+                                    ss.setSpan(span,start,end,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                                    setText(ss);
+                                }
+                            }
+                        });
+            }else if(Pattern.matches("(<video src=\".*\"/>)",media_str)){
+                View spanView = View.inflate(getContext(), R.layout.span_video,null);
+                ImageView iv_span_video = spanView.findViewById(R.id.iv_span_video);
+                String url = media_str.substring(12,media_str.length()-3);
+                fmmr.setDataSource(url);
+                Bitmap videoThumbnail =fmmr.getFrameAtTime(1000);
+                Glide.with(mContext).load(Tools.bitmapToByte(videoThumbnail)).asBitmap().into(iv_span_video);
+                Bitmap bitmap = Tools.convertView2Bitmap(spanView);
+                Drawable drawable = new BitmapDrawable(bitmap);
+                ImageSpan span = new ImageSpan(drawable);
+                ss.setSpan(span,start,end,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+                setText(ss);
+            }
+        }
     }
 
     /**
