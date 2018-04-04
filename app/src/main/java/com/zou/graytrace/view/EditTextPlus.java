@@ -39,7 +39,6 @@ import wseemann.media.FFmpegMediaMetadataRetriever;
 
 /**
  * Created by zou on 2018/1/25.
- * TODO 需要整理无用的代码
  * TODO 考虑多张图片同时添加的需求
  */
 
@@ -79,7 +78,7 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
     }
 
     /**
-     * TODO 测试！！！
+     *
      * 显示富文本中图片和视频
      * @param text
      */
@@ -121,6 +120,7 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
                                 Bitmap bitmap = (Bitmap) o;
                                 if(bitmap!=null){
                                     BitmapDrawable drawable = new BitmapDrawable(bitmap);
+                                    drawable.setBounds(0,0,800,400);
                                     ImageSpan span = new ImageSpan(drawable);
                                     ss.setSpan(span,start,end,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                                     setText(ss);
@@ -133,9 +133,10 @@ public class EditTextPlus extends android.support.v7.widget.AppCompatEditText {
                 String url = media_str.substring(12,media_str.length()-3);
                 fmmr.setDataSource(url);
                 Bitmap videoThumbnail =fmmr.getFrameAtTime(1000);
-                Glide.with(mContext).load(Tools.bitmapToByte(videoThumbnail)).asBitmap().into(iv_span_video);
+                iv_span_video.setImageBitmap(videoThumbnail);
                 Bitmap bitmap = Tools.convertView2Bitmap(spanView);
                 Drawable drawable = new BitmapDrawable(bitmap);
+                drawable.setBounds(0,0,800,400);
                 ImageSpan span = new ImageSpan(drawable);
                 ss.setSpan(span,start,end,Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
                 setText(ss);

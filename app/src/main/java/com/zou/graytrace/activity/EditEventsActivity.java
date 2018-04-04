@@ -237,7 +237,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 String event_title = gsonPeopleEvent.getEvent_title();
                                 String event_text = gsonPeopleEvent.getEvent_text();
                                 et_event_title.setText(event_title);
-                                et_event_content.setText(event_text);
+                                et_event_content.setSpanString(event_text);
                                 et_event_content.requestFocus(event_text.length());
                                 break;
                             default:
@@ -272,7 +272,7 @@ public class EditEventsActivity extends AppCompatActivity {
                                 String event_title = gsonPeopleEvent.getEvent_title();
                                 String event_text = gsonPeopleEvent.getEvent_text();
                                 et_event_title.setText(event_title);
-                                et_event_content.setText(event_text);
+                                et_event_content.setSpanString(event_text);
                                 et_event_content.requestFocus(event_text.length());
                                 break;
                             default:

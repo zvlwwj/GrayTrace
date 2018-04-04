@@ -133,7 +133,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
                         switch (gsonPeopleDescription.getCode()){
                             case 0:
                                 String description = gsonPeopleDescription.getDescription_text();
-                                et_description_content.setText(description);
+                                et_description_content.setSpanString(description);
                                 et_description_content.requestFocus(description.length());
                                 break;
                             default:
@@ -202,7 +202,7 @@ public class EditDescriptionActivity extends AppCompatActivity {
                         switch (gsonPeopleDescriptionFromDraft.getCode()){
                             case 0:
                                 String description = gsonPeopleDescriptionFromDraft.getDescription_text();
-                                et_description_content.setText(description);
+                                et_description_content.setSpanString(description);
                                 et_description_content.requestFocus(description.length());
                                 break;
                             default:

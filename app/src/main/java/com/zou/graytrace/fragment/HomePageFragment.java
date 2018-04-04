@@ -77,7 +77,7 @@ public class HomePageFragment extends BaseFragment {
 
         List<Fragment> fragments = new ArrayList<>();
         fragments.add(AttentionFragment.getInstance());
-        fragments.add(CelebrityFragment.getInstance());
+        fragments.add(RecommendFragment.getInstance());
         fragments.add(MementoFragment.getInstance());
 
         viewPager.setOffscreenPageLimit(2);
